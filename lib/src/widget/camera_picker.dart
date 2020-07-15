@@ -39,6 +39,69 @@ class CameraPicker extends StatefulWidget {
 
   final ThemeData theme;
 
+  /// Static method to create [AssetEntity] through camera.
+  /// 通过相机创建 [AssetEntity] 的静态方法
+  static Future<AssetEntity> pickFromCamera(
+    BuildContext context, {
+    bool shouldKeptInLocal = true,
+  }) async {
+    final AssetEntity result = await Navigator.of(
+      context,
+      rootNavigator: true,
+    ).push<AssetEntity>(
+      SlidePageTransitionBuilder<AssetEntity>(
+        builder: CameraPicker(
+          shouldKeptInLocal: shouldKeptInLocal,
+        ),
+        transitionCurve: Curves.easeIn,
+        transitionDuration: const Duration(milliseconds: 300),
+      ),
+    );
+    return result;
+  }
+
+  /// Build a dark theme according to the theme color.
+  /// 通过主题色构建一个默认的暗黑主题
+  static ThemeData themeData(Color themeColor) => ThemeData.dark().copyWith(
+    buttonColor: themeColor,
+    brightness: Brightness.dark,
+    primaryColor: Colors.grey[900],
+    primaryColorBrightness: Brightness.dark,
+    primaryColorLight: Colors.grey[900],
+    primaryColorDark: Colors.grey[900],
+    accentColor: themeColor,
+    accentColorBrightness: Brightness.dark,
+    canvasColor: Colors.grey[850],
+    scaffoldBackgroundColor: Colors.grey[900],
+    bottomAppBarColor: Colors.grey[900],
+    cardColor: Colors.grey[900],
+    highlightColor: Colors.transparent,
+    toggleableActiveColor: themeColor,
+    cursorColor: themeColor,
+    textSelectionColor: themeColor.withAlpha(100),
+    textSelectionHandleColor: themeColor,
+    indicatorColor: themeColor,
+    appBarTheme: const AppBarTheme(
+      brightness: Brightness.dark,
+      elevation: 0,
+    ),
+    colorScheme: ColorScheme(
+      primary: Colors.grey[900],
+      primaryVariant: Colors.grey[900],
+      secondary: themeColor,
+      secondaryVariant: themeColor,
+      background: Colors.grey[900],
+      surface: Colors.grey[900],
+      brightness: Brightness.dark,
+      error: const Color(0xffcf6679),
+      onPrimary: Colors.black,
+      onSecondary: Colors.black,
+      onSurface: Colors.white,
+      onBackground: Colors.white,
+      onError: Colors.black,
+    ),
+  );
+
   @override
   _CameraPickerState createState() => _CameraPickerState();
 }
@@ -85,6 +148,8 @@ class _CameraPickerState extends State<CameraPicker> {
   @override
   void initState() {
     super.initState();
+    _theme = widget.theme ?? CameraPicker.themeData(C.themeColor);
+
     // TODO(Alex): Currently hide status bar will cause the viewport shaking on Android.
     /// Hide system status bar automatically on iOS.
     /// 在iOS设备上自动隐藏状态栏
