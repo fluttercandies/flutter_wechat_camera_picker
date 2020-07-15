@@ -30,9 +30,11 @@ class CircleProgressBar extends StatefulWidget {
   State<StatefulWidget> createState() => CircleProgressState();
 }
 
-class CircleProgressState extends State<CircleProgressBar> with SingleTickerProviderStateMixin {
+class CircleProgressState extends State<CircleProgressBar>
+    with SingleTickerProviderStateMixin {
   final GlobalKey paintKey = GlobalKey();
-  final StreamController<double> progressStreamController = StreamController<double>.broadcast();
+  final StreamController<double> progressStreamController =
+      StreamController<double>.broadcast();
 
   AnimationController progressController;
   Animation<double> progressAnimation;
@@ -119,22 +121,22 @@ class ProgressPainter extends CustomPainter {
     final double innerRadius = center - ringsWidth * 2;
 
 //    if (progress > 0.0) {
-      final double progressWidth = outerRadius - innerRadius;
+    final double progressWidth = outerRadius - innerRadius;
 //      if (radians > 0.0) {
-        canvas.save();
-        canvas.translate(0.0, size.width);
-        canvas.rotate(-90.0.toRad);
-        final Rect arcRect = Rect.fromCircle(
-          center: offsetCenter,
-          radius: drawRadius,
-        );
-        final Paint progressPaint = Paint()
-          ..color = ringsColor
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = progressWidth;
-        canvas
-          ..drawArc(arcRect, 0, radians, false, progressPaint)
-          ..restore();
+    canvas.save();
+    canvas.translate(0.0, size.width);
+    canvas.rotate(-90.0.toRad);
+    final Rect arcRect = Rect.fromCircle(
+      center: offsetCenter,
+      radius: drawRadius,
+    );
+    final Paint progressPaint = Paint()
+      ..color = ringsColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = progressWidth;
+    canvas
+      ..drawArc(arcRect, 0, radians, false, progressPaint)
+      ..restore();
 //      }
 //    }
   }

@@ -76,9 +76,14 @@ class _TempPickerState extends State<TempPicker> {
               Center(
                 child: AnimatedContainer(
                   duration: kThemeChangeDuration,
-                  width: isShootingButtonAnimate ? outerSize.width : (Screens.width / 5),
-                  height: isShootingButtonAnimate ? outerSize.height : (Screens.width / 5),
-                  padding: EdgeInsets.all(Screens.width / (isShootingButtonAnimate ? 10 : 35)),
+                  width: isShootingButtonAnimate
+                      ? outerSize.width
+                      : (Screens.width / 5),
+                  height: isShootingButtonAnimate
+                      ? outerSize.height
+                      : (Screens.width / 5),
+                  padding: EdgeInsets.all(
+                      Screens.width / (isShootingButtonAnimate ? 10 : 35)),
                   decoration: BoxDecoration(
                     color: Colors.white30,
                     shape: BoxShape.circle,
@@ -91,11 +96,12 @@ class _TempPickerState extends State<TempPicker> {
                   ),
                 ),
               ),
-              if (isShowingProgress) CircleProgressBar(
-                duration: 15.seconds,
-                outerRadius: outerSize.width,
-                ringsWidth: 2.0,
-              ),
+              if (isShowingProgress)
+                CircleProgressBar(
+                  duration: 15.seconds,
+                  outerRadius: outerSize.width,
+                  ringsWidth: 2.0,
+                ),
             ],
           ),
         ),

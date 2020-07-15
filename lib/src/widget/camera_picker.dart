@@ -67,44 +67,44 @@ class CameraPicker extends StatefulWidget {
   /// Build a dark theme according to the theme color.
   /// 通过主题色构建一个默认的暗黑主题
   static ThemeData themeData(Color themeColor) => ThemeData.dark().copyWith(
-    buttonColor: themeColor,
-    brightness: Brightness.dark,
-    primaryColor: Colors.grey[900],
-    primaryColorBrightness: Brightness.dark,
-    primaryColorLight: Colors.grey[900],
-    primaryColorDark: Colors.grey[900],
-    accentColor: themeColor,
-    accentColorBrightness: Brightness.dark,
-    canvasColor: Colors.grey[850],
-    scaffoldBackgroundColor: Colors.grey[900],
-    bottomAppBarColor: Colors.grey[900],
-    cardColor: Colors.grey[900],
-    highlightColor: Colors.transparent,
-    toggleableActiveColor: themeColor,
-    cursorColor: themeColor,
-    textSelectionColor: themeColor.withAlpha(100),
-    textSelectionHandleColor: themeColor,
-    indicatorColor: themeColor,
-    appBarTheme: const AppBarTheme(
-      brightness: Brightness.dark,
-      elevation: 0,
-    ),
-    colorScheme: ColorScheme(
-      primary: Colors.grey[900],
-      primaryVariant: Colors.grey[900],
-      secondary: themeColor,
-      secondaryVariant: themeColor,
-      background: Colors.grey[900],
-      surface: Colors.grey[900],
-      brightness: Brightness.dark,
-      error: const Color(0xffcf6679),
-      onPrimary: Colors.black,
-      onSecondary: Colors.black,
-      onSurface: Colors.white,
-      onBackground: Colors.white,
-      onError: Colors.black,
-    ),
-  );
+        buttonColor: themeColor,
+        brightness: Brightness.dark,
+        primaryColor: Colors.grey[900],
+        primaryColorBrightness: Brightness.dark,
+        primaryColorLight: Colors.grey[900],
+        primaryColorDark: Colors.grey[900],
+        accentColor: themeColor,
+        accentColorBrightness: Brightness.dark,
+        canvasColor: Colors.grey[850],
+        scaffoldBackgroundColor: Colors.grey[900],
+        bottomAppBarColor: Colors.grey[900],
+        cardColor: Colors.grey[900],
+        highlightColor: Colors.transparent,
+        toggleableActiveColor: themeColor,
+        cursorColor: themeColor,
+        textSelectionColor: themeColor.withAlpha(100),
+        textSelectionHandleColor: themeColor,
+        indicatorColor: themeColor,
+        appBarTheme: const AppBarTheme(
+          brightness: Brightness.dark,
+          elevation: 0,
+        ),
+        colorScheme: ColorScheme(
+          primary: Colors.grey[900],
+          primaryVariant: Colors.grey[900],
+          secondary: themeColor,
+          secondaryVariant: themeColor,
+          background: Colors.grey[900],
+          surface: Colors.grey[900],
+          brightness: Brightness.dark,
+          error: const Color(0xffcf6679),
+          onPrimary: Colors.black,
+          onSecondary: Colors.black,
+          onSurface: Colors.white,
+          onBackground: Colors.white,
+          onError: Colors.black,
+        ),
+      );
 
   @override
   _CameraPickerState createState() => _CameraPickerState();
@@ -438,9 +438,14 @@ class _CameraPickerState extends State<CameraPicker> {
               Center(
                 child: AnimatedContainer(
                   duration: kThemeChangeDuration,
-                  width: isShootingButtonAnimate ? outerSize.width : (Screens.width / 5),
-                  height: isShootingButtonAnimate ? outerSize.height : (Screens.width / 5),
-                  padding: EdgeInsets.all(Screens.width / (isShootingButtonAnimate ? 10 : 35)),
+                  width: isShootingButtonAnimate
+                      ? outerSize.width
+                      : (Screens.width / 5),
+                  height: isShootingButtonAnimate
+                      ? outerSize.height
+                      : (Screens.width / 5),
+                  padding: EdgeInsets.all(
+                      Screens.width / (isShootingButtonAnimate ? 10 : 35)),
                   decoration: BoxDecoration(
                     color: Colors.white30,
                     shape: BoxShape.circle,
@@ -453,11 +458,12 @@ class _CameraPickerState extends State<CameraPicker> {
                   ),
                 ),
               ),
-              if (isShowingProgress) CircleProgressBar(
-                duration: 15.seconds,
-                outerRadius: outerSize.width,
-                ringsWidth: 2.0,
-              ),
+              if (isShowingProgress)
+                CircleProgressBar(
+                  duration: 15.seconds,
+                  outerRadius: outerSize.width,
+                  ringsWidth: 2.0,
+                ),
             ],
           ),
         ),
