@@ -2,6 +2,7 @@
 /// [Author] Alex (https://github.com/AlexV525)
 /// [Date] 2020/7/13 11:08
 ///
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -12,6 +13,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 import '../constants/constants.dart';
+import '../widget/circular_progress_bar.dart';
+
+import 'builder/slide_page_transition_builder.dart';
 
 /// Create a camera picker integrate with [CameraDescription].
 /// 通过 [CameraDescription] 整合的拍照选择
@@ -107,6 +111,10 @@ class CameraPicker extends StatefulWidget {
 }
 
 class _CameraPickerState extends State<CameraPicker> {
+  /// The [Duration] for record detection. (200ms)
+  /// 检测是否开始录制的时长 (200毫秒)
+  final Duration recordDetectDuration = kThemeChangeDuration;
+
   /// Available cameras.
   /// 可用的相机实例
   List<CameraDescription> cameras;
@@ -126,6 +134,29 @@ class _CameraPickerState extends State<CameraPicker> {
   /// The path of the taken file.
   /// 拍照文件的路径。
   String takenFilePath;
+
+  /// Whether the [shootingButton] should animate according to the gesture.
+  /// 拍照按钮是否需要执行动画
+  ///
+  /// This happens when the [shootingButton] is being long pressed. It will animate
+  /// for video recording state.
+  /// 当长按拍照按钮时，会进入准备录制视频的状态，此时需要执行动画。
+  bool isShootingButtonAnimate = false;
+
+  /// Whether the recording progress should display.
+  /// 视频录制的进度是否显示
+  ///
+  /// After [shootingButton] animated, the [CircleProgressBar] will become visible.
+  /// 当拍照按钮动画执行结束后，进度将变为可见状态并开始更新其状态。
+  bool isShowingProgress = false;
+
+  /// The [Timer] for record start detection.
+  /// 用于检测是否开始录制的定时器
+  ///
+  /// When the [shootingButton] started animate, this [Timer] will start at the same
+  /// time. When the time is more than [recordDetectDuration], which means we should
+  /// start recoding, the timer finished.
+  Timer recordDetectTimer;
 
   /// Whether the current [CameraDescription] initialized.
   /// 当前的相机实例是否已完成初始化
@@ -329,7 +360,7 @@ class _CameraPickerState extends State<CameraPicker> {
   /// 该区域显示在屏幕下方。
   Widget get shootingActions {
     return SizedBox(
-      height: Screens.width / 5,
+      height: Screens.width / 3.5,
       child: Row(
         children: <Widget>[
           Expanded(child: Center(child: backButton)),
@@ -368,21 +399,66 @@ class _CameraPickerState extends State<CameraPicker> {
   /// 拍照按钮
   // TODO(Alex): Need further integration with video recording.
   Widget get shootingButton {
-    return InkWell(
-      borderRadius: maxBorderRadius,
-      onTap: takePicture,
-      child: Container(
-        width: Screens.width / 5,
-        height: Screens.width / 5,
-        padding: const EdgeInsets.all(12.0),
-        decoration: BoxDecoration(
-          color: Colors.white30,
-          shape: BoxShape.circle,
-        ),
-        child: const DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
+    final Size outerSize = Size.square(Screens.width / 3.5);
+    return Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerUp: (PointerUpEvent event) {
+        recordDetectTimer?.cancel();
+        if (isShowingProgress) {
+          isShowingProgress = false;
+          if (mounted) {
+            setState(() {});
+          }
+        }
+        if (isShootingButtonAnimate) {
+          isShootingButtonAnimate = false;
+          if (mounted) {
+            setState(() {});
+          }
+        }
+      },
+      child: InkWell(
+        borderRadius: maxBorderRadius,
+        onTap: () {},
+        onLongPress: () {
+          recordDetectTimer = Timer(recordDetectDuration, () {
+            isShowingProgress = true;
+            if (mounted) {
+              setState(() {});
+            }
+          });
+          setState(() {
+            isShootingButtonAnimate = true;
+          });
+        },
+        child: SizedBox.fromSize(
+          size: outerSize,
+          child: Stack(
+            children: <Widget>[
+              Center(
+                child: AnimatedContainer(
+                  duration: kThemeChangeDuration,
+                  width: isShootingButtonAnimate ? outerSize.width : (Screens.width / 5),
+                  height: isShootingButtonAnimate ? outerSize.height : (Screens.width / 5),
+                  padding: EdgeInsets.all(Screens.width / (isShootingButtonAnimate ? 10 : 35)),
+                  decoration: BoxDecoration(
+                    color: Colors.white30,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ),
+              if (isShowingProgress) CircleProgressBar(
+                duration: 15.seconds,
+                outerRadius: outerSize.width,
+                ringsWidth: 2.0,
+              ),
+            ],
           ),
         ),
       ),
