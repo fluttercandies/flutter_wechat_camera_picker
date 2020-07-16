@@ -143,12 +143,12 @@ class _CameraPickerState extends State<CameraPicker> {
   /// 当长按拍照按钮时，会进入准备录制视频的状态，此时需要执行动画。
   bool isShootingButtonAnimate = false;
 
-  /// Whether the recording progress should display.
-  /// 视频录制的进度是否显示
+  /// Whether the recording progress started.
+  /// 是否已开始录制视频
   ///
   /// After [shootingButton] animated, the [CircleProgressBar] will become visible.
   /// 当拍照按钮动画执行结束后，进度将变为可见状态并开始更新其状态。
-  bool isShowingProgress = false;
+  bool isRecording = false;
 
   /// The [Timer] for record start detection.
   /// 用于检测是否开始录制的定时器
@@ -363,7 +363,9 @@ class _CameraPickerState extends State<CameraPicker> {
       height: Screens.width / 3.5,
       child: Row(
         children: <Widget>[
-          Expanded(child: Center(child: backButton)),
+          Expanded(
+            child: !isRecording ? Center(child: backButton) : const SizedBox.shrink(),
+          ),
           Expanded(child: Center(child: shootingButton)),
           const Spacer(),
         ],
@@ -404,8 +406,8 @@ class _CameraPickerState extends State<CameraPicker> {
       behavior: HitTestBehavior.opaque,
       onPointerUp: (PointerUpEvent event) {
         recordDetectTimer?.cancel();
-        if (isShowingProgress) {
-          isShowingProgress = false;
+        if (isRecording) {
+          isRecording = false;
           if (mounted) {
             setState(() {});
           }
@@ -422,7 +424,7 @@ class _CameraPickerState extends State<CameraPicker> {
         onTap: () {},
         onLongPress: () {
           recordDetectTimer = Timer(recordDetectDuration, () {
-            isShowingProgress = true;
+            isRecording = true;
             if (mounted) {
               setState(() {});
             }
@@ -458,7 +460,7 @@ class _CameraPickerState extends State<CameraPicker> {
                   ),
                 ),
               ),
-              if (isShowingProgress)
+              if (isRecording)
                 CircleProgressBar(
                   duration: 15.seconds,
                   outerRadius: outerSize.width,
