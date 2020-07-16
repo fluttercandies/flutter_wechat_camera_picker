@@ -32,7 +32,7 @@ class DefaultCameraPickerTextDelegate implements CameraPickerTextDelegate {
   String shootingTips = '轻触拍照';
 }
 
-/// Default text delegate implements with Chinese.
+/// Default text delegate including recording implements with Chinese.
 /// 中文文字实现
 class DefaultCameraPickerTextDelegateWithRecording
     implements CameraPickerTextDelegate {
@@ -65,4 +65,22 @@ class EnglishCameraPickerTextDelegate implements CameraPickerTextDelegate {
 
   @override
   String shootingTips = 'Tap to take photo.';
+}
+
+/// Default text delegate including recording implements with English.
+/// 英文文字实现
+class EnglishCameraPickerTextDelegateWithRecording
+    implements CameraPickerTextDelegate {
+  factory EnglishCameraPickerTextDelegateWithRecording() => _instance;
+
+  EnglishCameraPickerTextDelegateWithRecording._internal();
+
+  static final EnglishCameraPickerTextDelegateWithRecording _instance =
+      EnglishCameraPickerTextDelegateWithRecording._internal();
+
+  @override
+  String confirm = 'Confirm';
+
+  @override
+  String shootingTips = 'Tap to take photo. Long press to record video.';
 }

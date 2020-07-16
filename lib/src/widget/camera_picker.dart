@@ -22,6 +22,7 @@ import 'camera_picker_viewer.dart';
 /// The picker provides create an [AssetEntity] through the camera.
 /// However, this might failed (high probability) if there're any steps
 /// went wrong during the process.
+///
 /// 该选择器可以通过拍照创建 [AssetEntity] ，但由于过程中有的步骤随时会出现问题，
 /// 使用时有较高的概率会遇到失败。
 class CameraPicker extends StatefulWidget {
@@ -33,7 +34,10 @@ class CameraPicker extends StatefulWidget {
     this.theme,
     CameraPickerTextDelegate textDelegate,
   }) : super(key: key) {
-    Constants.textDelegate = textDelegate ?? DefaultCameraPickerTextDelegate();
+    Constants.textDelegate = textDelegate ??
+        (isAllowRecording
+            ? DefaultCameraPickerTextDelegateWithRecording()
+            : DefaultCameraPickerTextDelegate());
   }
 
   /// Whether the taken file should be kept in local.
@@ -155,6 +159,7 @@ class CameraPickerState extends State<CameraPicker> {
   ///
   /// This happens when the [shootingButton] is being long pressed. It will animate
   /// for video recording state.
+  ///
   /// 当长按拍照按钮时，会进入准备录制视频的状态，此时需要执行动画。
   bool isShootingButtonAnimate = false;
 
@@ -162,8 +167,9 @@ class CameraPickerState extends State<CameraPicker> {
   /// 是否已开始录制视频
   ///
   /// After [shootingButton] animated, the [CircleProgressBar] will become visible.
+  ///
   /// 当拍照按钮动画执行结束后，进度将变为可见状态并开始更新其状态。
-  bool isRecording = false;
+  bool get isRecording => cameraController?.value?.isRecordingVideo ?? false;
 
   /// The [Timer] for record start detection.
   /// 用于检测是否开始录制的定时器
@@ -171,7 +177,19 @@ class CameraPickerState extends State<CameraPicker> {
   /// When the [shootingButton] started animate, this [Timer] will start at the same
   /// time. When the time is more than [recordDetectDuration], which means we should
   /// start recoding, the timer finished.
+  ///
+  /// 当拍摄按钮开始执行动画时，定时器会同时启动。时长超过检测时长时，定时器完成。
   Timer recordDetectTimer;
+
+  /// The [Timer] for record countdown.
+  /// 用于录制视频倒计时的计时器
+  ///
+  /// When the record time reached the [maximumRecordingDuration], stop the recording.
+  /// However, if there's no limitation on record time, this will be useless.
+  ///
+  /// 当录像时间达到了最大时长，将通过定时器停止录像。
+  /// 但如果录像时间没有限制，定时器将不会起作用。
+  Timer recordCountdownTimer;
 
   /// Whether the current [CameraDescription] initialized.
   /// 当前的相机实例是否已完成初始化
@@ -185,13 +203,17 @@ class CameraPickerState extends State<CameraPicker> {
   /// 选择器是否可以录像（非空包装）
   bool get isAllowRecording => widget.isAllowRecording ?? false;
 
+  /// Getter for `widget.maximumRecordingDuration` .
+  Duration get maximumRecordingDuration => widget.maximumRecordingDuration;
+
   /// Whether the recording restricted to a specific duration.
   /// 录像是否有限制的时长
   ///
   /// It's **NON-GUARANTEE** for stability if there's no limitation on the record duration.
   /// This is still an experimental control.
+  ///
   /// 如果拍摄时长没有限制，不保证稳定性。它仍然是一项实验性的控制。
-  bool get isRecordingRestricted => widget.maximumRecordingDuration != null;
+  bool get isRecordingRestricted => maximumRecordingDuration != null;
 
   /// The path of the taken picture file.
   /// 拍照文件的路径
@@ -301,6 +323,7 @@ class CameraPickerState extends State<CameraPicker> {
   ///
   /// Switch cameras in order. When the [currentCameraIndex] reached the length
   /// of cameras, start from the beginning.
+  ///
   /// 按顺序切换相机。当达到相机数量时从头开始。
   void switchCameras() {
     ++currentCameraIndex;
@@ -315,6 +338,7 @@ class CameraPickerState extends State<CameraPicker> {
   ///
   /// The picture will only taken when [isInitialized], and the camera is not
   /// taking pictures.
+  ///
   /// 仅当初始化成功且相机未在拍照时拍照。
   Future<void> takePicture() async {
     if (isInitialized && !cameraController.value.isTakingPicture) {
@@ -322,11 +346,26 @@ class CameraPickerState extends State<CameraPicker> {
         final String path = '${cacheFilePath}_$currentTimeStamp.jpg';
         await cameraController.takePicture(path);
         takenPictureFilePath = path;
-        if (mounted) {
-          setState(() {});
+
+        final AssetEntity entity = await CameraPickerViewer.pushToViewer(
+          context,
+          pickerState: this,
+          pickerType: CameraPickerViewType.image,
+          previewFile: takenPictureFile,
+          previewFilePath: takenPictureFilePath,
+          theme: theme,
+        );
+        if (entity != null) {
+          Navigator.of(context).pop(entity);
+        } else {
+          takenPictureFilePath = null;
+          if (mounted) {
+            setState(() {});
+          }
         }
       } catch (e) {
         realDebugPrint('Error when taking pictures: $e');
+        takenPictureFilePath = null;
       }
     }
   }
@@ -376,8 +415,19 @@ class CameraPickerState extends State<CameraPicker> {
   /// 设置拍摄文件路径并开始录制视频
   void startRecordingVideo() {
     final String filePath = '${cacheFilePath}_$currentTimeStamp.mp4';
+    takenVideoFilePath = filePath;
     if (!cameraController.value.isRecordingVideo) {
-      cameraController.startVideoRecording(filePath).catchError((dynamic e) {
+      cameraController.startVideoRecording(filePath).then((dynamic _) {
+        if (mounted) {
+          setState(() {});
+        }
+        if (isRecordingRestricted) {
+          recordCountdownTimer = Timer(maximumRecordingDuration, () {
+            stopRecordingVideo();
+          });
+        }
+      }).catchError((dynamic e) {
+        takenVideoFilePath = null;
         realDebugPrint('Error when recording video: $e');
         if (cameraController.value.isRecordingVideo) {
           cameraController.stopVideoRecording().catchError((dynamic e) {
@@ -388,27 +438,34 @@ class CameraPickerState extends State<CameraPicker> {
     }
   }
 
-  /// Stop
+  /// Stop the recording process.
+  /// 停止录制视频
   Future<void> stopRecordingVideo() async {
     if (cameraController.value.isRecordingVideo) {
-      cameraController.stopVideoRecording().then((dynamic result) {
-        // TODO(Alex): Jump to the viewer.
+      cameraController.stopVideoRecording().then((dynamic result) async {
+        final AssetEntity entity = await CameraPickerViewer.pushToViewer(
+          context,
+          pickerState: this,
+          pickerType: CameraPickerViewType.video,
+          previewFile: takenVideoFile,
+          previewFilePath: takenVideoFilePath,
+          theme: theme,
+        );
+        if (entity != null) {
+          Navigator.of(context).pop(entity);
+        } else {
+          takenVideoFilePath = null;
+          if (mounted) {
+            setState(() {});
+          }
+        }
       }).catchError((dynamic e) {
         realDebugPrint('Error when stop recording video: $e');
+      }).whenComplete(() {
+        isShootingButtonAnimate = false;
+        takenVideoFilePath = null;
       });
     }
-  }
-
-  /// Make sure the [takenPictureFilePath] is `null` before pop.
-  /// Otherwise, make it `null` .
-  Future<bool> clearTakenFileBeforePop() async {
-    if (takenPictureFilePath != null) {
-      setState(() {
-        takenPictureFilePath = null;
-      });
-      return false;
-    }
-    return true;
   }
 
   /// Settings action section widget.
@@ -474,7 +531,9 @@ class CameraPickerState extends State<CameraPicker> {
       child: Row(
         children: <Widget>[
           Expanded(
-            child: !isRecording ? Center(child: backButton) : const SizedBox.shrink(),
+            child: !isRecording
+                ? Center(child: backButton)
+                : const SizedBox.shrink(),
           ),
           Expanded(child: Center(child: shootingButton)),
           const Spacer(),
@@ -526,8 +585,12 @@ class CameraPickerState extends State<CameraPicker> {
               Center(
                 child: AnimatedContainer(
                   duration: kThemeChangeDuration,
-                  width: isShootingButtonAnimate ? outerSize.width : (Screens.width / 5),
-                  height: isShootingButtonAnimate ? outerSize.height : (Screens.width / 5),
+                  width: isShootingButtonAnimate
+                      ? outerSize.width
+                      : (Screens.width / 5),
+                  height: isShootingButtonAnimate
+                      ? outerSize.height
+                      : (Screens.width / 5),
                   padding: EdgeInsets.all(
                     Screens.width / (isShootingButtonAnimate ? 10 : 35),
                   ),
@@ -558,38 +621,35 @@ class CameraPickerState extends State<CameraPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: clearTakenFileBeforePop,
-      child: Theme(
-        data: theme,
-        child: Material(
-          color: Colors.black,
-          child: Stack(
-            children: <Widget>[
-              if (isInitialized)
-                Center(
-                  child: AspectRatio(
-                    aspectRatio: cameraController.value.aspectRatio,
-                    child: CameraPreview(cameraController),
-                  ),
-                )
-              else
-                const SizedBox.shrink(),
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: Column(
-                    children: <Widget>[
-                      settingsAction,
-                      const Spacer(),
-                      tipsTextWidget,
-                      shootingActions,
-                    ],
-                  ),
+    return Theme(
+      data: theme,
+      child: Material(
+        color: Colors.black,
+        child: Stack(
+          children: <Widget>[
+            if (isInitialized)
+              Center(
+                child: AspectRatio(
+                  aspectRatio: cameraController.value.aspectRatio,
+                  child: CameraPreview(cameraController),
+                ),
+              )
+            else
+              const SizedBox.shrink(),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: Column(
+                  children: <Widget>[
+                    settingsAction,
+                    const Spacer(),
+                    tipsTextWidget,
+                    shootingActions,
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

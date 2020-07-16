@@ -15,13 +15,13 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  const MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
@@ -30,42 +30,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            FlatButton(
-              onPressed: () {
-                CameraPicker.pickFromCamera(context);
-//                Navigator.of(context).push(
-//                  MaterialPageRoute<void>(
-//                    builder: (BuildContext _) => TempPicker(),
-//                  ),
-//                );
-              },
-              child: const Text('test'),
-            )
-          ],
-        ),
-      ),
+      body: const Center(),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () {
+          CameraPicker.pickFromCamera(
+            context,
+            isAllowRecording: true,
+          );
+        },
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: Icon(Icons.camera_enhance),
       ),
     );
   }
