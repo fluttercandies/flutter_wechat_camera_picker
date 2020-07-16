@@ -26,12 +26,15 @@ import 'builder/slide_page_transition_builder.dart';
 /// 该选择器可以通过拍照创建 [AssetEntity] ，但由于过程中有的步骤随时会出现问题，
 /// 使用时有较高的概率会遇到失败。
 class CameraPicker extends StatefulWidget {
-  const CameraPicker({
+  CameraPicker({
     Key key,
     this.shouldKeptInLocal = false,
     this.isAllowRecording = false,
     this.theme,
-  }) : super(key: key);
+    CameraPickerTextDelegate textDelegate,
+  }) : super(key: key) {
+    Constants.textDelegate = textDelegate ?? DefaultCameraPickerTextDelegate();
+  }
 
   /// Whether the taken file should be kept in local.
   /// 拍照的文件是否应该保存在本地
@@ -47,7 +50,10 @@ class CameraPicker extends StatefulWidget {
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity> pickFromCamera(
     BuildContext context, {
-    bool shouldKeptInLocal = true,
+    bool shouldKeptInLocal = false,
+    bool isAllowRecording = false,
+    ThemeData theme,
+    CameraPickerTextDelegate textDelegate,
   }) async {
     final AssetEntity result = await Navigator.of(
       context,
@@ -56,6 +62,9 @@ class CameraPicker extends StatefulWidget {
       SlidePageTransitionBuilder<AssetEntity>(
         builder: CameraPicker(
           shouldKeptInLocal: shouldKeptInLocal,
+          isAllowRecording: isAllowRecording,
+          theme: theme,
+          textDelegate: textDelegate,
         ),
         transitionCurve: Curves.easeIn,
         transitionDuration: const Duration(milliseconds: 300),
@@ -353,6 +362,24 @@ class _CameraPickerState extends State<CameraPicker> {
     );
   }
 
+  /// Text widget for shooting tips.
+  /// 拍摄的提示文字
+  Widget get tipsTextWidget {
+    return AnimatedOpacity(
+      duration: recordDetectDuration,
+      opacity: isRecording ? 0.0 : 1.0,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          vertical: 20.0,
+        ),
+        child: Text(
+          Constants.textDelegate.shootingTips,
+          style: const TextStyle(fontSize: 15.0),
+        ),
+      ),
+    );
+  }
+
   /// Shooting action section widget.
   /// 拍照操作区
   ///
@@ -588,9 +615,10 @@ class _CameraPickerState extends State<CameraPicker> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       settingsAction,
+                      const Spacer(),
+                      tipsTextWidget,
                       shootingActions,
                     ],
                   ),
