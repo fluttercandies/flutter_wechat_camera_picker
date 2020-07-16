@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 import '../constants/constants.dart';
 import '../widget/circular_progress_bar.dart';
@@ -174,6 +173,10 @@ class _CameraPickerState extends State<CameraPicker> {
   /// Whether the taken file should be kept in local. (A non-null wrapper)
   /// 拍照的文件是否应该保存在本地（非空包装）
   bool get shouldKeptInLocal => widget.shouldKeptInLocal ?? false;
+
+  /// Whether the picker can record video. (A non-null wrapper)
+  /// 选择器是否可以录像（非空包装）
+  bool get isAllowRecording => widget.isAllowRecording ?? false;
 
   /// A getter to the current [CameraDescription].
   /// 获取当前相机实例
@@ -431,35 +434,39 @@ class _CameraPickerState extends State<CameraPicker> {
     final Size outerSize = Size.square(Screens.width / 3.5);
     return Listener(
       behavior: HitTestBehavior.opaque,
-      onPointerUp: (PointerUpEvent event) {
-        recordDetectTimer?.cancel();
-        if (isRecording) {
-          isRecording = false;
-          if (mounted) {
-            setState(() {});
-          }
-        }
-        if (isShootingButtonAnimate) {
-          isShootingButtonAnimate = false;
-          if (mounted) {
-            setState(() {});
-          }
-        }
-      },
+      onPointerUp: isAllowRecording
+          ? (PointerUpEvent event) {
+              recordDetectTimer?.cancel();
+              if (isRecording) {
+                isRecording = false;
+                if (mounted) {
+                  setState(() {});
+                }
+              }
+              if (isShootingButtonAnimate) {
+                isShootingButtonAnimate = false;
+                if (mounted) {
+                  setState(() {});
+                }
+              }
+            }
+          : null,
       child: InkWell(
         borderRadius: maxBorderRadius,
-        onTap: () {},
-        onLongPress: () {
-          recordDetectTimer = Timer(recordDetectDuration, () {
-            isRecording = true;
-            if (mounted) {
-              setState(() {});
-            }
-          });
-          setState(() {
-            isShootingButtonAnimate = true;
-          });
-        },
+        onTap: takePicture,
+        onLongPress: isAllowRecording
+            ? () {
+                recordDetectTimer = Timer(recordDetectDuration, () {
+                  isRecording = true;
+                  if (mounted) {
+                    setState(() {});
+                  }
+                });
+                setState(() {
+                  isShootingButtonAnimate = true;
+                });
+              }
+            : null,
         child: SizedBox.fromSize(
           size: outerSize,
           child: Stack(
