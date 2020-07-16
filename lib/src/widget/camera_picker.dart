@@ -4,7 +4,6 @@
 ///
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +14,7 @@ import '../constants/constants.dart';
 import '../widget/circular_progress_bar.dart';
 
 import 'builder/slide_page_transition_builder.dart';
+import 'camera_picker_viewer.dart';
 
 /// Create a camera picker integrate with [CameraDescription].
 /// 通过 [CameraDescription] 整合的拍照选择
@@ -331,7 +331,75 @@ class CameraPickerState extends State<CameraPicker> {
     }
   }
 
-  /// Make sure the [takenFilePath] is `null` before pop.
+  /// When the [shootingButton]'s `onLongPress` called, the timer [recordDetectTimer]
+  /// will be initialized to achieve press time detection. If the duration
+  /// reached to same as [recordDetectDuration], and the timer still active,
+  /// start recording video.
+  ///
+  /// 当 [shootingButton] 触发了长按，初始化一个定时器来实现时间检测。如果长按时间
+  /// 达到了 [recordDetectDuration] 且定时器未被销毁，则开始录制视频。
+  void recordDetection() {
+    recordDetectTimer = Timer(recordDetectDuration, () {
+      startRecordingVideo();
+      if (mounted) {
+        setState(() {});
+      }
+    });
+    setState(() {
+      isShootingButtonAnimate = true;
+    });
+  }
+
+  /// This will be given to the [Listener] in the [shootingButton]. When it's
+  /// called, which means no more pressing on the button, cancel the timer and
+  /// reset the status.
+  ///
+  /// 这个方法会赋值给 [shootingButton] 中的 [Listener]。当按钮释放了点击后，定时器
+  /// 将被取消，并且状态会重置。
+  void recordDetectionCancel(PointerUpEvent event) {
+    recordDetectTimer?.cancel();
+    if (isRecording) {
+      stopRecordingVideo();
+      if (mounted) {
+        setState(() {});
+      }
+    }
+    if (isShootingButtonAnimate) {
+      isShootingButtonAnimate = false;
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
+  /// Set record file path and start recording.
+  /// 设置拍摄文件路径并开始录制视频
+  void startRecordingVideo() {
+    final String filePath = '${cacheFilePath}_$currentTimeStamp.mp4';
+    if (!cameraController.value.isRecordingVideo) {
+      cameraController.startVideoRecording(filePath).catchError((dynamic e) {
+        realDebugPrint('Error when recording video: $e');
+        if (cameraController.value.isRecordingVideo) {
+          cameraController.stopVideoRecording().catchError((dynamic e) {
+            realDebugPrint('Error when stop recording video: $e');
+          });
+        }
+      });
+    }
+  }
+
+  /// Stop
+  Future<void> stopRecordingVideo() async {
+    if (cameraController.value.isRecordingVideo) {
+      cameraController.stopVideoRecording().then((dynamic result) {
+        // TODO(Alex): Jump to the viewer.
+      }).catchError((dynamic e) {
+        realDebugPrint('Error when stop recording video: $e');
+      });
+    }
+  }
+
+  /// Make sure the [takenPictureFilePath] is `null` before pop.
   /// Otherwise, make it `null` .
   Future<bool> clearTakenFileBeforePop() async {
     if (takenPictureFilePath != null) {
@@ -341,27 +409,6 @@ class CameraPickerState extends State<CameraPicker> {
       return false;
     }
     return true;
-  }
-
-  /// When users confirm to use the taken file, create the [AssetEntity] using
-  /// [Editor.saveImage] (PhotoManager.editor.saveImage), then delete the file
-  /// if not [shouldKeptInLocal]. While the entity might returned null, there's
-  /// no side effects if popping `null` because the parent picker will ignore it.
-  Future<void> createAssetEntityAndPop() async {
-    try {
-      final File file = takenPictureFile;
-      final Uint8List data = await file.readAsBytes();
-      final AssetEntity entity = await PhotoManager.editor.saveImage(
-        data,
-        title: takenPictureFilePath,
-      );
-      if (!shouldKeptInLocal) {
-        file.delete();
-      }
-      Navigator.of(context).pop(entity);
-    } catch (e) {
-      realDebugPrint('Error when creating entity: $e');
-    }
   }
 
   /// Settings action section widget.
@@ -467,39 +514,11 @@ class CameraPickerState extends State<CameraPicker> {
     final Size outerSize = Size.square(Screens.width / 3.5);
     return Listener(
       behavior: HitTestBehavior.opaque,
-      onPointerUp: isAllowRecording
-          ? (PointerUpEvent event) {
-              recordDetectTimer?.cancel();
-              if (isRecording) {
-                isRecording = false;
-                if (mounted) {
-                  setState(() {});
-                }
-              }
-              if (isShootingButtonAnimate) {
-                isShootingButtonAnimate = false;
-                if (mounted) {
-                  setState(() {});
-                }
-              }
-            }
-          : null,
+      onPointerUp: isAllowRecording ? recordDetectionCancel : null,
       child: InkWell(
         borderRadius: maxBorderRadius,
         onTap: takePicture,
-        onLongPress: isAllowRecording
-            ? () {
-                recordDetectTimer = Timer(recordDetectDuration, () {
-                  isRecording = true;
-                  if (mounted) {
-                    setState(() {});
-                  }
-                });
-                setState(() {
-                  isShootingButtonAnimate = true;
-                });
-              }
-            : null,
+        onLongPress: isAllowRecording ? recordDetection : null,
         child: SizedBox.fromSize(
           size: outerSize,
           child: Stack(
@@ -507,14 +526,11 @@ class CameraPickerState extends State<CameraPicker> {
               Center(
                 child: AnimatedContainer(
                   duration: kThemeChangeDuration,
-                  width: isShootingButtonAnimate
-                      ? outerSize.width
-                      : (Screens.width / 5),
-                  height: isShootingButtonAnimate
-                      ? outerSize.height
-                      : (Screens.width / 5),
+                  width: isShootingButtonAnimate ? outerSize.width : (Screens.width / 5),
+                  height: isShootingButtonAnimate ? outerSize.height : (Screens.width / 5),
                   padding: EdgeInsets.all(
-                      Screens.width / (isShootingButtonAnimate ? 10 : 35)),
+                    Screens.width / (isShootingButtonAnimate ? 10 : 35),
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white30,
                     shape: BoxShape.circle,
@@ -537,98 +553,6 @@ class CameraPickerState extends State<CameraPicker> {
           ),
         ),
       ),
-    );
-  }
-
-  /// The preview section for the taken file.
-  /// 拍摄文件的预览区
-  Widget get takenFilePreviewWidget {
-    return ColoredBox(
-      color: Colors.black,
-      child: Stack(
-        children: <Widget>[
-          Positioned.fill(child: Image.file(takenPictureFile)),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8.0,
-                vertical: 20.0,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      previewBackButton,
-                      const Spacer(),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      const Spacer(),
-                      previewConfirmButton,
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// The back button for the preview section.
-  /// 预览区的返回按钮
-  Widget get previewBackButton {
-    return InkWell(
-      borderRadius: maxBorderRadius,
-      onTap: () {
-        takenPictureFile.delete();
-        setState(() {
-          takenPictureFilePath = null;
-        });
-      },
-      child: Container(
-        margin: const EdgeInsets.all(10.0),
-        width: Screens.width / 15,
-        height: Screens.width / 15,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-        ),
-        child: Center(
-          child: Icon(
-            Icons.close,
-            color: Colors.black,
-            size: 18.0,
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// The confirm button for the preview section.
-  /// 预览区的确认按钮
-  Widget get previewConfirmButton {
-    return MaterialButton(
-      minWidth: 20.0,
-      height: 32.0,
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      color: theme.colorScheme.secondary,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(3.0),
-      ),
-      child: Text(
-        '完成',
-        style: TextStyle(
-          color: theme.textTheme.bodyText1.color,
-          fontSize: 17.0,
-          fontWeight: FontWeight.normal,
-        ),
-      ),
-      onPressed: createAssetEntityAndPop,
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 
@@ -664,7 +588,6 @@ class CameraPickerState extends State<CameraPicker> {
                   ),
                 ),
               ),
-              if (takenPictureFilePath != null) takenFilePreviewWidget,
             ],
           ),
         ),
