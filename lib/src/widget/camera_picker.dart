@@ -29,6 +29,7 @@ class CameraPicker extends StatefulWidget {
     Key key,
     this.shouldKeptInLocal = false,
     this.isAllowRecording = false,
+    this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
     CameraPickerTextDelegate textDelegate,
   }) : super(key: key) {
@@ -43,6 +44,15 @@ class CameraPicker extends StatefulWidget {
   /// 选择器是否可以录像
   final bool isAllowRecording;
 
+  /// The maximum duration of the video recording process.
+  /// 录制视频最长时长
+  ///
+  /// This is 15 seconds by default.
+  /// Also allow `null` for unrestricted video recording.
+  final Duration maximumRecordingDuration;
+
+  /// Theme data for the picker.
+  /// 选择器的主题
   final ThemeData theme;
 
   /// Static method to create [AssetEntity] through camera.
@@ -51,6 +61,7 @@ class CameraPicker extends StatefulWidget {
     BuildContext context, {
     bool shouldKeptInLocal = false,
     bool isAllowRecording = false,
+    Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData theme,
     CameraPickerTextDelegate textDelegate,
   }) async {
@@ -174,6 +185,14 @@ class CameraPickerState extends State<CameraPicker> {
   /// 选择器是否可以录像（非空包装）
   bool get isAllowRecording => widget.isAllowRecording ?? false;
 
+  /// Whether the recording restricted to a specific duration.
+  /// 录像是否有限制的时长
+  ///
+  /// It's **NON-GUARANTEE** for stability if there's no limitation on the record duration.
+  /// This is still an experimental control.
+  /// 如果拍摄时长没有限制，不保证稳定性。它仍然是一项实验性的控制。
+  bool get isRecordingRestricted => widget.maximumRecordingDuration != null;
+
   /// The path of the taken picture file.
   /// 拍照文件的路径
   String takenPictureFilePath;
@@ -194,9 +213,6 @@ class CameraPickerState extends State<CameraPicker> {
   /// 获取当前相机实例
   CameraDescription get currentCamera => cameras?.elementAt(currentCameraIndex);
 
-  /// Theme data for the picker.
-  /// 选择器的主题
-  ///
   /// If there's no theme provided from the user, use [CameraPicker.themeData] .
   /// 如果用户未提供主题，
   ThemeData _theme;
@@ -411,9 +427,7 @@ class CameraPickerState extends State<CameraPicker> {
       child: Row(
         children: <Widget>[
           Expanded(
-            child: !isRecording
-                ? Center(child: backButton)
-                : const SizedBox.shrink(),
+            child: !isRecording ? Center(child: backButton) : const SizedBox.shrink(),
           ),
           Expanded(child: Center(child: shootingButton)),
           const Spacer(),
