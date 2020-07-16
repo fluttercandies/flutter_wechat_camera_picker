@@ -115,10 +115,10 @@ class CameraPicker extends StatefulWidget {
       );
 
   @override
-  _CameraPickerState createState() => _CameraPickerState();
+  CameraPickerState createState() => CameraPickerState();
 }
 
-class _CameraPickerState extends State<CameraPicker> {
+class CameraPickerState extends State<CameraPicker> {
   /// The [Duration] for record detection. (200ms)
   /// 检测是否开始录制的时长 (200毫秒)
   final Duration recordDetectDuration = kThemeChangeDuration;
