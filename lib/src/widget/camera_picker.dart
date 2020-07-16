@@ -121,7 +121,7 @@ class CameraPicker extends StatefulWidget {
 class CameraPickerState extends State<CameraPicker> {
   /// The [Duration] for record detection. (200ms)
   /// 检测是否开始录制的时长 (200毫秒)
-  final Duration recordDetectDuration = kThemeChangeDuration;
+  final Duration recordDetectDuration = 200.milliseconds;
 
   /// Available cameras.
   /// 可用的相机实例
@@ -129,7 +129,7 @@ class CameraPickerState extends State<CameraPicker> {
 
   /// The controller for the current camera.
   /// 当前相机实例的控制器
-  CameraController controller;
+  CameraController cameraController;
 
   /// The index of the current cameras. Defaults to `0`.
   /// 当前相机的索引。默认为0
@@ -138,10 +138,6 @@ class CameraPickerState extends State<CameraPicker> {
   /// The path which the temporary file will be stored.
   /// 临时文件会存放的目录
   String cacheFilePath;
-
-  /// The path of the taken file.
-  /// 拍照文件的路径。
-  String takenFilePath;
 
   /// Whether the [shootingButton] should animate according to the gesture.
   /// 拍照按钮是否需要执行动画
@@ -168,7 +164,7 @@ class CameraPickerState extends State<CameraPicker> {
 
   /// Whether the current [CameraDescription] initialized.
   /// 当前的相机实例是否已完成初始化
-  bool get isInitialized => controller?.value?.isInitialized ?? false;
+  bool get isInitialized => cameraController?.value?.isInitialized ?? false;
 
   /// Whether the taken file should be kept in local. (A non-null wrapper)
   /// 拍照的文件是否应该保存在本地（非空包装）
@@ -178,10 +174,31 @@ class CameraPickerState extends State<CameraPicker> {
   /// 选择器是否可以录像（非空包装）
   bool get isAllowRecording => widget.isAllowRecording ?? false;
 
+  /// The path of the taken picture file.
+  /// 拍照文件的路径
+  String takenPictureFilePath;
+
+  /// The path of the taken video file.
+  /// 录制文件的路径
+  String takenVideoFilePath;
+
+  /// The [File] instance of the taken picture.
+  /// 拍照文件的 [File] 实例
+  File get takenPictureFile => File(takenPictureFilePath);
+
+  /// The [File] instance of the taken video.
+  /// 录制文件的 [File] 实例
+  File get takenVideoFile => File(takenVideoFilePath);
+
   /// A getter to the current [CameraDescription].
   /// 获取当前相机实例
   CameraDescription get currentCamera => cameras?.elementAt(currentCameraIndex);
 
+  /// Theme data for the picker.
+  /// 选择器的主题
+  ///
+  /// If there's no theme provided from the user, use [CameraPicker.themeData] .
+  /// 如果用户未提供主题，
   ThemeData _theme;
 
   /// Get [ThemeData] of the [AssetPicker] through [Constants.pickerKey].
@@ -206,7 +223,7 @@ class CameraPickerState extends State<CameraPicker> {
   @override
   void dispose() {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    controller?.dispose();
+    cameraController?.dispose();
     super.dispose();
   }
 
@@ -235,7 +252,7 @@ class CameraPickerState extends State<CameraPicker> {
   /// Initialize cameras instances.
   /// 初始化相机实例
   Future<void> initCameras({CameraDescription cameraDescription}) async {
-    controller?.dispose();
+    cameraController?.dispose();
 
     /// When it's null, which means this is the first time initializing the cameras.
     /// So cameras should fetch.
@@ -252,11 +269,11 @@ class CameraPickerState extends State<CameraPicker> {
 
     /// Initialize the controller with the max resolution preset.
     /// - No one want the lower resolutions. :)
-    controller = CameraController(
+    cameraController = CameraController(
       cameraDescription ?? cameras[0],
       ResolutionPreset.max,
     );
-    controller.initialize().then((dynamic _) {
+    cameraController.initialize().then((dynamic _) {
       if (mounted) {
         setState(() {});
       }
@@ -284,11 +301,11 @@ class CameraPickerState extends State<CameraPicker> {
   /// taking pictures.
   /// 仅当初始化成功且相机未在拍照时拍照。
   Future<void> takePicture() async {
-    if (isInitialized && !controller.value.isTakingPicture) {
+    if (isInitialized && !cameraController.value.isTakingPicture) {
       try {
         final String path = '${cacheFilePath}_$currentTimeStamp.jpg';
-        await controller.takePicture(path);
-        takenFilePath = path;
+        await cameraController.takePicture(path);
+        takenPictureFilePath = path;
         if (mounted) {
           setState(() {});
         }
@@ -301,9 +318,9 @@ class CameraPickerState extends State<CameraPicker> {
   /// Make sure the [takenFilePath] is `null` before pop.
   /// Otherwise, make it `null` .
   Future<bool> clearTakenFileBeforePop() async {
-    if (takenFilePath != null) {
+    if (takenPictureFilePath != null) {
       setState(() {
-        takenFilePath = null;
+        takenPictureFilePath = null;
       });
       return false;
     }
@@ -316,11 +333,11 @@ class CameraPickerState extends State<CameraPicker> {
   /// no side effects if popping `null` because the parent picker will ignore it.
   Future<void> createAssetEntityAndPop() async {
     try {
-      final File file = File(takenFilePath);
+      final File file = takenPictureFile;
       final Uint8List data = await file.readAsBytes();
       final AssetEntity entity = await PhotoManager.editor.saveImage(
         data,
-        title: takenFilePath,
+        title: takenPictureFilePath,
       );
       if (!shouldKeptInLocal) {
         file.delete();
@@ -394,7 +411,9 @@ class CameraPickerState extends State<CameraPicker> {
       child: Row(
         children: <Widget>[
           Expanded(
-            child: !isRecording ? Center(child: backButton) : const SizedBox.shrink(),
+            child: !isRecording
+                ? Center(child: backButton)
+                : const SizedBox.shrink(),
           ),
           Expanded(child: Center(child: shootingButton)),
           const Spacer(),
@@ -514,7 +533,7 @@ class CameraPickerState extends State<CameraPicker> {
       color: Colors.black,
       child: Stack(
         children: <Widget>[
-          Positioned.fill(child: Image.file(File(takenFilePath))),
+          Positioned.fill(child: Image.file(takenPictureFile)),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -551,9 +570,9 @@ class CameraPickerState extends State<CameraPicker> {
     return InkWell(
       borderRadius: maxBorderRadius,
       onTap: () {
-        File(takenFilePath).delete();
+        takenPictureFile.delete();
         setState(() {
-          takenFilePath = null;
+          takenPictureFilePath = null;
         });
       },
       child: Container(
@@ -612,8 +631,8 @@ class CameraPickerState extends State<CameraPicker> {
               if (isInitialized)
                 Center(
                   child: AspectRatio(
-                    aspectRatio: controller.value.aspectRatio,
-                    child: CameraPreview(controller),
+                    aspectRatio: cameraController.value.aspectRatio,
+                    child: CameraPreview(cameraController),
                   ),
                 )
               else
@@ -631,7 +650,7 @@ class CameraPickerState extends State<CameraPicker> {
                   ),
                 ),
               ),
-              if (takenFilePath != null) takenFilePreviewWidget,
+              if (takenPictureFilePath != null) takenFilePreviewWidget,
             ],
           ),
         ),
