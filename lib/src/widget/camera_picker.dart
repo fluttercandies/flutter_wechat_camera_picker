@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:path_provider/path_provider.dart';
@@ -244,14 +245,28 @@ class CameraPickerState extends State<CameraPicker> {
     if (Platform.isIOS) {
       SystemChrome.setEnabledSystemUIOverlays(<SystemUiOverlay>[]);
     }
-    initStorePath();
-    initCameras();
+
+    try {
+      initStorePath();
+      initCameras();
+    } catch (e) {
+      realDebugPrint('Error when initializing: $e');
+      if (context == null) {
+        SchedulerBinding.instance.addPostFrameCallback((Duration _) {
+          Navigator.of(context).pop();
+        });
+      } else {
+        Navigator.of(context).pop();
+      }
+    }
   }
 
   @override
   void dispose() {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     cameraController?.dispose();
+    recordDetectTimer?.cancel();
+    recordCountdownTimer?.cancel();
     super.dispose();
   }
 
