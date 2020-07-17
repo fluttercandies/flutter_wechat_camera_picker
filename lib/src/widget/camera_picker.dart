@@ -600,9 +600,9 @@ class CameraPickerState extends State<CameraPicker> {
                   ),
                 ),
               ),
-              if (isRecording)
+              if (isRecording && isRecordingRestricted)
                 CircleProgressBar(
-                  duration: 15.seconds,
+                  duration: maximumRecordingDuration,
                   outerRadius: outerSize.width,
                   ringsWidth: 2.0,
                 ),
