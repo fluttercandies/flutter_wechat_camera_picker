@@ -1,0 +1,15 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 50,
+  "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square&logo=github)](#contributors)",
+  "commit": false,
+  "contributors": [],
+  "contributorsPerLine": 7,
+  "projectName": "flutter_wechat_assets_picker",
+  "projectOwner": "fluttercandies",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
