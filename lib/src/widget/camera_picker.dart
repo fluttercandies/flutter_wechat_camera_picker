@@ -59,7 +59,6 @@ class CameraPicker extends StatefulWidget {
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity> pickFromCamera(
     BuildContext context, {
-    bool shouldKeptInLocal = false,
     bool isAllowRecording = false,
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData theme,
