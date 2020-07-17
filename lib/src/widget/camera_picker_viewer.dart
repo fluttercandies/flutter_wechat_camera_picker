@@ -271,7 +271,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
     return MaterialButton(
       minWidth: 20.0,
       height: 32.0,
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       color: theme.colorScheme.secondary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(3.0),
