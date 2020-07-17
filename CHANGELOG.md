@@ -1,3 +1,4 @@
-# [0.1.0]
+# [1.0.0]
 
-* initial release.
+* Support take picture and video.
+* Support video recording duration limitation.
