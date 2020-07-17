@@ -67,7 +67,8 @@ class CameraPickerViewer extends StatefulWidget {
         previewFilePath: previewFilePath,
         theme: theme,
       );
-      final PageRouteBuilder<AssetEntity> pageRoute = PageRouteBuilder<AssetEntity>(
+      final PageRouteBuilder<AssetEntity> pageRoute =
+          PageRouteBuilder<AssetEntity>(
         pageBuilder: (
           BuildContext context,
           Animation<double> animation,
@@ -84,7 +85,8 @@ class CameraPickerViewer extends StatefulWidget {
           return FadeTransition(opacity: animation, child: child);
         },
       );
-      final AssetEntity result = await Navigator.of(context).push<AssetEntity>(pageRoute);
+      final AssetEntity result =
+          await Navigator.of(context).push<AssetEntity>(pageRoute);
       return result;
     } catch (e) {
       realDebugPrint('Error when calling camera picker viewer: $e');
@@ -193,9 +195,9 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
     }
   }
 
-  /// When users confirm to use the taken file, create the [AssetEntity], then delete
-  /// the file if not [shouldKeptInLocal]. While the entity might returned null, there's
-  /// no side effects if popping `null` because the parent picker will ignore it.
+  /// When users confirm to use the taken file, create the [AssetEntity].
+  /// While the entity might returned null, there's no side effects if popping `null`
+  /// because the parent picker will ignore it.
   Future<void> createAssetEntityAndPop() async {
     try {
       Future<AssetEntity> saveFuture;
@@ -203,17 +205,28 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       switch (pickerType) {
         case CameraPickerViewType.image:
           final Uint8List data = await previewFile.readAsBytes();
-          saveFuture = PhotoManager.editor.saveImage(data, title: previewFilePath);
-          break;
+          saveFuture = PhotoManager.editor.saveImage(
+            data,
+            title: previewFilePath,
+          );
           break;
         case CameraPickerViewType.video:
-          saveFuture = PhotoManager.editor.saveVideo(previewFile, title: previewFilePath);
+          saveFuture = PhotoManager.editor.saveVideo(
+            previewFile,
+            title: previewFilePath,
+          );
           break;
       }
 
       saveFuture.then((AssetEntity entity) {
-        if (!pickerState.shouldKeptInLocal) {
-          previewFile.delete();
+        if (Platform.isAndroid) {
+          if (!DeviceUtils.isLowerThanAndroidQ && previewFile.existsSync()) {
+            previewFile.delete();
+          }
+        } else {
+          if (previewFile.existsSync()) {
+            previewFile.delete();
+          }
         }
         Navigator.of(context).pop(entity);
       });
@@ -228,10 +241,9 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
     return InkWell(
       borderRadius: maxBorderRadius,
       onTap: () {
-        previewFile.delete();
-        widget.pickerState.setState(() {
-          widget.pickerState.takenPictureFilePath = null;
-        });
+        if (previewFile.existsSync()) {
+          previewFile.delete();
+        }
         Navigator.of(context).pop();
       },
       child: Container(
@@ -295,7 +307,9 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                isControllerPlaying ? Icons.pause_circle_outline : Icons.play_circle_filled,
+                isControllerPlaying
+                    ? Icons.pause_circle_outline
+                    : Icons.play_circle_filled,
                 size: 70.0,
                 color: Colors.white,
               ),
@@ -357,7 +371,8 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
               ),
 
           /// Place the button before the actions to ensure it's not blocking.
-          if (pickerType == CameraPickerViewType.video && videoController != null)
+          if (pickerType == CameraPickerViewType.video &&
+              videoController != null)
             playControlButton,
 
           viewerActions,

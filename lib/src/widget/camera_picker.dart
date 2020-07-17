@@ -28,7 +28,6 @@ import 'camera_picker_viewer.dart';
 class CameraPicker extends StatefulWidget {
   CameraPicker({
     Key key,
-    this.shouldKeptInLocal = false,
     this.isAllowRecording = false,
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
@@ -39,10 +38,6 @@ class CameraPicker extends StatefulWidget {
             ? DefaultCameraPickerTextDelegateWithRecording()
             : DefaultCameraPickerTextDelegate());
   }
-
-  /// Whether the taken file should be kept in local.
-  /// 拍照的文件是否应该保存在本地
-  final bool shouldKeptInLocal;
 
   /// Whether the picker can record video.
   /// 选择器是否可以录像
@@ -75,7 +70,6 @@ class CameraPicker extends StatefulWidget {
     ).push<AssetEntity>(
       SlidePageTransitionBuilder<AssetEntity>(
         builder: CameraPicker(
-          shouldKeptInLocal: shouldKeptInLocal,
           isAllowRecording: isAllowRecording,
           theme: theme,
           textDelegate: textDelegate,
@@ -195,10 +189,6 @@ class CameraPickerState extends State<CameraPicker> {
   /// 当前的相机实例是否已完成初始化
   bool get isInitialized => cameraController?.value?.isInitialized ?? false;
 
-  /// Whether the taken file should be kept in local. (A non-null wrapper)
-  /// 拍照的文件是否应该保存在本地（非空包装）
-  bool get shouldKeptInLocal => widget.shouldKeptInLocal ?? false;
-
   /// Whether the picker can record video. (A non-null wrapper)
   /// 选择器是否可以录像（非空包装）
   bool get isAllowRecording => widget.isAllowRecording ?? false;
@@ -265,25 +255,29 @@ class CameraPickerState extends State<CameraPicker> {
     super.dispose();
   }
 
-  /// Defined the path according to [shouldKeptInLocal], with platforms specification.
-  /// 根据 [shouldKeptInLocal] 及平台规定确定存储路径。
+  /// Defined the path with platforms specification.
+  /// 根据平台存储规范及特性确定存储路径。
   ///
-  /// * When [Platform.isIOS], use [getApplicationDocumentsDirectory].
-  /// * When platform is others: [shouldKeptInLocal] ?
-  ///   * [true] : [getExternalStorageDirectory]'s path
-  ///   * [false]: [getExternalCacheDirectories]'s last path
+  /// * When the platform is not Android, use [getApplicationDocumentsDirectory] .
+  /// * When [Platform.isAndroid] :
+  ///   * SDK < 29: /sdcard/DCIM/camera .
+  ///   * SDK >= 29: ${cacheDir}/ .
   Future<void> initStorePath() async {
-    if (Platform.isIOS) {
-      cacheFilePath = (await getApplicationDocumentsDirectory()).path;
-    } else {
-      if (shouldKeptInLocal) {
-        cacheFilePath = (await getExternalStorageDirectory()).path;
+    /// Get device info before the path initialized.
+    await DeviceUtils.getDeviceInfo();
+
+    if (Platform.isAndroid) {
+      if (DeviceUtils.isLowerThanAndroidQ) {
+        cacheFilePath =
+            '${(await getExternalStorageDirectory()).path}/DCIM/Camera/';
       } else {
-        cacheFilePath = (await getExternalCacheDirectories()).last.path;
+        cacheFilePath = (await getTemporaryDirectory()).path;
       }
+    } else {
+      cacheFilePath = (await getApplicationDocumentsDirectory()).path;
     }
     if (cacheFilePath != null) {
-      cacheFilePath += '/picker';
+      cacheFilePath += '/cameraPicker';
     }
   }
 
