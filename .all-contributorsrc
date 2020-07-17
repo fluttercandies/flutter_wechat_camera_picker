@@ -5,7 +5,24 @@
   "imageSize": 50,
   "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square&logo=github)](#contributors)",
   "commit": false,
-  "contributors": [],
+  "contributors": [
+    {
+      "login": "AlexV525",
+      "name": "Alex Li",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/15884415?v=4",
+      "profile": "https://blog.alexv525.com",
+      "contributions": [
+        "code",
+        "design",
+        "doc",
+        "example",
+        "ideas",
+        "maintenance",
+        "question",
+        "review"
+      ]
+    }
+  ],
   "contributorsPerLine": 7,
   "projectName": "flutter_wechat_camera_picker",
   "projectOwner": "fluttercandies",
