@@ -277,21 +277,34 @@ class CameraPickerState extends State<CameraPicker> {
   ///   * SDK < 29: /sdcard/DCIM/camera .
   ///   * SDK >= 29: ${cacheDir}/ .
   Future<void> initStorePath() async {
-    /// Get device info before the path initialized.
-    await DeviceUtils.getDeviceInfo();
+    try {
+      /// Get device info before the path initialized.
+      await DeviceUtils.getDeviceInfo();
 
-    if (Platform.isAndroid) {
-      if (DeviceUtils.isLowerThanAndroidQ) {
-        cacheFilePath =
-            '${(await getExternalStorageDirectory()).path}/DCIM/Camera/';
+      if (Platform.isAndroid) {
+        if (DeviceUtils.isLowerThanAndroidQ) {
+          cacheFilePath =
+              '${(await getExternalStorageDirectory()).path}/DCIM/Camera/';
+        } else {
+          cacheFilePath = (await getTemporaryDirectory()).path;
+        }
       } else {
-        cacheFilePath = (await getTemporaryDirectory()).path;
+        cacheFilePath = (await getApplicationDocumentsDirectory()).path;
       }
-    } else {
-      cacheFilePath = (await getApplicationDocumentsDirectory()).path;
-    }
-    if (cacheFilePath != null) {
-      cacheFilePath += '/cameraPicker';
+      if (cacheFilePath != null) {
+        cacheFilePath += '/cameraPicker';
+
+        /// Check if the directory is exist.
+        final Directory directory = Directory(cacheFilePath);
+        if (!directory.existsSync()) {
+          /// Create the directory recursively.
+          await directory.create(recursive: true);
+        }
+      } else {
+        realDebugPrint('Failed to initialize path: Still null.');
+      }
+    } catch (e) {
+      realDebugPrint('Error when initializing store path: $e');
     }
   }
 
