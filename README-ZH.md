@@ -43,6 +43,7 @@ Language: [English](README.md) | 中文简体
 | 参数名                     | 类型                       | 描述                                          | 默认值                          |
 | ------------------------ | -------------------------- | ---------------------------------------------------- | -------------------------------------- |
 | isAllowRecording         | `bool`                     | 选择器是否可以录像                 | `false`                                |
+| isOnlyAllowRecording | `bool` | 选择器是否仅可以录像。只在 `isAllowRecording`  为 `true` 时有效。 | `false` |
 | maximumRecordingDuration | `Duration`                 | 录制视频最长时长 | `const Duration(seconds: 15)`          |
 | theme                    | `ThemeData`                | 选择器的主题                           | `CameraPicker.themeData(C.themeColor)` |
 | textDelegate             | `CameraPickerTextDelegate` | 控制部件中的文字实现       | `DefaultCameraPickerTextDelegate`      |
