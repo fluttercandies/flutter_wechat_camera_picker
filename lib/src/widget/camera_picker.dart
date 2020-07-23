@@ -329,7 +329,7 @@ class CameraPickerState extends State<CameraPicker> {
   /// Initialize cameras instances.
   /// 初始化相机实例
   Future<void> initCameras({CameraDescription cameraDescription}) async {
-    cameraController?.dispose();
+    await cameraController?.dispose();
 
     /// When it's null, which means this is the first time initializing the cameras.
     /// So cameras should fetch.
@@ -516,10 +516,11 @@ class CameraPickerState extends State<CameraPicker> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Row(
-        children: const <Widget>[
-          Spacer(),
+        children: <Widget>[
+          const Spacer(),
           // TODO(Alex): There's an issue tracking NPE of the camera plugin, so switching is temporary disabled .
-//          if ((cameras?.length ?? 0) > 1) switchCamerasButton,
+          if ((cameras?.length ?? 0) > 1)
+            switchCamerasButton,
         ],
       ),
     );
