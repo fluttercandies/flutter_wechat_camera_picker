@@ -30,10 +30,15 @@ class CameraPicker extends StatefulWidget {
   CameraPicker({
     Key key,
     this.isAllowRecording = false,
+    this.isOnlyAllowRecording = false,
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
     CameraPickerTextDelegate textDelegate,
-  }) : super(key: key) {
+  })  : assert(
+          isAllowRecording == true || isOnlyAllowRecording != true,
+          'Recording mode error.',
+        ),
+        super(key: key) {
     Constants.textDelegate = textDelegate ??
         (isAllowRecording
             ? DefaultCameraPickerTextDelegateWithRecording()
@@ -43,6 +48,10 @@ class CameraPicker extends StatefulWidget {
   /// Whether the picker can record video.
   /// 选择器是否可以录像
   final bool isAllowRecording;
+
+  /// Whether the picker can record video.
+  /// 选择器是否可以录像
+  final bool isOnlyAllowRecording;
 
   /// The maximum duration of the video recording process.
   /// 录制视频最长时长
@@ -60,10 +69,14 @@ class CameraPicker extends StatefulWidget {
   static Future<AssetEntity> pickFromCamera(
     BuildContext context, {
     bool isAllowRecording = false,
+    bool isOnlyAllowRecording = false,
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData theme,
     CameraPickerTextDelegate textDelegate,
   }) async {
+    if (isAllowRecording != true && isOnlyAllowRecording == true) {
+      throw ArgumentError('Recording mode error.');
+    }
     final AssetEntity result = await Navigator.of(
       context,
       rootNavigator: true,
@@ -71,6 +84,7 @@ class CameraPicker extends StatefulWidget {
       SlidePageTransitionBuilder<AssetEntity>(
         builder: CameraPicker(
           isAllowRecording: isAllowRecording,
+          isOnlyAllowRecording: isOnlyAllowRecording,
           theme: theme,
           textDelegate: textDelegate,
         ),
@@ -192,6 +206,10 @@ class CameraPickerState extends State<CameraPicker> {
   /// Whether the picker can record video. (A non-null wrapper)
   /// 选择器是否可以录像（非空包装）
   bool get isAllowRecording => widget.isAllowRecording ?? false;
+
+  /// Whether the picker can only record video. (A non-null wrapper)
+  /// 选择器是否仅可以录像（非空包装）
+  bool get isOnlyAllowRecording => widget.isOnlyAllowRecording ?? false;
 
   /// Getter for `widget.maximumRecordingDuration` .
   Duration get maximumRecordingDuration => widget.maximumRecordingDuration;
@@ -597,7 +615,7 @@ class CameraPickerState extends State<CameraPicker> {
       onPointerUp: isAllowRecording ? recordDetectionCancel : null,
       child: InkWell(
         borderRadius: maxBorderRadius,
-        onTap: takePicture,
+        onTap: !isOnlyAllowRecording ? takePicture : null,
         onLongPress: isAllowRecording ? recordDetection : null,
         child: SizedBox.fromSize(
           size: outerSize,
