@@ -11,7 +11,7 @@
 
 Language: English | [中文简体](README-ZH.md)
 
-A **camera picker** which is an extension for [wechat_assets_picker](https://pub.dev/packages/wechat_assets_picker). Based on `camera` for camera functions and `photo_manager` for asset implementation.
+A **camera picker** which is an extension for [wechat_assets_picker](https://fluttercandies.github.io/flutter_wechat_assets_picker). Based on `camera` for camera functions and `photo_manager` for asset implementation.
 
 
 ## Contributors ✨
