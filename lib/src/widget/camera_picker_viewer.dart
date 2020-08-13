@@ -254,7 +254,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
           color: Colors.white,
           shape: BoxShape.circle,
         ),
-        child: Center(
+        child: const Center(
           child: Icon(
             Icons.close,
             color: Colors.black,
@@ -302,7 +302,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
           child: GestureDetector(
             onTap: playButtonCallback,
             child: DecoratedBox(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 boxShadow: <BoxShadow>[BoxShadow(color: Colors.black12)],
                 shape: BoxShape.circle,
               ),

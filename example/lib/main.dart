@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
         tooltip: 'Increment',
-        child: Icon(Icons.camera_enhance),
+        child: const Icon(Icons.camera_enhance),
       ),
     );
   }

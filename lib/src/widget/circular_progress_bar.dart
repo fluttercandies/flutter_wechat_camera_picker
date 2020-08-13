@@ -120,9 +120,7 @@ class ProgressPainter extends CustomPainter {
     final double outerRadius = center;
     final double innerRadius = center - ringsWidth * 2;
 
-//    if (progress > 0.0) {
     final double progressWidth = outerRadius - innerRadius;
-//      if (radians > 0.0) {
     canvas.save();
     canvas.translate(0.0, size.width);
     canvas.rotate(-90.0.toRad);
@@ -137,8 +135,6 @@ class ProgressPainter extends CustomPainter {
     canvas
       ..drawArc(arcRect, 0, radians, false, progressPaint)
       ..restore();
-//      }
-//    }
   }
 
   @override
@@ -147,6 +143,4 @@ class ProgressPainter extends CustomPainter {
 
 extension _MathExtension on double {
   double get toRad => this * (math.pi / 180.0);
-
-  double get toDeg => this * (180.0 / math.pi);
 }

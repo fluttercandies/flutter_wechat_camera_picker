@@ -531,8 +531,8 @@ class CameraPickerState extends State<CameraPicker> {
   Widget get switchCamerasButton {
     return InkWell(
       onTap: switchCameras,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
+      child: const Padding(
+        padding: EdgeInsets.all(8.0),
         child: Icon(
           Icons.switch_camera,
           color: Colors.white,
@@ -596,7 +596,7 @@ class CameraPickerState extends State<CameraPicker> {
           color: Colors.white,
           shape: BoxShape.circle,
         ),
-        child: Center(
+        child: const Center(
           child: Icon(
             Icons.keyboard_arrow_down,
             color: Colors.black,
@@ -634,7 +634,7 @@ class CameraPickerState extends State<CameraPicker> {
                   padding: EdgeInsets.all(
                     Screens.width / (isShootingButtonAnimate ? 10 : 35),
                   ),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white30,
                     shape: BoxShape.circle,
                   ),
