@@ -277,7 +277,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
         borderRadius: BorderRadius.circular(3.0),
       ),
       child: Text(
-        '完成',
+        Constants.textDelegate.confirm,
         style: TextStyle(
           color: theme.textTheme.bodyText1.color,
           fontSize: 17.0,
