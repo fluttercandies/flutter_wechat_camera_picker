@@ -144,7 +144,7 @@ class CameraPicker extends StatefulWidget {
 class CameraPickerState extends State<CameraPicker> {
   /// The [Duration] for record detection. (200ms)
   /// 检测是否开始录制的时长 (200毫秒)
-  final Duration recordDetectDuration = 200.milliseconds;
+  final Duration recordDetectDuration = const Duration(milliseconds: 200);
 
   /// Available cameras.
   /// 可用的相机实例

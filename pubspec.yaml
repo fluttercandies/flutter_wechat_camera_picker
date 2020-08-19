@@ -13,7 +13,6 @@ dependencies:
 
   camera: ^0.5.8+5
   device_info: ^0.4.2+6
-  flutter_common_exports: ^0.1.0
   path_provider: ^1.6.11
   photo_manager: ^0.5.7
   video_player: ^0.10.11+2
