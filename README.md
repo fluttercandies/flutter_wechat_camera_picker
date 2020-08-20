@@ -46,7 +46,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 - [x] 🎥 Video recording support
   - [x] ⏱ Duration limitation support
 
-## Screenshots  📸
+## Screenshots 📸
 
 | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yrdqej30u01t017w.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yh3x4j30u01t0wuo.jpg) |
 |-----------------|------------------|
@@ -65,6 +65,7 @@ Reference: [wechat_assets_picker#preparing-for-use](https://github.com/flutterca
 | maximumRecordingDuration | `Duration`                 | The maximum duration of the video recording process.         | `const Duration(seconds: 15)`          |
 | theme                    | `ThemeData`                | Theme data for the picker.                                   | `CameraPicker.themeData(C.themeColor)` |
 | textDelegate             | `CameraPickerTextDelegate` | Text delegate that controls text in widgets.                 | `DefaultCameraPickerTextDelegate`      |
+| resolutionPreset         | `ResolutionPreset`         | Present resolution for the camera.                           | `ResolutionPreset.max`                 |
 
 ### Simple usage
 

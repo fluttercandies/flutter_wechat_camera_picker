@@ -27,8 +27,7 @@ Language: [English](README.md) | 中文简体
 - [x] 🎥 支持录像
   - [x] ⏱ 支持限制录像时间
 
-
-## 截图  📸
+## 截图 📸
 
 | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yrdqej30u01t017w.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yh3x4j30u01t0wuo.jpg) |
 |-----------------|------------------|
@@ -47,6 +46,7 @@ Language: [English](README.md) | 中文简体
 | maximumRecordingDuration | `Duration`                 | 录制视频最长时长 | `const Duration(seconds: 15)`          |
 | theme                    | `ThemeData`                | 选择器的主题                           | `CameraPicker.themeData(C.themeColor)` |
 | textDelegate             | `CameraPickerTextDelegate` | 控制部件中的文字实现       | `DefaultCameraPickerTextDelegate`      |
+| resolutionPreset         | `ResolutionPreset`         | 相机的分辨率预设         | `ResolutionPreset.max`                 |
 
 ### 简单的使用方法
 
