@@ -33,10 +33,15 @@ class CameraPicker extends StatefulWidget {
     this.isOnlyAllowRecording = false,
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
+    this.resolutionPreset = ResolutionPreset.max,
     CameraPickerTextDelegate textDelegate,
   })  : assert(
           isAllowRecording == true || isOnlyAllowRecording != true,
           'Recording mode error.',
+        ),
+        assert(
+          resolutionPreset != null,
+          'Resolution preset must not be null.',
         ),
         super(key: key) {
     Constants.textDelegate = textDelegate ??
@@ -64,6 +69,10 @@ class CameraPicker extends StatefulWidget {
   /// 选择器的主题
   final ThemeData theme;
 
+  /// Present resolution for the camera.
+  /// 相机的分辨率预设
+  final ResolutionPreset resolutionPreset;
+
   /// Static method to create [AssetEntity] through camera.
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity> pickFromCamera(
@@ -73,9 +82,13 @@ class CameraPicker extends StatefulWidget {
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData theme,
     CameraPickerTextDelegate textDelegate,
+    ResolutionPreset resolutionPreset = ResolutionPreset.max,
   }) async {
     if (isAllowRecording != true && isOnlyAllowRecording == true) {
       throw ArgumentError('Recording mode error.');
+    }
+    if (resolutionPreset == null) {
+      throw ArgumentError('Resolution preset must not be null.');
     }
     final AssetEntity result = await Navigator.of(
       context,
@@ -87,6 +100,7 @@ class CameraPicker extends StatefulWidget {
           isOnlyAllowRecording: isOnlyAllowRecording,
           theme: theme,
           textDelegate: textDelegate,
+          resolutionPreset: resolutionPreset,
         ),
         transitionCurve: Curves.easeIn,
         transitionDuration: const Duration(milliseconds: 300),
@@ -348,7 +362,7 @@ class CameraPickerState extends State<CameraPicker> {
     /// - No one want the lower resolutions. :)
     cameraController = CameraController(
       cameraDescription ?? cameras[0],
-      ResolutionPreset.max,
+      widget.resolutionPreset,
     );
     cameraController.initialize().then((dynamic _) {
       if (mounted) {
