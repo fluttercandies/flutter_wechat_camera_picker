@@ -35,7 +35,9 @@ Language: [English](README.md) | 中文简体
 
 ## 准备工作 🍭
 
-参考: [wechat_assets_picker#准备工作](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/README-ZH.md#preparing-for-use-)
+参考:
+- [wechat_assets_picker#准备工作](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/README-ZH.md#preparing-for-use-)
+- [camera#installation](https://pub.dev/packages/camera#installation)
 
 ## 使用方法 📖
 
