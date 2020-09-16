@@ -54,7 +54,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ## Preparing for use 🍭
 
-Reference: 
+Reference:
 - [wechat_assets_picker#preparing-for-use](https://github.com/fluttercandies/flutter_wechat_assets_picker#preparing-for-use-)
 - [camera#installation](https://pub.dev/packages/camera#installation)
 
