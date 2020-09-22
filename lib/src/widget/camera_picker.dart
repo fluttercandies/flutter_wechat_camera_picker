@@ -34,7 +34,7 @@ class CameraPicker extends StatefulWidget {
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
     this.resolutionPreset = ResolutionPreset.max,
-    this.quarterTurns = 0,
+    this.cameraQuarterTurns = 0,
     CameraPickerTextDelegate textDelegate,
   })  : assert(
           isAllowRecording == true || isOnlyAllowRecording != true,
@@ -51,9 +51,9 @@ class CameraPicker extends StatefulWidget {
             : DefaultCameraPickerTextDelegate());
   }
 
-  /// Quarter rotate turns.
-  /// 摄像机视图旋转次数
-  final int quarterTurns;
+  /// The number of clockwise quarter turns the camera view should be rotated.
+  /// 摄像机视图顺时针旋转次数，每次90度
+  final int cameraQuarterTurns;
 
   /// Whether the picker can record video.
   /// 选择器是否可以录像
@@ -105,7 +105,7 @@ class CameraPicker extends StatefulWidget {
           isAllowRecording: isAllowRecording,
           isOnlyAllowRecording: isOnlyAllowRecording,
           theme: theme,
-          quarterTurns: cameraQuarterTurns,
+          cameraQuarterTurns: cameraQuarterTurns,
           textDelegate: textDelegate,
           resolutionPreset: resolutionPreset,
         ),
@@ -540,7 +540,8 @@ class CameraPickerState extends State<CameraPicker> {
         children: <Widget>[
           const Spacer(),
           // TODO(Alex): There's an issue tracking NPE of the camera plugin, so switching is temporary disabled .
-          if ((cameras?.length ?? 0) > 1) switchCamerasButton,
+          if ((cameras?.length ?? 0) > 1) 
+            switchCamerasButton,
         ],
       ),
     );
@@ -690,7 +691,7 @@ class CameraPickerState extends State<CameraPicker> {
             if (isInitialized)
               Center(
                 child: RotatedBox(
-                  quarterTurns: widget.quarterTurns ?? 0,
+                  quarterTurns: widget.cameraQuarterTurns ?? 0,
                   child: AspectRatio(
                     aspectRatio: cameraController.value.aspectRatio,
                     child: CameraPreview(cameraController),
