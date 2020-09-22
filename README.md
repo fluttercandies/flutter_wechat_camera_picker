@@ -34,10 +34,14 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ## Category 🗂
 
-* [Features](#features-)
-* [Screenshots](#screenshots-)
-* [Preparing for use](#preparing-for-use-)
-* [Usage](#usage-)
+- [Flutter WeChat Camera Picker](#flutter-wechat-camera-picker)
+  - [Contributors ✨](#contributors-)
+  - [Category 🗂](#category-)
+  - [Features ✨](#features-)
+  - [Screenshots 📸](#screenshots-)
+  - [Preparing for use 🍭](#preparing-for-use-)
+  - [Usage 📖](#usage-)
+    - [Simple usage](#simple-usage)
 
 ## Features ✨
 
@@ -49,7 +53,7 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 ## Screenshots 📸
 
 | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yrdqej30u01t017w.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yh3x4j30u01t0wuo.jpg) |
-|-----------------|------------------|
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6z1h7xj30u01t01kx.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6zarvhj30u01t0x5f.jpg) |
 
 ## Preparing for use 🍭
@@ -60,14 +64,15 @@ Reference:
 
 ## Usage 📖
 
-| Name                     | Type                       | Description                                                  | Default Value                          |
-| ------------------------ | -------------------------- | ------------------------------------------------------------ | -------------------------------------- |
-| isAllowRecording         | `bool`                     | Whether the picker can record video.                         | `false`                                |
+| Name                     | Type                       | Description                                                                                  | Default Value                          |
+| ------------------------ | -------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------- |
+| isAllowRecording         | `bool`                     | Whether the picker can record video.                                                         | `false`                                |
 | isOnlyAllowRecording     | `bool`                     | Whether the picker can only record video. Only available when `isAllowRecording` is `true `. | `false`                                |
-| maximumRecordingDuration | `Duration`                 | The maximum duration of the video recording process.         | `const Duration(seconds: 15)`          |
-| theme                    | `ThemeData`                | Theme data for the picker.                                   | `CameraPicker.themeData(C.themeColor)` |
-| textDelegate             | `CameraPickerTextDelegate` | Text delegate that controls text in widgets.                 | `DefaultCameraPickerTextDelegate`      |
-| resolutionPreset         | `ResolutionPreset`         | Present resolution for the camera.                           | `ResolutionPreset.max`                 |
+| maximumRecordingDuration | `Duration`                 | The maximum duration of the video recording process.                                         | `const Duration(seconds: 15)`          |
+| theme                    | `ThemeData`                | Theme data for the picker.                                                                   | `CameraPicker.themeData(C.themeColor)` |
+| textDelegate             | `CameraPickerTextDelegate` | Text delegate that controls text in widgets.                                                 | `DefaultCameraPickerTextDelegate`      |
+| resolutionPreset         | `ResolutionPreset`         | Present resolution for the camera.                                                           | `ResolutionPreset.max`                 |
+| cameraQuarterTurns       | `int`                      | The number of clockwise quarter turns the camera view should be rotated.                     | `0`                                    |
 
 ### Simple usage
 
