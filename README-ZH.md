@@ -30,7 +30,7 @@ Language: [English](README.md) | 中文简体
 ## 截图 📸
 
 | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yrdqej30u01t017w.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yh3x4j30u01t0wuo.jpg) |
-|-----------------|------------------|
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6z1h7xj30u01t01kx.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6zarvhj30u01t0x5f.jpg) |
 
 ## 准备工作 🍭
@@ -41,15 +41,15 @@ Language: [English](README.md) | 中文简体
 
 ## 使用方法 📖
 
-| 参数名                     | 类型                       | 描述                                          | 默认值                          |
-| ------------------------ | -------------------------- | ---------------------------------------------------- | -------------------------------------- |
-| isAllowRecording         | `bool`                     | 选择器是否可以录像                 | `false`                                |
-| isOnlyAllowRecording | `bool` | 选择器是否仅可以录像。只在 `isAllowRecording`  为 `true` 时有效。 | `false` |
-| maximumRecordingDuration | `Duration`                 | 录制视频最长时长 | `const Duration(seconds: 15)`          |
-| theme                    | `ThemeData`                | 选择器的主题                           | `CameraPicker.themeData(C.themeColor)` |
-| textDelegate             | `CameraPickerTextDelegate` | 控制部件中的文字实现       | `DefaultCameraPickerTextDelegate`      |
-| resolutionPreset         | `ResolutionPreset`         | 相机的分辨率预设         | `ResolutionPreset.max`                 |
-
+| 参数名                   | 类型                       | 描述                                                              | 默认值                                 |
+| ------------------------ | -------------------------- | ----------------------------------------------------------------- | -------------------------------------- |
+| isAllowRecording         | `bool`                     | 选择器是否可以录像                                                | `false`                                |
+| isOnlyAllowRecording     | `bool`                     | 选择器是否仅可以录像。只在 `isAllowRecording`  为 `true` 时有效。 | `false`                                |
+| maximumRecordingDuration | `Duration`                 | 录制视频最长时长                                                  | `const Duration(seconds: 15)`          |
+| theme                    | `ThemeData`                | 选择器的主题                                                      | `CameraPicker.themeData(C.themeColor)` |
+| textDelegate             | `CameraPickerTextDelegate` | 控制部件中的文字实现                                              | `DefaultCameraPickerTextDelegate`      |
+| resolutionPreset         | `ResolutionPreset`         | 相机的分辨率预设                                                  | `ResolutionPreset.max`                 |
+| cameraQuarterTurns       | `int`                      | 摄像机视图顺时针旋转次数，每次90度                                | `0`                                    |
 ### 简单的使用方法
 
 ```dart
