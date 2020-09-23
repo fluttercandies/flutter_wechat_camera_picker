@@ -31,6 +31,15 @@
         "example",
         "ideas"
       ]
+    },
+    {
+      "login": "LaelLuo",
+      "name": "Lael",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/26056971?v=4",
+      "profile": "https://github.com/LaelLuo",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
