@@ -540,8 +540,7 @@ class CameraPickerState extends State<CameraPicker> {
         children: <Widget>[
           const Spacer(),
           // TODO(Alex): There's an issue tracking NPE of the camera plugin, so switching is temporary disabled .
-          if ((cameras?.length ?? 0) > 1) 
-            switchCamerasButton,
+          if ((cameras?.length ?? 0) > 1) switchCamerasButton,
         ],
       ),
     );
