@@ -12,7 +12,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_common_exports: ^0.1.0
   wechat_camera_picker:
     path: ../
 

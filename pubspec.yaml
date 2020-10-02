@@ -11,8 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  camera: ^0.5.8+5
-  device_info: ^0.4.2+6
-  path_provider: ^1.6.11
-  photo_manager: ^0.5.7
-  video_player: ^0.10.11+2
+  camera: ">=0.5.8+7 <2.0.0"
+  device_info: ">=0.4.2+8 <2.0.0"
+  path_provider: ^1.6.18
+  photo_manager: ">=0.5.8 <2.0.0"
+  video_player: ">=0.11.0 <2.0.0"
