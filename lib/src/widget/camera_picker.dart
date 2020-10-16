@@ -104,6 +104,7 @@ class CameraPicker extends StatefulWidget {
         builder: CameraPicker(
           isAllowRecording: isAllowRecording,
           isOnlyAllowRecording: isOnlyAllowRecording,
+          maximumRecordingDuration: maximumRecordingDuration,
           theme: theme,
           cameraQuarterTurns: cameraQuarterTurns,
           textDelegate: textDelegate,
