@@ -31,6 +31,7 @@ class CameraPicker extends StatefulWidget {
     Key key,
     this.isAllowRecording = false,
     this.isOnlyAllowRecording = false,
+    this.enableAudio = true,
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
     this.resolutionPreset = ResolutionPreset.max,
@@ -63,6 +64,10 @@ class CameraPicker extends StatefulWidget {
   /// 选择器是否可以录像
   final bool isOnlyAllowRecording;
 
+  /// Whether the picker should record audio.
+  /// 选择器录像时是否需要录制声音
+  final bool enableAudio;
+
   /// The maximum duration of the video recording process.
   /// 录制视频最长时长
   ///
@@ -84,6 +89,7 @@ class CameraPicker extends StatefulWidget {
     BuildContext context, {
     bool isAllowRecording = false,
     bool isOnlyAllowRecording = false,
+    bool enableAudio = true,
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData theme,
     int cameraQuarterTurns = 0,
@@ -104,6 +110,7 @@ class CameraPicker extends StatefulWidget {
         builder: CameraPicker(
           isAllowRecording: isAllowRecording,
           isOnlyAllowRecording: isOnlyAllowRecording,
+          enableAudio: enableAudio,
           maximumRecordingDuration: maximumRecordingDuration,
           theme: theme,
           cameraQuarterTurns: cameraQuarterTurns,
@@ -232,6 +239,10 @@ class CameraPickerState extends State<CameraPicker> {
   /// Whether the picker can only record video. (A non-null wrapper)
   /// 选择器是否仅可以录像（非空包装）
   bool get isOnlyAllowRecording => widget.isOnlyAllowRecording ?? false;
+
+  /// Whether the picker should record audio. (A non-null wrapper)
+  /// 选择器录制视频时，是否需要录制音频（非空包装）
+  bool get enableAudio => isAllowRecording && (widget.enableAudio ?? true);
 
   /// Getter for `widget.maximumRecordingDuration` .
   Duration get maximumRecordingDuration => widget.maximumRecordingDuration;
@@ -371,6 +382,7 @@ class CameraPickerState extends State<CameraPicker> {
     cameraController = CameraController(
       cameraDescription ?? cameras[0],
       widget.resolutionPreset,
+      enableAudio: enableAudio,
     );
     cameraController.initialize().then((dynamic _) {
       if (mounted) {
