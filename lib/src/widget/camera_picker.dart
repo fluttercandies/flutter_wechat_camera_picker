@@ -47,7 +47,9 @@ class CameraPicker extends StatefulWidget {
         ),
         super(key: key) {
     Constants.textDelegate = textDelegate ??
-        (isAllowRecording ? DefaultCameraPickerTextDelegateWithRecording() : DefaultCameraPickerTextDelegate());
+        (isAllowRecording
+            ? DefaultCameraPickerTextDelegateWithRecording()
+            : DefaultCameraPickerTextDelegate());
   }
 
   /// The number of clockwise quarter turns the camera view should be rotated.
@@ -240,7 +242,7 @@ class CameraPickerState extends State<CameraPicker> {
 
   /// Whether the picker should record audio. (A non-null wrapper)
   /// 选择器录制视频时，是否需要录制音频（非空包装）
-  bool get enableAudio => isAllowRecording && widget.enableAudio;
+  bool get enableAudio => isAllowRecording && (widget.enableAudio ?? true);
 
   /// Getter for `widget.maximumRecordingDuration` .
   Duration get maximumRecordingDuration => widget.maximumRecordingDuration;
@@ -332,7 +334,8 @@ class CameraPickerState extends State<CameraPicker> {
 
       if (Platform.isAndroid) {
         if (DeviceUtils.isLowerThanAndroidQ) {
-          cacheFilePath = '${(await getExternalStorageDirectory()).path}/DCIM/Camera/';
+          cacheFilePath =
+          '${(await getExternalStorageDirectory()).path}/DCIM/Camera/';
         } else {
           cacheFilePath = (await getTemporaryDirectory()).path;
         }
@@ -601,7 +604,9 @@ class CameraPickerState extends State<CameraPicker> {
       child: Row(
         children: <Widget>[
           Expanded(
-            child: !isRecording ? Center(child: backButton) : const SizedBox.shrink(),
+            child: !isRecording
+                ? Center(child: backButton)
+                : const SizedBox.shrink(),
           ),
           Expanded(child: Center(child: shootingButton)),
           const Spacer(),
@@ -653,8 +658,12 @@ class CameraPickerState extends State<CameraPicker> {
               Center(
                 child: AnimatedContainer(
                   duration: kThemeChangeDuration,
-                  width: isShootingButtonAnimate ? outerSize.width : (Screens.width / 5),
-                  height: isShootingButtonAnimate ? outerSize.height : (Screens.width / 5),
+                  width: isShootingButtonAnimate
+                      ? outerSize.width
+                      : (Screens.width / 5),
+                  height: isShootingButtonAnimate
+                      ? outerSize.height
+                      : (Screens.width / 5),
                   padding: EdgeInsets.all(
                     Screens.width / (isShootingButtonAnimate ? 10 : 35),
                   ),
