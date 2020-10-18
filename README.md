@@ -71,6 +71,7 @@ Reference:
 | ------------------------ | -------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------- |
 | isAllowRecording         | `bool`                     | Whether the picker can record video.                                                         | `false`                                |
 | isOnlyAllowRecording     | `bool`                     | Whether the picker can only record video. Only available when `isAllowRecording` is `true `. | `false`                                |
+| enableAudio              | `bool`                     | Whether Whether the picker should record audio. Only available with recording.               | `true`                                 |
 | maximumRecordingDuration | `Duration`                 | The maximum duration of the video recording process.                                         | `const Duration(seconds: 15)`          |
 | theme                    | `ThemeData`                | Theme data for the picker.                                                                   | `CameraPicker.themeData(C.themeColor)` |
 | textDelegate             | `CameraPickerTextDelegate` | Text delegate that controls text in widgets.                                                 | `DefaultCameraPickerTextDelegate`      |

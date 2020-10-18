@@ -242,6 +242,9 @@ class CameraPickerState extends State<CameraPicker> {
 
   /// Whether the picker should record audio. (A non-null wrapper)
   /// 选择器录制视频时，是否需要录制音频（非空包装）
+  ///
+  /// No audio integration required when it's only for camera.
+  /// 在仅允许拍照时不需要启用音频
   bool get enableAudio => isAllowRecording && (widget.enableAudio ?? true);
 
   /// Getter for `widget.maximumRecordingDuration` .
