@@ -31,7 +31,7 @@ class CameraPicker extends StatefulWidget {
     Key key,
     this.isAllowRecording = false,
     this.isOnlyAllowRecording = false,
-    this.enableAudio = false,
+    this.enableAudio = true,
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
     this.resolutionPreset = ResolutionPreset.max,
@@ -47,9 +47,7 @@ class CameraPicker extends StatefulWidget {
         ),
         super(key: key) {
     Constants.textDelegate = textDelegate ??
-        (isAllowRecording
-            ? DefaultCameraPickerTextDelegateWithRecording()
-            : DefaultCameraPickerTextDelegate());
+        (isAllowRecording ? DefaultCameraPickerTextDelegateWithRecording() : DefaultCameraPickerTextDelegate());
   }
 
   /// The number of clockwise quarter turns the camera view should be rotated.
@@ -89,7 +87,7 @@ class CameraPicker extends StatefulWidget {
     BuildContext context, {
     bool isAllowRecording = false,
     bool isOnlyAllowRecording = false,
-    bool enableAudio = false,
+    bool enableAudio = true,
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData theme,
     int cameraQuarterTurns = 0,
@@ -242,7 +240,7 @@ class CameraPickerState extends State<CameraPicker> {
 
   /// Whether the picker should record audio. (A non-null wrapper)
   /// 选择器录制视频时，是否需要录制音频（非空包装）
-  bool get enableAudio => widget.enableAudio ?? false;
+  bool get enableAudio => isAllowRecording && widget.enableAudio;
 
   /// Getter for `widget.maximumRecordingDuration` .
   Duration get maximumRecordingDuration => widget.maximumRecordingDuration;
@@ -334,8 +332,7 @@ class CameraPickerState extends State<CameraPicker> {
 
       if (Platform.isAndroid) {
         if (DeviceUtils.isLowerThanAndroidQ) {
-          cacheFilePath =
-              '${(await getExternalStorageDirectory()).path}/DCIM/Camera/';
+          cacheFilePath = '${(await getExternalStorageDirectory()).path}/DCIM/Camera/';
         } else {
           cacheFilePath = (await getTemporaryDirectory()).path;
         }
@@ -604,9 +601,7 @@ class CameraPickerState extends State<CameraPicker> {
       child: Row(
         children: <Widget>[
           Expanded(
-            child: !isRecording
-                ? Center(child: backButton)
-                : const SizedBox.shrink(),
+            child: !isRecording ? Center(child: backButton) : const SizedBox.shrink(),
           ),
           Expanded(child: Center(child: shootingButton)),
           const Spacer(),
@@ -658,12 +653,8 @@ class CameraPickerState extends State<CameraPicker> {
               Center(
                 child: AnimatedContainer(
                   duration: kThemeChangeDuration,
-                  width: isShootingButtonAnimate
-                      ? outerSize.width
-                      : (Screens.width / 5),
-                  height: isShootingButtonAnimate
-                      ? outerSize.height
-                      : (Screens.width / 5),
+                  width: isShootingButtonAnimate ? outerSize.width : (Screens.width / 5),
+                  height: isShootingButtonAnimate ? outerSize.height : (Screens.width / 5),
                   padding: EdgeInsets.all(
                     Screens.width / (isShootingButtonAnimate ? 10 : 35),
                   ),
