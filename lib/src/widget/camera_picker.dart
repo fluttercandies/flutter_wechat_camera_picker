@@ -335,7 +335,7 @@ class CameraPickerState extends State<CameraPicker> {
       if (Platform.isAndroid) {
         if (DeviceUtils.isLowerThanAndroidQ) {
           cacheFilePath =
-          '${(await getExternalStorageDirectory()).path}/DCIM/Camera/';
+              '${(await getExternalStorageDirectory()).path}/DCIM/Camera/';
         } else {
           cacheFilePath = (await getTemporaryDirectory()).path;
         }
