@@ -5,14 +5,14 @@ homepage: https://github.com/fluttercandies/flutter_wechat_camera_picker
 
 environment:
   sdk: ">=2.8.1 <3.0.0"
-  flutter: ">=1.17.0"
+  flutter: ">=1.20.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  camera: ">=0.5.8+7 <2.0.0"
-  device_info: ">=0.4.2+8 <2.0.0"
-  path_provider: ^1.6.18
-  photo_manager: ">=0.5.8 <2.0.0"
-  video_player: ">=0.11.0 <2.0.0"
+  camera: ^0.5.8
+  device_info: ^1.0.0
+  path_provider: ^1.6.24
+  photo_manager: ^0.5.8
+  video_player: ^1.0.1
