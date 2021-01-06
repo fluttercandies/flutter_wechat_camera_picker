@@ -4,12 +4,12 @@
 ///
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../constants/constants.dart';
 import '../widget/circular_progress_bar.dart';
@@ -17,15 +17,14 @@ import '../widget/circular_progress_bar.dart';
 import 'builder/slide_page_transition_builder.dart';
 import 'camera_picker_viewer.dart';
 
+const Duration _kRouteDuration = Duration(milliseconds: 300);
+
 /// Create a camera picker integrate with [CameraDescription].
 /// 通过 [CameraDescription] 整合的拍照选择
 ///
 /// The picker provides create an [AssetEntity] through the camera.
-/// However, this might failed (high probability) if there're any steps
-/// went wrong during the process.
 ///
-/// 该选择器可以通过拍照创建 [AssetEntity] ，但由于过程中有的步骤随时会出现问题，
-/// 使用时有较高的概率会遇到失败。
+/// 该选择器可以通过拍照创建 [AssetEntity]。
 class CameraPicker extends StatefulWidget {
   CameraPicker({
     Key key,
@@ -71,8 +70,7 @@ class CameraPicker extends StatefulWidget {
   /// The maximum duration of the video recording process.
   /// 录制视频最长时长
   ///
-  /// This is 15 seconds by default.
-  /// Also allow `null` for unrestricted video recording.
+  /// Defaults to 15 seconds, also allow `null` for unrestricted video recording.
   final Duration maximumRecordingDuration;
 
   /// Theme data for the picker.
@@ -118,7 +116,7 @@ class CameraPicker extends StatefulWidget {
           resolutionPreset: resolutionPreset,
         ),
         transitionCurve: Curves.easeIn,
-        transitionDuration: const Duration(milliseconds: 300),
+        transitionDuration: _kRouteDuration,
       ),
     );
     return result;
@@ -170,67 +168,93 @@ class CameraPicker extends StatefulWidget {
   CameraPickerState createState() => CameraPickerState();
 }
 
-class CameraPickerState extends State<CameraPicker> {
+class CameraPickerState extends State<CameraPicker>
+    with WidgetsBindingObserver {
   /// The [Duration] for record detection. (200ms)
   /// 检测是否开始录制的时长 (200毫秒)
   final Duration recordDetectDuration = const Duration(milliseconds: 200);
+
+  /// The last exposure point offset on the screen.
+  /// 最后一次手动聚焦的点坐标
+  final ValueNotifier<Offset> _lastExposurePoint = ValueNotifier<Offset>(null);
+
+  /// The controller for the current camera.
+  /// 当前相机实例的控制器
+  CameraController controller;
 
   /// Available cameras.
   /// 可用的相机实例
   List<CameraDescription> cameras;
 
-  /// The controller for the current camera.
-  /// 当前相机实例的控制器
-  CameraController cameraController;
+  /// The maximum available value for exposure.
+  /// 最大可用曝光值
+  double _maxAvailableExposureOffset = 0.0;
+
+  /// The minimum available value for exposure.
+  /// 最小可用曝光值
+  double _minAvailableExposureOffset = 0.0;
+
+  double _currentExposureOffset = 0.0;
+
+  /// The maximum available value for zooming.
+  /// 最大可用缩放值
+  double _maxAvailableZoom;
+
+  /// The minimum available value for zooming.
+  /// 最小可用缩放值
+  double _minAvailableZoom;
+
+  /// Counting pointers (number of user fingers on screen).
+  /// 屏幕上的触摸点计数
+  int _pointers = 0;
+  double _currentZoom = 1.0;
+  double _baseZoom = 1.0;
 
   /// The index of the current cameras. Defaults to `0`.
   /// 当前相机的索引。默认为0
   int currentCameraIndex = 0;
 
-  /// The path which the temporary file will be stored.
-  /// 临时文件会存放的目录
-  String cacheFilePath;
-
   /// Whether the [shootingButton] should animate according to the gesture.
   /// 拍照按钮是否需要执行动画
   ///
-  /// This happens when the [shootingButton] is being long pressed. It will animate
-  /// for video recording state.
+  /// This happens when the [shootingButton] is being long pressed.
+  /// It will animate for video recording state.
   ///
   /// 当长按拍照按钮时，会进入准备录制视频的状态，此时需要执行动画。
   bool isShootingButtonAnimate = false;
 
-  /// Whether the recording progress started.
-  /// 是否已开始录制视频
-  ///
-  /// After [shootingButton] animated, the [CircleProgressBar] will become visible.
-  ///
-  /// 当拍照按钮动画执行结束后，进度将变为可见状态并开始更新其状态。
-  bool get isRecording => cameraController?.value?.isRecordingVideo ?? false;
+  /// The [Timer] for keep the [_lastExposurePoint] displays.
+  /// 用于控制上次手动聚焦点显示的计时器
+  Timer _exposurePointDisplayTimer;
 
   /// The [Timer] for record start detection.
-  /// 用于检测是否开始录制的定时器
+  /// 用于检测是否开始录制的计时器
   ///
-  /// When the [shootingButton] started animate, this [Timer] will start at the same
-  /// time. When the time is more than [recordDetectDuration], which means we should
-  /// start recoding, the timer finished.
+  /// When the [shootingButton] started animate, this [Timer] will start
+  /// at the same time. When the time is more than [recordDetectDuration],
+  /// which means we should start recoding, the timer finished.
   ///
   /// 当拍摄按钮开始执行动画时，定时器会同时启动。时长超过检测时长时，定时器完成。
-  Timer recordDetectTimer;
+  Timer _recordDetectTimer;
 
   /// The [Timer] for record countdown.
   /// 用于录制视频倒计时的计时器
   ///
-  /// When the record time reached the [maximumRecordingDuration], stop the recording.
+  /// Stop record When the record time reached the [maximumRecordingDuration].
   /// However, if there's no limitation on record time, this will be useless.
   ///
   /// 当录像时间达到了最大时长，将通过定时器停止录像。
   /// 但如果录像时间没有限制，定时器将不会起作用。
-  Timer recordCountdownTimer;
+  Timer _recordCountdownTimer;
+
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////// Global Getters //////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
 
   /// Whether the current [CameraDescription] initialized.
   /// 当前的相机实例是否已完成初始化
-  bool get isInitialized => cameraController?.value?.isInitialized ?? false;
+  bool get isInitialized =>
+      controller != null && controller.value?.isInitialized == true;
 
   /// Whether the picker can record video. (A non-null wrapper)
   /// 选择器是否可以录像（非空包装）
@@ -252,28 +276,7 @@ class CameraPickerState extends State<CameraPicker> {
 
   /// Whether the recording restricted to a specific duration.
   /// 录像是否有限制的时长
-  ///
-  /// It's **NON-GUARANTEE** for stability if there's no limitation on the record duration.
-  /// This is still an experimental control.
-  ///
-  /// 如果拍摄时长没有限制，不保证稳定性。它仍然是一项实验性的控制。
   bool get isRecordingRestricted => maximumRecordingDuration != null;
-
-  /// The path of the taken picture file.
-  /// 拍照文件的路径
-  String takenPictureFilePath;
-
-  /// The path of the taken video file.
-  /// 录制文件的路径
-  String takenVideoFilePath;
-
-  /// The [File] instance of the taken picture.
-  /// 拍照文件的 [File] 实例
-  File get takenPictureFile => File(takenPictureFilePath);
-
-  /// The [File] instance of the taken video.
-  /// 录制文件的 [File] 实例
-  File get takenVideoFile => File(takenVideoFilePath);
 
   /// A getter to the current [CameraDescription].
   /// 获取当前相机实例
@@ -290,6 +293,7 @@ class CameraPickerState extends State<CameraPicker> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.removeObserver(this);
     _theme = widget.theme ?? CameraPicker.themeData(C.themeColor);
 
     // TODO(Alex): Currently hide status bar will cause the viewport shaking on Android.
@@ -299,99 +303,91 @@ class CameraPickerState extends State<CameraPicker> {
       SystemChrome.setEnabledSystemUIOverlays(<SystemUiOverlay>[]);
     }
 
-    try {
-      initStorePath();
-      initCameras();
-    } catch (e) {
-      realDebugPrint('Error when initializing: $e');
-      if (context == null) {
-        SchedulerBinding.instance.addPostFrameCallback((Duration _) {
+    Future<void>.delayed(_kRouteDuration, () {
+      if (mounted) {
+        try {
+          initCameras();
+        } catch (e) {
+          realDebugPrint('Error when initializing: $e');
           Navigator.of(context).pop();
-        });
-      } else {
-        Navigator.of(context).pop();
+        }
       }
-    }
+    });
   }
 
   @override
   void dispose() {
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    cameraController?.dispose();
-    recordDetectTimer?.cancel();
-    recordCountdownTimer?.cancel();
+    if (Platform.isIOS) {
+      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    }
+    WidgetsBinding.instance.removeObserver(this);
+    controller?.dispose();
+    _exposurePointDisplayTimer?.cancel();
+    _recordDetectTimer?.cancel();
+    _recordCountdownTimer?.cancel();
     super.dispose();
   }
 
-  /// Defined the path with platforms specification.
-  /// 根据平台存储规范及特性确定存储路径。
-  ///
-  /// * When the platform is not Android, use [getApplicationDocumentsDirectory] .
-  /// * When [Platform.isAndroid] :
-  ///   * SDK < 29: /sdcard/DCIM/camera .
-  ///   * SDK >= 29: ${cacheDir}/ .
-  Future<void> initStorePath() async {
-    try {
-      /// Get device info before the path initialized.
-      await DeviceUtils.getDeviceInfo();
-
-      if (Platform.isAndroid) {
-        if (DeviceUtils.isLowerThanAndroidQ) {
-          cacheFilePath =
-              '${(await getExternalStorageDirectory()).path}/DCIM/Camera/';
-        } else {
-          cacheFilePath = (await getTemporaryDirectory()).path;
-        }
-      } else {
-        cacheFilePath = (await getApplicationDocumentsDirectory()).path;
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // App state changed before we got the chance to initialize.
+    if (controller == null || !controller.value.isInitialized) {
+      return;
+    }
+    if (state == AppLifecycleState.inactive) {
+      controller?.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      if (controller != null) {
+        initCameras(currentCamera);
       }
-      if (cacheFilePath != null) {
-        cacheFilePath += '/cameraPicker';
-
-        /// Check if the directory is exist.
-        final Directory directory = Directory(cacheFilePath);
-        if (!directory.existsSync()) {
-          /// Create the directory recursively.
-          await directory.create(recursive: true);
-        }
-      } else {
-        realDebugPrint('Failed to initialize path: Still null.');
-      }
-    } catch (e) {
-      realDebugPrint('Error when initializing store path: $e');
     }
   }
 
   /// Initialize cameras instances.
   /// 初始化相机实例
-  Future<void> initCameras({CameraDescription cameraDescription}) async {
-    await cameraController?.dispose();
+  Future<void> initCameras([CameraDescription cameraDescription]) async {
+    await controller?.dispose();
 
-    /// When it's null, which means this is the first time initializing the cameras.
+    /// When it's null, which means this is the first time initializing cameras.
     /// So cameras should fetch.
     if (cameraDescription == null) {
       cameras = await availableCameras();
     }
 
-    /// After cameras fetched, judge again with the list is empty or not to ensure
-    /// there is at least an available camera for use.
+    /// After cameras fetched, judge again with the list is empty or not to
+    /// ensure there is at least an available camera for use.
     if (cameraDescription == null && (cameras?.isEmpty ?? true)) {
       realDebugPrint('No cameras found.');
       return;
     }
 
-    /// Initialize the controller with the max resolution preset.
-    /// - No one want the lower resolutions. :)
-    cameraController = CameraController(
+    /// Initialize the controller with the given resolution preset.
+    controller = CameraController(
       cameraDescription ?? cameras[0],
       widget.resolutionPreset,
       enableAudio: enableAudio,
-    );
-    cameraController.initialize().then((dynamic _) {
-      if (mounted) {
-        setState(() {});
-      }
-    });
+    )..addListener(() {
+        safeSetState(() {});
+        if (controller.value.hasError) {
+          realDebugPrint('Camera error ${controller.value.errorDescription}');
+        }
+      });
+
+    try {
+      await controller.initialize();
+      Future.wait<void>(<Future<dynamic>>[
+        (() async => _maxAvailableExposureOffset =
+            await controller.getMaxExposureOffset())(),
+        (() async => _minAvailableExposureOffset =
+            await controller.getMinExposureOffset())(),
+        (() async => _maxAvailableZoom = await controller.getMaxZoomLevel())(),
+        (() async => _minAvailableZoom = await controller.getMinZoomLevel())(),
+      ]);
+    } on CameraException catch (e) {
+      realDebugPrint('CameraException: $e');
+    } finally {
+      safeSetState(() {});
+    }
   }
 
   /// The method to switch cameras.
@@ -406,7 +402,67 @@ class CameraPickerState extends State<CameraPicker> {
     if (currentCameraIndex == cameras.length) {
       currentCameraIndex = 0;
     }
-    initCameras(cameraDescription: currentCamera);
+    initCameras(currentCamera);
+  }
+
+  /// The method to switch between flash modes.
+  /// 切换闪光灯模式的方法
+  Future<void> switchFlashesMode() async {
+    switch (controller.value.flashMode) {
+      case FlashMode.off:
+        await controller.setFlashMode(FlashMode.auto);
+        break;
+      case FlashMode.auto:
+        await controller.setFlashMode(FlashMode.always);
+        break;
+      case FlashMode.always:
+      case FlashMode.torch:
+        await controller.setFlashMode(FlashMode.off);
+        break;
+    }
+  }
+
+  /// Handle when the scale gesture start.
+  /// 处理缩放开始的手势
+  void _handleScaleStart(ScaleStartDetails details) {
+    _baseZoom = _currentZoom;
+  }
+
+  /// Handle when the scale details is updating.
+  /// 处理缩放更新
+  Future<void> _handleScaleUpdate(ScaleUpdateDetails details) async {
+    // When there are not exactly two fingers on screen don't scale
+    if (_pointers != 2) {
+      return;
+    }
+
+    _currentZoom = (_baseZoom * details.scale)
+        .clamp(_minAvailableZoom, _maxAvailableZoom)
+        .toDouble();
+
+    await controller.setZoomLevel(_currentZoom);
+  }
+
+  /// Use the [details] point to set exposure and focus.
+  /// 通过点击点的 [details] 设置曝光和对焦。
+  void setExposurePoint(TapDownDetails details) {
+    _lastExposurePoint.value = Offset(
+      details.localPosition.dx,
+      details.localPosition.dy,
+    );
+    _exposurePointDisplayTimer?.cancel();
+    _exposurePointDisplayTimer = Timer(const Duration(seconds: 5), () {
+      _lastExposurePoint.value = null;
+    });
+    controller.setExposurePoint(
+      _lastExposurePoint.value.scale(1 / Screens.width, 1 / Screens.height),
+    );
+    realDebugPrint(
+      'Setting new exposure point ('
+      'x: ${_lastExposurePoint.value.dx}, '
+      'y: ${_lastExposurePoint.value.dy}'
+      ')',
+    );
   }
 
   /// The method to take a picture.
@@ -417,36 +473,27 @@ class CameraPickerState extends State<CameraPicker> {
   ///
   /// 仅当初始化成功且相机未在拍照时拍照。
   Future<void> takePicture() async {
-    if (isInitialized && !cameraController.value.isTakingPicture) {
+    if (controller.value.isInitialized && !controller.value.isTakingPicture) {
       try {
-        final String path = '${cacheFilePath}_$currentTimeStamp.jpg';
-        await cameraController.takePicture(path);
-        takenPictureFilePath = path;
-
         final AssetEntity entity = await CameraPickerViewer.pushToViewer(
           context,
           pickerState: this,
           pickerType: CameraPickerViewType.image,
-          previewFile: takenPictureFile,
-          previewFilePath: takenPictureFilePath,
+          previewXFile: await controller.takePicture(),
           theme: theme,
         );
         if (entity != null) {
           Navigator.of(context).pop(entity);
         } else {
-          takenPictureFilePath = null;
-          if (mounted) {
-            setState(() {});
-          }
+          safeSetState(() {});
         }
       } catch (e) {
         realDebugPrint('Error when taking pictures: $e');
-        takenPictureFilePath = null;
       }
     }
   }
 
-  /// When the [shootingButton]'s `onLongPress` called, the timer [recordDetectTimer]
+  /// When the [shootingButton]'s `onLongPress` called, the [_recordDetectTimer]
   /// will be initialized to achieve press time detection. If the duration
   /// reached to same as [recordDetectDuration], and the timer still active,
   /// start recording video.
@@ -454,11 +501,9 @@ class CameraPickerState extends State<CameraPicker> {
   /// 当 [shootingButton] 触发了长按，初始化一个定时器来实现时间检测。如果长按时间
   /// 达到了 [recordDetectDuration] 且定时器未被销毁，则开始录制视频。
   void recordDetection() {
-    recordDetectTimer = Timer(recordDetectDuration, () {
+    _recordDetectTimer = Timer(recordDetectDuration, () {
       startRecordingVideo();
-      if (mounted) {
-        setState(() {});
-      }
+      safeSetState(() {});
     });
     setState(() {
       isShootingButtonAnimate = true;
@@ -472,41 +517,33 @@ class CameraPickerState extends State<CameraPicker> {
   /// 这个方法会赋值给 [shootingButton] 中的 [Listener]。当按钮释放了点击后，定时器
   /// 将被取消，并且状态会重置。
   void recordDetectionCancel(PointerUpEvent event) {
-    recordDetectTimer?.cancel();
-    if (isRecording) {
+    _recordDetectTimer?.cancel();
+    if (controller.value.isRecordingVideo) {
       stopRecordingVideo();
-      if (mounted) {
-        setState(() {});
-      }
+      safeSetState(() {});
     }
     if (isShootingButtonAnimate) {
-      isShootingButtonAnimate = false;
-      if (mounted) {
-        setState(() {});
-      }
+      safeSetState(() {
+        isShootingButtonAnimate = false;
+      });
     }
   }
 
   /// Set record file path and start recording.
   /// 设置拍摄文件路径并开始录制视频
   void startRecordingVideo() {
-    final String filePath = '${cacheFilePath}_$currentTimeStamp.mp4';
-    takenVideoFilePath = filePath;
-    if (!cameraController.value.isRecordingVideo) {
-      cameraController.startVideoRecording(filePath).then((dynamic _) {
-        if (mounted) {
-          setState(() {});
-        }
+    if (!controller.value.isRecordingVideo) {
+      controller.startVideoRecording().then((dynamic _) {
+        safeSetState(() {});
         if (isRecordingRestricted) {
-          recordCountdownTimer = Timer(maximumRecordingDuration, () {
+          _recordCountdownTimer = Timer(maximumRecordingDuration, () {
             stopRecordingVideo();
           });
         }
       }).catchError((dynamic e) {
-        takenVideoFilePath = null;
         realDebugPrint('Error when recording video: $e');
-        if (cameraController.value.isRecordingVideo) {
-          cameraController.stopVideoRecording().catchError((dynamic e) {
+        if (controller.value.isRecordingVideo) {
+          controller.stopVideoRecording().catchError((dynamic e) {
             realDebugPrint('Error when stop recording video: $e');
           });
         }
@@ -517,29 +554,24 @@ class CameraPickerState extends State<CameraPicker> {
   /// Stop the recording process.
   /// 停止录制视频
   Future<void> stopRecordingVideo() async {
-    if (cameraController.value.isRecordingVideo) {
-      cameraController.stopVideoRecording().then((dynamic result) async {
+    if (controller.value.isRecordingVideo) {
+      controller.stopVideoRecording().then((XFile file) async {
         final AssetEntity entity = await CameraPickerViewer.pushToViewer(
           context,
           pickerState: this,
           pickerType: CameraPickerViewType.video,
-          previewFile: takenVideoFile,
-          previewFilePath: takenVideoFilePath,
+          previewXFile: file,
           theme: theme,
         );
         if (entity != null) {
           Navigator.of(context).pop(entity);
         } else {
-          takenVideoFilePath = null;
-          if (mounted) {
-            setState(() {});
-          }
+          safeSetState(() {});
         }
       }).catchError((dynamic e) {
         realDebugPrint('Error when stop recording video: $e');
       }).whenComplete(() {
         isShootingButtonAnimate = false;
-        takenVideoFilePath = null;
       });
     }
   }
@@ -550,40 +582,48 @@ class CameraPickerState extends State<CameraPicker> {
   /// This displayed at the top of the screen.
   /// 该区域显示在屏幕上方。
   Widget get settingsAction {
+    if (!isInitialized) {
+      return const SizedBox.shrink();
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Row(
-        children: <Widget>[
-          const Spacer(),
-          // TODO(Alex): There's an issue tracking NPE of the camera plugin, so switching is temporary disabled .
-          if ((cameras?.length ?? 0) > 1) switchCamerasButton,
-        ],
+        children: <Widget>[const Spacer(), switchFlashesButton],
       ),
     );
   }
 
-  /// The button to switch between cameras.
-  /// 切换相机的按钮
-  Widget get switchCamerasButton {
-    return InkWell(
-      onTap: switchCameras,
-      child: const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Icon(
-          Icons.switch_camera,
-          color: Colors.white,
-          size: 30.0,
-        ),
-      ),
+  /// The button to switch flash modes.
+  /// 切换闪光灯模式的按钮
+  Widget get switchFlashesButton {
+    IconData icon;
+    switch (controller.value.flashMode) {
+      case FlashMode.off:
+        icon = Icons.flash_off;
+        break;
+      case FlashMode.auto:
+        icon = Icons.flash_auto;
+        break;
+      case FlashMode.always:
+      case FlashMode.torch:
+        icon = Icons.flash_on;
+        break;
+    }
+    return IconButton(
+      onPressed: switchFlashesMode,
+      icon: Icon(icon, size: 24),
     );
   }
 
   /// Text widget for shooting tips.
   /// 拍摄的提示文字
   Widget get tipsTextWidget {
+    if (!isInitialized) {
+      return const SizedBox.shrink();
+    }
     return AnimatedOpacity(
       duration: recordDetectDuration,
-      opacity: isRecording ? 0.0 : 1.0,
+      opacity: controller.value.isRecordingVideo ? 0.0 : 1.0,
       child: Padding(
         padding: const EdgeInsets.symmetric(
           vertical: 20.0,
@@ -607,7 +647,7 @@ class CameraPickerState extends State<CameraPicker> {
       child: Row(
         children: <Widget>[
           Expanded(
-            child: !isRecording
+            child: controller?.value?.isRecordingVideo == false
                 ? Center(child: backButton)
                 : const SizedBox.shrink(),
           ),
@@ -644,7 +684,6 @@ class CameraPickerState extends State<CameraPicker> {
 
   /// The shooting button.
   /// 拍照按钮
-  // TODO(Alex): Need further integration with video recording.
   Widget get shootingButton {
     final Size outerSize = Size.square(Screens.width / 3.5);
     return Listener(
@@ -670,8 +709,8 @@ class CameraPickerState extends State<CameraPicker> {
                   padding: EdgeInsets.all(
                     Screens.width / (isShootingButtonAnimate ? 10 : 35),
                   ),
-                  decoration: const BoxDecoration(
-                    color: Colors.white30,
+                  decoration: BoxDecoration(
+                    color: theme.canvasColor.withOpacity(0.95),
                     shape: BoxShape.circle,
                   ),
                   child: const DecoratedBox(
@@ -682,16 +721,91 @@ class CameraPickerState extends State<CameraPicker> {
                   ),
                 ),
               ),
-              if (isRecording && isRecordingRestricted)
-                CircleProgressBar(
+              _initializeWrapper(
+                isInitialized: () =>
+                    controller?.value?.isRecordingVideo == true &&
+                    isRecordingRestricted,
+                child: CircleProgressBar(
                   duration: maximumRecordingDuration,
                   outerRadius: outerSize.width,
                   ringsWidth: 2.0,
                 ),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  /// The area widget for the last exposure point that user manually set.
+  /// 用户手动设置的曝光点的区域显示
+  Widget get _focusingAreaWidget {
+    Widget _buildFromPoint(Offset point) {
+      const double _width = 100;
+      final double _effectiveLeft = math.min(
+        Screens.width - _width,
+        math.max(0, point.dx - _width / 2),
+      );
+      final double _effectiveTop = math.min(
+        Screens.height - _width,
+        math.max(0, point.dy - _width / 2),
+      );
+      return Positioned(
+        left: _effectiveLeft,
+        top: _effectiveTop,
+        width: _width,
+        height: _width,
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0, end: 1),
+          duration: kThemeAnimationDuration,
+          builder: (__, double v, _) => Opacity(
+            opacity: v,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: theme.iconTheme.color, width: 2),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return ValueListenableBuilder<Offset>(
+      valueListenable: _lastExposurePoint,
+      builder: (_, Offset point, __) {
+        if (point == null) {
+          return const SizedBox.shrink();
+        }
+        return _buildFromPoint(point);
+      },
+    );
+  }
+
+  Widget _cameraPreview(BuildContext context) {
+    return Listener(
+      onPointerDown: (_) => _pointers++,
+      onPointerUp: (_) => _pointers--,
+      child: GestureDetector(
+        onScaleStart: _handleScaleStart,
+        onScaleUpdate: _handleScaleUpdate,
+        onTapDown: setExposurePoint,
+        onDoubleTap: switchCameras,
+        child: CameraPreview(controller),
+      ),
+    );
+  }
+
+  Widget _initializeWrapper({
+    @required Widget child,
+    bool Function() isInitialized,
+  }) {
+    assert(child != null);
+    return AnimatedSwitcher(
+      duration: kThemeAnimationDuration,
+      child: isInitialized?.call() ?? this.isInitialized
+          ? child
+          : const SizedBox.shrink(),
     );
   }
 
@@ -702,19 +816,23 @@ class CameraPickerState extends State<CameraPicker> {
       child: Material(
         color: Colors.black,
         child: Stack(
+          fit: StackFit.expand,
           children: <Widget>[
             if (isInitialized)
               Center(
                 child: RotatedBox(
                   quarterTurns: widget.cameraQuarterTurns ?? 0,
                   child: AspectRatio(
-                    aspectRatio: cameraController.value.aspectRatio,
-                    child: CameraPreview(cameraController),
+                    aspectRatio: controller.value.aspectRatio,
+                    child: Stack(
+                      children: <Widget>[
+                        Positioned.fill(child: _cameraPreview(context)),
+                        _focusingAreaWidget,
+                      ],
+                    ),
                   ),
                 ),
-              )
-            else
-              const SizedBox.shrink(),
+              ),
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20.0),

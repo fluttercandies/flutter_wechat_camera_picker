@@ -6,6 +6,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
 import 'package:video_player/video_player.dart';
 
 import '../constants/constants.dart';
@@ -21,11 +22,10 @@ class CameraPickerViewer extends StatefulWidget {
     Key key,
     @required this.pickerState,
     @required this.pickerType,
-    @required this.previewFile,
-    @required this.previewFilePath,
+    @required this.previewXFile,
     @required this.theme,
   })  : assert(
-          theme != null && previewFile != null && pickerState != null,
+          theme != null && previewXFile != null && pickerState != null,
         ),
         super(key: key);
 
@@ -37,13 +37,9 @@ class CameraPickerViewer extends StatefulWidget {
   /// 预览的类型（图片或视频）
   final CameraPickerViewType pickerType;
 
-  /// The [File] of the preview file.
-  /// 预览文件的 [File] 实例
-  final File previewFile;
-
-  /// The file path of the preview file.
-  /// 预览文件的文件路径
-  final String previewFilePath;
+  /// The [XFile] of the preview file.
+  /// 预览文件的 [XFile] 实例
+  final XFile previewXFile;
 
   /// The [ThemeData] which the picker is using.
   /// 选择器使用的主题
@@ -55,16 +51,14 @@ class CameraPickerViewer extends StatefulWidget {
     BuildContext context, {
     @required CameraPickerState pickerState,
     @required CameraPickerViewType pickerType,
-    @required File previewFile,
-    @required String previewFilePath,
+    @required XFile previewXFile,
     @required ThemeData theme,
   }) async {
     try {
       final Widget viewer = CameraPickerViewer(
         pickerState: pickerState,
         pickerType: pickerType,
-        previewFile: previewFile,
-        previewFilePath: previewFilePath,
+        previewXFile: previewXFile,
         theme: theme,
       );
       final PageRouteBuilder<AssetEntity> pageRoute =
@@ -104,11 +98,14 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
 
   CameraPickerViewType get pickerType => widget.pickerType;
 
-  File get previewFile => widget.previewFile;
+  XFile get previewXFile => widget.previewXFile;
 
-  String get previewFilePath => widget.previewFilePath;
+  /// Construct an [File] instance through [previewXFile].
+  /// 通过 [previewXFile] 构建 [File] 实例。
+  File get previewFile => File(previewXFile.path);
 
   ThemeData get theme => widget.theme;
+
   /* End of widget getter */
 
   /// Controller for the video player.
@@ -207,13 +204,13 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
           final Uint8List data = await previewFile.readAsBytes();
           saveFuture = PhotoManager.editor.saveImage(
             data,
-            title: previewFilePath,
+            title: previewFile.path,
           );
           break;
         case CameraPickerViewType.video:
           saveFuture = PhotoManager.editor.saveVideo(
             previewFile,
-            title: previewFilePath,
+            title: previewFile.path,
           );
           break;
       }

@@ -2,13 +2,12 @@
 /// [Author] Alex (https://github.com/AlexV525)
 /// [Date] 2020/7/15 21:13
 ///
-import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import '../constants/constants.dart';
+import '../constants/colors.dart';
 
 class CircleProgressBar extends StatefulWidget {
   const CircleProgressBar({
@@ -33,12 +32,8 @@ class CircleProgressBar extends StatefulWidget {
 class CircleProgressState extends State<CircleProgressBar>
     with SingleTickerProviderStateMixin {
   final GlobalKey paintKey = GlobalKey();
-  final StreamController<double> progressStreamController =
-      StreamController<double>.broadcast();
 
   AnimationController progressController;
-  Animation<double> progressAnimation;
-  CurvedAnimation progressCurvedAnimation;
 
   @override
   void initState() {
@@ -47,22 +42,7 @@ class CircleProgressState extends State<CircleProgressBar>
     progressController = AnimationController(
       duration: widget.duration,
       vsync: this,
-    );
-    progressController.value = widget.progress ?? 0.0;
-
-    progressCurvedAnimation = CurvedAnimation(
-      parent: progressController,
-      curve: Curves.linear,
-    );
-
-    progressAnimation = Tween<double>(
-      begin: widget.progress ?? 0.0,
-      end: 1.0,
-    ).animate(progressCurvedAnimation);
-
-    progressController.addListener(() {
-      progressStreamController.add(progressController.value);
-    });
+    )..value = widget.progress ?? 0.0;
 
     SchedulerBinding.instance.addPostFrameCallback((Duration _) {
       progressController.forward();
@@ -79,20 +59,17 @@ class CircleProgressState extends State<CircleProgressBar>
   Widget build(BuildContext context) {
     final Size size = Size.square(widget.outerRadius * 2);
     return Center(
-      child: StreamBuilder<double>(
-        initialData: 0.0,
-        stream: progressStreamController.stream,
-        builder: (BuildContext _, AsyncSnapshot<double> snapshot) {
-          return CustomPaint(
-            key: paintKey,
-            size: size,
-            painter: ProgressPainter(
-              progress: snapshot.data,
-              ringsWidth: widget.ringsWidth,
-              ringsColor: widget.ringsColor,
-            ),
-          );
-        },
+      child: AnimatedBuilder(
+        animation: progressController,
+        builder: (_, __) => CustomPaint(
+          key: paintKey,
+          size: size,
+          painter: ProgressPainter(
+            progress: progressController.value,
+            ringsWidth: widget.ringsWidth,
+            ringsColor: widget.ringsColor,
+          ),
+        ),
       ),
     );
   }
