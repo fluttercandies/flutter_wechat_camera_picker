@@ -16,6 +16,7 @@ import '../widget/circular_progress_bar.dart';
 
 import 'builder/slide_page_transition_builder.dart';
 import 'camera_picker_viewer.dart';
+import 'exposure_point_widget.dart';
 
 const Duration _kRouteDuration = Duration(milliseconds: 300);
 
@@ -759,7 +760,8 @@ class CameraPickerState extends State<CameraPicker>
   /// 用户手动设置的曝光点的区域显示
   Widget get _focusingAreaWidget {
     Widget _buildFromPoint(Offset point) {
-      const double _width = 100;
+      final double _width = Screens.width / 5;
+
       final double _effectiveLeft = math.min(
         Screens.width - _width,
         math.max(0, point.dx - _width / 2),
@@ -768,23 +770,13 @@ class CameraPickerState extends State<CameraPicker>
         Screens.height - _width,
         math.max(0, point.dy - _width / 2),
       );
+
       return Positioned(
         left: _effectiveLeft,
         top: _effectiveTop,
         width: _width,
         height: _width,
-        child: TweenAnimationBuilder<double>(
-          tween: Tween<double>(begin: 0, end: 1),
-          duration: kThemeAnimationDuration,
-          builder: (__, double v, _) => Opacity(
-            opacity: v,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(color: theme.iconTheme.color, width: 2),
-              ),
-            ),
-          ),
-        ),
+        child: ExposurePointWidget(key: ValueKey<int>(currentTimeStamp)),
       );
     }
 
@@ -799,6 +791,18 @@ class CameraPickerState extends State<CameraPicker>
     );
   }
 
+  /// The [GestureDetector] widget for setting exposure poing manually.
+  /// 用于手动设置曝光点的 [GestureDetector]
+  Widget _exposureDetectorWidget(BuildContext context) {
+    return Positioned.fill(
+      child: GestureDetector(
+        onTapDown: setExposurePoint,
+        behavior: HitTestBehavior.translucent,
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+
   Widget _cameraPreview(BuildContext context) {
     assert(controller != null);
 
@@ -808,7 +812,6 @@ class CameraPickerState extends State<CameraPicker>
       child: GestureDetector(
         onScaleStart: _handleScaleStart,
         onScaleUpdate: _handleScaleUpdate,
-        onTapDown: setExposurePoint,
         onDoubleTap: switchCameras,
         child: CameraPreview(controller),
       ),
@@ -886,6 +889,7 @@ class CameraPickerState extends State<CameraPicker>
                   ),
                 ),
               ),
+            _exposureDetectorWidget(context),
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20.0),
