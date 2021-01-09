@@ -186,6 +186,10 @@ class CameraPickerState extends State<CameraPicker>
   /// 可用的相机实例
   List<CameraDescription> cameras;
 
+  /// 当前曝光值
+  final ValueNotifier<double> _currentExposureOffset =
+      ValueNotifier<double>(0.0);
+
   /// The maximum available value for exposure.
   /// 最大可用曝光值
   double _maxAvailableExposureOffset = 0.0;
@@ -193,8 +197,6 @@ class CameraPickerState extends State<CameraPicker>
   /// The minimum available value for exposure.
   /// 最小可用曝光值
   double _minAvailableExposureOffset = 0.0;
-
-  double _currentExposureOffset = 0.0;
 
   /// The maximum available value for zooming.
   /// 最大可用缩放值
@@ -340,6 +342,21 @@ class CameraPickerState extends State<CameraPicker>
       if (controller != null) {
         initCameras(currentCamera);
       }
+    }
+  }
+
+  /// Adjust the proper scale type according to the [controller].
+  /// 通过 [controller] 的预览大小，判断相机预览适用的缩放类型。
+  _PreviewScaleType get _effectiveScaleType {
+    assert(controller != null);
+    final Size _size = controller.value.previewSize;
+    final Size _scaledSize = _size * (Screens.widthPixels / _size.height);
+    if (_scaledSize.width > Screens.heightPixels) {
+      return _PreviewScaleType.width;
+    } else if (_scaledSize.width < Screens.heightPixels) {
+      return _PreviewScaleType.height;
+    } else {
+      return _PreviewScaleType.none;
     }
   }
 
@@ -783,7 +800,9 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   Widget _cameraPreview(BuildContext context) {
-    return Listener(
+    assert(controller != null);
+
+    Widget _preview = Listener(
       onPointerDown: (_) => _pointers++,
       onPointerUp: (_) => _pointers--,
       child: GestureDetector(
@@ -794,6 +813,41 @@ class CameraPickerState extends State<CameraPicker>
         child: CameraPreview(controller),
       ),
     );
+
+    if (_effectiveScaleType == _PreviewScaleType.none) {
+      return _preview;
+    }
+
+    double _width;
+    double _height;
+    switch (_effectiveScaleType) {
+      case _PreviewScaleType.width:
+        _width = Screens.width;
+        _height = Screens.width / controller.value.aspectRatio;
+        break;
+      case _PreviewScaleType.height:
+        _width = Screens.height * controller.value.aspectRatio;
+        _height = Screens.height;
+        break;
+      default:
+        _width = Screens.width;
+        _height = Screens.height;
+        break;
+    }
+    final double _offsetHorizontal = (_width - Screens.width).abs() / -2;
+    final double _offsetVertical = (_height - Screens.height).abs() / -2;
+    _preview = Stack(
+      children: <Widget>[
+        Positioned(
+          left: _offsetHorizontal,
+          right: _offsetHorizontal,
+          top: _offsetVertical,
+          bottom: _offsetVertical,
+          child: _preview,
+        ),
+      ],
+    );
+    return _preview;
   }
 
   Widget _initializeWrapper({
@@ -817,25 +871,24 @@ class CameraPickerState extends State<CameraPicker>
         color: Colors.black,
         child: Stack(
           fit: StackFit.expand,
+          alignment: Alignment.center,
           children: <Widget>[
             if (isInitialized)
-              Center(
-                child: RotatedBox(
-                  quarterTurns: widget.cameraQuarterTurns ?? 0,
-                  child: AspectRatio(
-                    aspectRatio: controller.value.aspectRatio,
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned.fill(child: _cameraPreview(context)),
-                        _focusingAreaWidget,
-                      ],
-                    ),
+              RotatedBox(
+                quarterTurns: widget.cameraQuarterTurns ?? 0,
+                child: AspectRatio(
+                  aspectRatio: controller.value.aspectRatio,
+                  child: Stack(
+                    children: <Widget>[
+                      Positioned.fill(child: _cameraPreview(context)),
+                      _focusingAreaWidget,
+                    ],
                   ),
                 ),
               ),
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                padding: const EdgeInsets.only(bottom: 20.0),
                 child: Column(
                   children: <Widget>[
                     settingsAction,
@@ -852,3 +905,5 @@ class CameraPickerState extends State<CameraPicker>
     );
   }
 }
+
+enum _PreviewScaleType { none, width, height }
