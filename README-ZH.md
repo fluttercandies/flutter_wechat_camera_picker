@@ -45,20 +45,26 @@ Flutter SDK：`>=1.20.0` 。
 
 ## 使用方法 📖
 
-| 参数名                   | 类型                       | 描述                                                              | 默认值                                 |
-| ------------------------ | -------------------------- | ----------------------------------------------------------------- | -------------------------------------- |
-| isAllowRecording         | `bool`                     | 选择器是否可以录像                                                | `false`                                |
-| isOnlyAllowRecording     | `bool`                     | 选择器是否仅可以录像。只在 `isAllowRecording`  为 `true` 时有效。 | `false`                                |
-| enabledAudio             | `bool`                     | 选择器是否需要录制音频。只于录像配合有效。                           | `true`                                |
-| maximumRecordingDuration | `Duration`                 | 录制视频最长时长                                                  | `const Duration(seconds: 15)`          |
-| theme                    | `ThemeData`                | 选择器的主题                                                      | `CameraPicker.themeData(C.themeColor)` |
-| textDelegate             | `CameraPickerTextDelegate` | 控制部件中的文字实现                                              | `DefaultCameraPickerTextDelegate`      |
-| resolutionPreset         | `ResolutionPreset`         | 相机的分辨率预设                                                  | `ResolutionPreset.max`                 |
-| cameraQuarterTurns       | `int`                      | 摄像机视图顺时针旋转次数，每次90度                                | `0`                                    |
+| 参数名                   | 类型                           | 描述                                                              | 默认值                                 |
+| ------------------------ | ------------------------------ | ----------------------------------------------------------------- | -------------------------------------- |
+| isAllowPinchToZoom       | `bool`                         | 用户是否可以在界面上双指缩放相机对焦                                | `true`                                 |
+| isAllowRecording         | `bool`                         | 选择器是否可以录像                                                | `false`                                |
+| isOnlyAllowRecording     | `bool`                         | 选择器是否仅可以录像。只在 `isAllowRecording`  为 `true` 时有效。 | `false`                                |
+| enabledAudio             | `bool`                         | 选择器是否需要录制音频。只于录像配合有效。                           | `true`                                |
+| maximumRecordingDuration | `Duration`                     | 录制视频最长时长                                                  | `const Duration(seconds: 15)`          |
+| theme                    | `ThemeData`                    | 选择器的主题                                                      | `CameraPicker.themeData(C.themeColor)` |
+| textDelegate             | `CameraPickerTextDelegate`     | 控制部件中的文字实现                                              | `DefaultCameraPickerTextDelegate`      |
+| resolutionPreset         | `ResolutionPreset`             | 相机的分辨率预设                                                  | `ResolutionPreset.max`                 |
+| cameraQuarterTurns       | `int`                          | 摄像机视图顺时针旋转次数，每次90度                                | `0`                                    |
+
 ### 简单的使用方法
 
 ```dart
 final AssetEntity entity = await CameraPicker.pickFromCamera(context);
 ```
 
-在选择器唤起后，并且 `isAllowRecording` 为 `true`，点击拍摄按钮以拍照，长按拍摄按钮以录像。
+在选择器唤起后，点击拍摄按钮以拍照。
+
+如果 `isAllowPinchToZoom` 为 `true`，双指捏合界面可以缩放。
+
+如果 `isAllowRecording` 为 `true`，长按拍摄按钮可以录像。

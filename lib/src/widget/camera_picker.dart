@@ -28,6 +28,7 @@ const Duration _kRouteDuration = Duration(milliseconds: 300);
 class CameraPicker extends StatefulWidget {
   CameraPicker({
     Key key,
+    this.isAllowPinchToZoom = true,
     this.isAllowRecording = false,
     this.isOnlyAllowRecording = false,
     this.enableAudio = true,
@@ -54,6 +55,10 @@ class CameraPicker extends StatefulWidget {
   /// The number of clockwise quarter turns the camera view should be rotated.
   /// 摄像机视图顺时针旋转次数，每次90度
   final int cameraQuarterTurns;
+
+  /// Whether users can zoom the camera by pinch.
+  /// 用户是否可以在界面上双指缩放相机对焦
+  final bool isAllowPinchToZoom;
 
   /// Whether the picker can record video.
   /// 选择器是否可以录像
@@ -86,6 +91,7 @@ class CameraPicker extends StatefulWidget {
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity> pickFromCamera(
     BuildContext context, {
+    bool isAllowPinchToZoom = true,
     bool isAllowRecording = false,
     bool isOnlyAllowRecording = false,
     bool enableAudio = true,
@@ -107,6 +113,7 @@ class CameraPicker extends StatefulWidget {
     ).push<AssetEntity>(
       SlidePageTransitionBuilder<AssetEntity>(
         builder: CameraPicker(
+          isAllowPinchToZoom: isAllowPinchToZoom,
           isAllowRecording: isAllowRecording,
           isOnlyAllowRecording: isOnlyAllowRecording,
           enableAudio: enableAudio,
@@ -256,6 +263,10 @@ class CameraPickerState extends State<CameraPicker>
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////// Global Getters //////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
+
+  /// Whether users can zoom the camera by pinch. (A non-null wrapper)
+  /// 用户是否可以在界面上双指缩放相机对焦（非空包装）
+  bool get isAllowPinchToZoom => widget.isAllowPinchToZoom ?? true;
 
   /// Whether the picker can record video. (A non-null wrapper)
   /// 选择器是否可以录像（非空包装）
@@ -848,8 +859,8 @@ class CameraPickerState extends State<CameraPicker>
       onPointerDown: (_) => _pointers++,
       onPointerUp: (_) => _pointers--,
       child: GestureDetector(
-        onScaleStart: _handleScaleStart,
-        onScaleUpdate: _handleScaleUpdate,
+        onScaleStart: isAllowPinchToZoom ? _handleScaleStart : null,
+        onScaleUpdate: isAllowPinchToZoom ? _handleScaleUpdate : null,
         onDoubleTap: switchCameras,
         child: CameraPreview(controller),
       ),

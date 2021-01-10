@@ -71,16 +71,17 @@ Reference:
 
 ## Usage 📖
 
-| Name                     | Type                       | Description                                                                                  | Default Value                          |
-| ------------------------ | -------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------- |
-| isAllowRecording         | `bool`                     | Whether the picker can record video.                                                         | `false`                                |
-| isOnlyAllowRecording     | `bool`                     | Whether the picker can only record video. Only available when `isAllowRecording` is `true `. | `false`                                |
-| enableAudio              | `bool`                     | Whether Whether the picker should record audio. Only available with recording.               | `true`                                 |
-| maximumRecordingDuration | `Duration`                 | The maximum duration of the video recording process.                                         | `const Duration(seconds: 15)`          |
-| theme                    | `ThemeData`                | Theme data for the picker.                                                                   | `CameraPicker.themeData(C.themeColor)` |
-| textDelegate             | `CameraPickerTextDelegate` | Text delegate that controls text in widgets.                                                 | `DefaultCameraPickerTextDelegate`      |
-| resolutionPreset         | `ResolutionPreset`         | Present resolution for the camera.                                                           | `ResolutionPreset.max`                 |
-| cameraQuarterTurns       | `int`                      | The number of clockwise quarter turns the camera view should be rotated.                     | `0`                                    |
+| Name                     | Type                           | Description                                                                                  | Default Value                          |
+| ------------------------ | ------------------------------ | -------------------------------------------------------------------------------------------- | -------------------------------------- |
+| isAllowPinchToZoom       | `bool`                         | Whether users can zoom the camera by pinch.                                                  | `true`                                 |
+| isAllowRecording         | `bool`                         | Whether the picker can record video.                                                         | `false`                                |
+| isOnlyAllowRecording     | `bool`                         | Whether the picker can only record video. Only available when `isAllowRecording` is `true `. | `false`                                |
+| enableAudio              | `bool`                         | Whether Whether the picker should record audio. Only available with recording.               | `true`                                 |
+| maximumRecordingDuration | `Duration`                     | The maximum duration of the video recording process.                                         | `const Duration(seconds: 15)`          |
+| theme                    | `ThemeData`                    | Theme data for the picker.                                                                   | `CameraPicker.themeData(C.themeColor)` |
+| textDelegate             | `CameraPickerTextDelegate`     | Text delegate that controls text in widgets.                                                 | `DefaultCameraPickerTextDelegate`      |
+| resolutionPreset         | `ResolutionPreset`             | Present resolution for the camera.                                                           | `ResolutionPreset.max`                 |
+| cameraQuarterTurns       | `int`                          | The number of clockwise quarter turns the camera view should be rotated.                     | `0`                                    |
 
 ### Simple usage
 
@@ -88,4 +89,8 @@ Reference:
 final AssetEntity entity = await CameraPicker.pickFromCamera(context);
 ```
 
-After called and the picker displayed, plus `isAllowRecording` is `true`, tap the shooting button to take a picture, long press the shooting button to record a video.
+After called and the picker displayed,tap the shooting button to take a picture.
+
+If `isAllowPinchToZoom` is `true`, pinch on the screen can zoom the camera.
+
+If `isAllowRecording` is `true`, long press the shooting button to record a video.
