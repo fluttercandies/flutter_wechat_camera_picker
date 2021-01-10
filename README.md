@@ -82,6 +82,7 @@ Reference:
 | textDelegate             | `CameraPickerTextDelegate`     | Text delegate that controls text in widgets.                                                 | `DefaultCameraPickerTextDelegate`      |
 | resolutionPreset         | `ResolutionPreset`             | Present resolution for the camera.                                                           | `ResolutionPreset.max`                 |
 | cameraQuarterTurns       | `int`                          | The number of clockwise quarter turns the camera view should be rotated.                     | `0`                                    |
+| foregroundBuilder        | `Widget Function(CameraValue)` | The foreground widget builder which will cover the whole camera preview.                     | null                                   |
 
 ### Simple usage
 

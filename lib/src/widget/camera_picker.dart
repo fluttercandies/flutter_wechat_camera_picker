@@ -36,6 +36,7 @@ class CameraPicker extends StatefulWidget {
     this.theme,
     this.resolutionPreset = ResolutionPreset.max,
     this.cameraQuarterTurns = 0,
+    this.foregroundBuilder,
     CameraPickerTextDelegate textDelegate,
   })  : assert(
           isAllowRecording == true || isOnlyAllowRecording != true,
@@ -87,6 +88,10 @@ class CameraPicker extends StatefulWidget {
   /// 相机的分辨率预设
   final ResolutionPreset resolutionPreset;
 
+  /// The foreground widget builder which will cover the whole camera preview.
+  /// 覆盖在相机预览上方的前景构建
+  final Widget Function(CameraValue) foregroundBuilder;
+
   /// Static method to create [AssetEntity] through camera.
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity> pickFromCamera(
@@ -100,6 +105,7 @@ class CameraPicker extends StatefulWidget {
     int cameraQuarterTurns = 0,
     CameraPickerTextDelegate textDelegate,
     ResolutionPreset resolutionPreset = ResolutionPreset.max,
+    Widget Function(CameraValue) foregroundBuilder,
   }) async {
     if (isAllowRecording != true && isOnlyAllowRecording == true) {
       throw ArgumentError('Recording mode error.');
@@ -122,6 +128,7 @@ class CameraPicker extends StatefulWidget {
           cameraQuarterTurns: cameraQuarterTurns,
           textDelegate: textDelegate,
           resolutionPreset: resolutionPreset,
+          foregroundBuilder: foregroundBuilder,
         ),
         transitionCurve: Curves.easeIn,
         transitionDuration: _kRouteDuration,
@@ -949,6 +956,10 @@ class CameraPickerState extends State<CameraPicker>
                           children: <Widget>[
                             Positioned.fill(child: _cameraPreview(context)),
                             _focusingAreaWidget,
+                            if (widget.foregroundBuilder != null)
+                              Positioned.fill(
+                                child: widget.foregroundBuilder(value),
+                              ),
                           ],
                         ),
                       ),
