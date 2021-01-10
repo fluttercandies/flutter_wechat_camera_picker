@@ -337,12 +337,17 @@ class CameraPickerState extends State<CameraPicker>
     if (controller == null || !controller.value.isInitialized) {
       return;
     }
-    if (state == AppLifecycleState.inactive) {
-      controller?.dispose();
-    } else if (state == AppLifecycleState.resumed) {
-      if (controller != null) {
-        initCameras(currentCamera);
-      }
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (controller != null) {
+          initCameras(currentCamera);
+        }
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        controller?.dispose();
+        break;
     }
   }
 
