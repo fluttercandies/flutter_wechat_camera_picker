@@ -47,9 +47,9 @@ Flutter SDK：`>=1.20.0` 。
 
 | 参数名                   | 类型                           | 描述                                                              | 默认值                                 |
 | ------------------------ | ------------------------------ | ----------------------------------------------------------------- | -------------------------------------- |
-| isAllowPinchToZoom       | `bool`                         | 用户是否可以在界面上双指缩放相机对焦                                | `true`                                 |
-| isAllowRecording         | `bool`                         | 选择器是否可以录像                                                | `false`                                |
-| isOnlyAllowRecording     | `bool`                         | 选择器是否仅可以录像。只在 `isAllowRecording`  为 `true` 时有效。 | `false`                                |
+| allowPinchToZoom         | `bool`                         | 用户是否可以在界面上双指缩放相机对焦                                | `true`                                 |
+| allowRecording           | `bool`                         | 选择器是否可以录像                                                | `false`                                |
+| onlyAllowRecording       | `bool`                         | 选择器是否仅可以录像。只在 `isAllowRecording`  为 `true` 时有效。 | `false`                                |
 | enabledAudio             | `bool`                         | 选择器是否需要录制音频。只于录像配合有效。                           | `true`                                |
 | maximumRecordingDuration | `Duration`                     | 录制视频最长时长                                                  | `const Duration(seconds: 15)`          |
 | theme                    | `ThemeData`                    | 选择器的主题                                                      | `CameraPicker.themeData(C.themeColor)` |
@@ -63,9 +63,3 @@ Flutter SDK：`>=1.20.0` 。
 ```dart
 final AssetEntity entity = await CameraPicker.pickFromCamera(context);
 ```
-
-在选择器唤起后，点击拍摄按钮以拍照。
-
-如果 `isAllowPinchToZoom` 为 `true`，双指捏合界面可以缩放。
-
-如果 `isAllowRecording` 为 `true`，长按拍摄按钮可以录像。

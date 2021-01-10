@@ -73,9 +73,9 @@ Reference:
 
 | Name                     | Type                           | Description                                                                                  | Default Value                          |
 | ------------------------ | ------------------------------ | -------------------------------------------------------------------------------------------- | -------------------------------------- |
-| isAllowPinchToZoom       | `bool`                         | Whether users can zoom the camera by pinch.                                                  | `true`                                 |
-| isAllowRecording         | `bool`                         | Whether the picker can record video.                                                         | `false`                                |
-| isOnlyAllowRecording     | `bool`                         | Whether the picker can only record video. Only available when `isAllowRecording` is `true `. | `false`                                |
+| allowPinchToZoom         | `bool`                         | Whether users can zoom the camera by pinch.                                                  | `true`                                 |
+| allowRecording           | `bool`                         | Whether the picker can record video.                                                         | `false`                                |
+| onlyAllowRecording       | `bool`                         | Whether the picker can only record video. Only available when `isAllowRecording` is `true `. | `false`                                |
 | enableAudio              | `bool`                         | Whether Whether the picker should record audio. Only available with recording.               | `true`                                 |
 | maximumRecordingDuration | `Duration`                     | The maximum duration of the video recording process.                                         | `const Duration(seconds: 15)`          |
 | theme                    | `ThemeData`                    | Theme data for the picker.                                                                   | `CameraPicker.themeData(C.themeColor)` |
@@ -89,9 +89,3 @@ Reference:
 ```dart
 final AssetEntity entity = await CameraPicker.pickFromCamera(context);
 ```
-
-After called and the picker displayed,tap the shooting button to take a picture.
-
-If `isAllowPinchToZoom` is `true`, pinch on the screen can zoom the camera.
-
-If `isAllowRecording` is `true`, long press the shooting button to record a video.

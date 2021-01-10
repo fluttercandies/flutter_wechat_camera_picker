@@ -28,10 +28,10 @@ const Duration _kRouteDuration = Duration(milliseconds: 300);
 class CameraPicker extends StatefulWidget {
   CameraPicker({
     Key key,
-    this.isAllowPinchToZoom = true,
-    this.isAllowRecording = false,
-    this.isOnlyAllowRecording = false,
+    this.allowRecording = false,
+    this.onlyAllowRecording = false,
     this.enableAudio = true,
+    this.enablePinchToZoom = true,
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
     this.resolutionPreset = ResolutionPreset.max,
@@ -39,7 +39,7 @@ class CameraPicker extends StatefulWidget {
     this.foregroundBuilder,
     CameraPickerTextDelegate textDelegate,
   })  : assert(
-          isAllowRecording == true || isOnlyAllowRecording != true,
+          allowRecording == true || onlyAllowRecording != true,
           'Recording mode error.',
         ),
         assert(
@@ -48,7 +48,7 @@ class CameraPicker extends StatefulWidget {
         ),
         super(key: key) {
     Constants.textDelegate = textDelegate ??
-        (isAllowRecording
+        (allowRecording
             ? DefaultCameraPickerTextDelegateWithRecording()
             : DefaultCameraPickerTextDelegate());
   }
@@ -57,21 +57,21 @@ class CameraPicker extends StatefulWidget {
   /// 摄像机视图顺时针旋转次数，每次90度
   final int cameraQuarterTurns;
 
-  /// Whether users can zoom the camera by pinch.
-  /// 用户是否可以在界面上双指缩放相机对焦
-  final bool isAllowPinchToZoom;
+  /// Whether the picker can record video.
+  /// 选择器是否可以录像
+  final bool allowRecording;
 
   /// Whether the picker can record video.
   /// 选择器是否可以录像
-  final bool isAllowRecording;
-
-  /// Whether the picker can record video.
-  /// 选择器是否可以录像
-  final bool isOnlyAllowRecording;
+  final bool onlyAllowRecording;
 
   /// Whether the picker should record audio.
   /// 选择器录像时是否需要录制声音
   final bool enableAudio;
+
+  /// Whether users can zoom the camera by pinch.
+  /// 用户是否可以在界面上双指缩放相机对焦
+  final bool enablePinchToZoom;
 
   /// The maximum duration of the video recording process.
   /// 录制视频最长时长
@@ -96,9 +96,9 @@ class CameraPicker extends StatefulWidget {
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity> pickFromCamera(
     BuildContext context, {
-    bool isAllowPinchToZoom = true,
-    bool isAllowRecording = false,
-    bool isOnlyAllowRecording = false,
+    bool allowPinchToZoom = true,
+    bool allowRecording = false,
+    bool onlyAllowRecording = false,
     bool enableAudio = true,
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData theme,
@@ -107,7 +107,7 @@ class CameraPicker extends StatefulWidget {
     ResolutionPreset resolutionPreset = ResolutionPreset.max,
     Widget Function(CameraValue) foregroundBuilder,
   }) async {
-    if (isAllowRecording != true && isOnlyAllowRecording == true) {
+    if (allowRecording != true && onlyAllowRecording == true) {
       throw ArgumentError('Recording mode error.');
     }
     if (resolutionPreset == null) {
@@ -119,9 +119,9 @@ class CameraPicker extends StatefulWidget {
     ).push<AssetEntity>(
       SlidePageTransitionBuilder<AssetEntity>(
         builder: CameraPicker(
-          isAllowPinchToZoom: isAllowPinchToZoom,
-          isAllowRecording: isAllowRecording,
-          isOnlyAllowRecording: isOnlyAllowRecording,
+          enablePinchToZoom: allowPinchToZoom,
+          allowRecording: allowRecording,
+          onlyAllowRecording: onlyAllowRecording,
           enableAudio: enableAudio,
           maximumRecordingDuration: maximumRecordingDuration,
           theme: theme,
@@ -273,22 +273,22 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Whether users can zoom the camera by pinch. (A non-null wrapper)
   /// 用户是否可以在界面上双指缩放相机对焦（非空包装）
-  bool get isAllowPinchToZoom => widget.isAllowPinchToZoom ?? true;
+  bool get allowPinchToZoom => widget.enablePinchToZoom ?? true;
 
   /// Whether the picker can record video. (A non-null wrapper)
   /// 选择器是否可以录像（非空包装）
-  bool get isAllowRecording => widget.isAllowRecording ?? false;
+  bool get allowRecording => widget.allowRecording ?? false;
 
   /// Whether the picker can only record video. (A non-null wrapper)
   /// 选择器是否仅可以录像（非空包装）
-  bool get isOnlyAllowRecording => widget.isOnlyAllowRecording ?? false;
+  bool get onlyAllowRecording => widget.onlyAllowRecording ?? false;
 
   /// Whether the picker should record audio. (A non-null wrapper)
   /// 选择器录制视频时，是否需要录制音频（非空包装）
   ///
   /// No audio integration required when it's only for camera.
   /// 在仅允许拍照时不需要启用音频
-  bool get enableAudio => isAllowRecording && (widget.enableAudio ?? true);
+  bool get enableAudio => allowRecording && (widget.enableAudio ?? true);
 
   /// Getter for `widget.maximumRecordingDuration` .
   Duration get maximumRecordingDuration => widget.maximumRecordingDuration;
@@ -742,11 +742,11 @@ class CameraPickerState extends State<CameraPicker>
     final Size outerSize = Size.square(Screens.width / 3.5);
     return Listener(
       behavior: HitTestBehavior.opaque,
-      onPointerUp: isAllowRecording ? recordDetectionCancel : null,
+      onPointerUp: allowRecording ? recordDetectionCancel : null,
       child: InkWell(
         borderRadius: maxBorderRadius,
-        onTap: !isOnlyAllowRecording ? takePicture : null,
-        onLongPress: isAllowRecording ? recordDetection : null,
+        onTap: !onlyAllowRecording ? takePicture : null,
+        onLongPress: allowRecording ? recordDetection : null,
         child: SizedBox.fromSize(
           size: outerSize,
           child: Stack(
@@ -866,9 +866,10 @@ class CameraPickerState extends State<CameraPicker>
       onPointerDown: (_) => _pointers++,
       onPointerUp: (_) => _pointers--,
       child: GestureDetector(
-        onScaleStart: isAllowPinchToZoom ? _handleScaleStart : null,
-        onScaleUpdate: isAllowPinchToZoom ? _handleScaleUpdate : null,
-        onDoubleTap: switchCameras,
+        onScaleStart: allowPinchToZoom ? _handleScaleStart : null,
+        onScaleUpdate: allowPinchToZoom ? _handleScaleUpdate : null,
+        // Enabled cameras switching by default if we have multiple cameras.
+        onDoubleTap: cameras.length > 1 ? switchCameras : null,
         child: CameraPreview(controller),
       ),
     );
