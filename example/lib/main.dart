@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
@@ -14,12 +16,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'WeChat Camera Picker Demo',
       theme: ThemeData(
+        brightness: MediaQueryData.fromWindow(ui.window).platformBrightness,
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'WeChat Camera Picker Demo'),
     );
   }
 }
@@ -40,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: const Center(),
+      body: const Center(child: Text('Click the button to start picking.')),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           CameraPicker.pickFromCamera(
