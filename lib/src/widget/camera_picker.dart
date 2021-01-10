@@ -481,23 +481,31 @@ class CameraPickerState extends State<CameraPicker>
   /// Use the [details] point to set exposure and focus.
   /// 通过点击点的 [details] 设置曝光和对焦。
   void setExposurePoint(TapDownDetails details) {
+    // Ignore point update when the new point is less than 8% and higher than
+    // 92% of the screen's height.
+    if (details.globalPosition.dy < Screens.height / 12 ||
+        details.globalPosition.dy > Screens.height / 12 * 11) {
+      return;
+    }
+    realDebugPrint(
+      'Setting new exposure point ('
+      'x: ${details.globalPosition.dx}, '
+      'y: ${details.globalPosition.dy}'
+      ')',
+    );
     _lastExposurePoint.value = Offset(
-      details.localPosition.dx,
-      details.localPosition.dy,
+      details.globalPosition.dx,
+      details.globalPosition.dy,
     );
     _exposurePointDisplayTimer?.cancel();
     _exposurePointDisplayTimer = Timer(const Duration(seconds: 5), () {
       _lastExposurePoint.value = null;
     });
-    controller.setExposurePoint(
-      _lastExposurePoint.value.scale(1 / Screens.width, 1 / Screens.height),
-    );
-    realDebugPrint(
-      'Setting new exposure point ('
-      'x: ${_lastExposurePoint.value.dx}, '
-      'y: ${_lastExposurePoint.value.dy}'
-      ')',
-    );
+    controller
+      ..setExposureMode(ExposureMode.auto)
+      ..setExposurePoint(
+        _lastExposurePoint.value.scale(1 / Screens.width, 1 / Screens.height),
+      );
   }
 
   /// The method to take a picture.
@@ -770,7 +778,10 @@ class CameraPickerState extends State<CameraPicker>
   /// 用户手动设置的曝光点的区域显示
   Widget get _focusingAreaWidget {
     Widget _buildFromPoint(Offset point) {
-      final double _width = Screens.width / 5;
+      final double _pointWidth = Screens.width / 5;
+      const double _exposureControlWidth = 20;
+      final double _width = _pointWidth + _exposureControlWidth + 2;
+      final bool _shouldReverseLayout = point.dx > Screens.width / 4 * 3;
 
       final double _effectiveLeft = math.min(
         Screens.width - _width,
@@ -785,8 +796,25 @@ class CameraPickerState extends State<CameraPicker>
         left: _effectiveLeft,
         top: _effectiveTop,
         width: _width,
-        height: _width,
-        child: ExposurePointWidget(key: ValueKey<int>(currentTimeStamp)),
+        height: _pointWidth,
+        child: Row(
+          textDirection:
+              _shouldReverseLayout ? TextDirection.rtl : TextDirection.ltr,
+          children: <Widget>[
+            ExposurePointWidget(
+              key: ValueKey<int>(currentTimeStamp),
+              size: _pointWidth,
+            ),
+            const SizedBox(width: 2),
+            SizedBox.fromSize(
+              size: Size(_exposureControlWidth, _pointWidth),
+              child: const Icon(
+                Icons.wb_sunny_outlined,
+                size: _exposureControlWidth,
+              ),
+            ),
+          ],
+        ),
       );
     }
 
@@ -916,7 +944,8 @@ class CameraPickerState extends State<CameraPicker>
                     ),
                   );
                 }
-                return const SizedBox.expand();},
+                return const SizedBox.expand();
+              },
             ),
             _exposureDetectorWidget(context),
             SafeArea(

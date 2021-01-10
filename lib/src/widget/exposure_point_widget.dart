@@ -11,8 +11,9 @@ import 'builder/tween_animation_builder_2.dart';
 class ExposurePointWidget extends StatelessWidget {
   const ExposurePointWidget({
     Key key,
-    this.size = 90,
-  }) : super(key: key);
+    @required this.size,
+  })  : assert(size != null),
+        super(key: key);
 
   final double size;
 
