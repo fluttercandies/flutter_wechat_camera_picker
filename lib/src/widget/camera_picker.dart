@@ -31,6 +31,8 @@ class CameraPicker extends StatefulWidget {
     this.allowRecording = false,
     this.onlyAllowRecording = false,
     this.enableAudio = true,
+    this.enableSetExposure = true,
+    this.enableExposureControlOnPoint = true,
     this.enablePinchToZoom = true,
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
@@ -38,7 +40,16 @@ class CameraPicker extends StatefulWidget {
     this.cameraQuarterTurns = 0,
     this.foregroundBuilder,
     CameraPickerTextDelegate textDelegate,
-  })  : assert(
+  })  : assert(allowRecording != null),
+        assert(onlyAllowRecording != null),
+        assert(enableAudio != null),
+        assert(enablePinchToZoom != null),
+        assert(enableSetExposure != null),
+        assert(enableExposureControlOnPoint != null),
+        assert(maximumRecordingDuration != null),
+        assert(resolutionPreset != null),
+        assert(cameraQuarterTurns != null),
+        assert(
           allowRecording == true || onlyAllowRecording != true,
           'Recording mode error.',
         ),
@@ -69,6 +80,14 @@ class CameraPicker extends StatefulWidget {
   /// 选择器录像时是否需要录制声音
   final bool enableAudio;
 
+  /// Whether users can set the exposure point by tapping.
+  /// 用户是否可以在界面上通过点击设定曝光点
+  final bool enableSetExposure;
+
+  /// Whether users can adjust exposure according to the set point.
+  /// 用户是否可以根据已经设置的曝光点调节曝光度
+  final bool enableExposureControlOnPoint;
+
   /// Whether users can zoom the camera by pinch.
   /// 用户是否可以在界面上双指缩放相机对焦
   final bool enablePinchToZoom;
@@ -96,10 +115,12 @@ class CameraPicker extends StatefulWidget {
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity> pickFromCamera(
     BuildContext context, {
-    bool allowPinchToZoom = true,
     bool allowRecording = false,
     bool onlyAllowRecording = false,
     bool enableAudio = true,
+    bool enableSetExposure = true,
+    bool enableExposureControlOnPoint = true,
+    bool enablePinchToZoom = true,
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData theme,
     int cameraQuarterTurns = 0,
@@ -119,10 +140,12 @@ class CameraPicker extends StatefulWidget {
     ).push<AssetEntity>(
       SlidePageTransitionBuilder<AssetEntity>(
         builder: CameraPicker(
-          enablePinchToZoom: allowPinchToZoom,
           allowRecording: allowRecording,
           onlyAllowRecording: onlyAllowRecording,
           enableAudio: enableAudio,
+          enableSetExposure: enableSetExposure,
+          enableExposureControlOnPoint: enableExposureControlOnPoint,
+          enablePinchToZoom: enablePinchToZoom,
           maximumRecordingDuration: maximumRecordingDuration,
           theme: theme,
           cameraQuarterTurns: cameraQuarterTurns,
@@ -271,24 +294,19 @@ class CameraPickerState extends State<CameraPicker>
   ////////////////////////////// Global Getters //////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
 
-  /// Whether users can zoom the camera by pinch. (A non-null wrapper)
-  /// 用户是否可以在界面上双指缩放相机对焦（非空包装）
-  bool get allowPinchToZoom => widget.enablePinchToZoom ?? true;
+  bool get allowRecording => widget.allowRecording;
 
-  /// Whether the picker can record video. (A non-null wrapper)
-  /// 选择器是否可以录像（非空包装）
-  bool get allowRecording => widget.allowRecording ?? false;
+  bool get onlyAllowRecording => widget.onlyAllowRecording;
 
-  /// Whether the picker can only record video. (A non-null wrapper)
-  /// 选择器是否仅可以录像（非空包装）
-  bool get onlyAllowRecording => widget.onlyAllowRecording ?? false;
-
-  /// Whether the picker should record audio. (A non-null wrapper)
-  /// 选择器录制视频时，是否需要录制音频（非空包装）
-  ///
   /// No audio integration required when it's only for camera.
   /// 在仅允许拍照时不需要启用音频
-  bool get enableAudio => allowRecording && (widget.enableAudio ?? true);
+  bool get enableAudio => allowRecording && widget.enableAudio;
+
+  bool get enableSetExposure => widget.enableSetExposure;
+
+  bool get enableExposureControlOnPoint => widget.enableExposureControlOnPoint;
+
+  bool get enablePinchToZoom => widget.enablePinchToZoom;
 
   /// Getter for `widget.maximumRecordingDuration` .
   Duration get maximumRecordingDuration => widget.maximumRecordingDuration;
@@ -498,7 +516,8 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Use the [details] point to set exposure and focus.
   /// 通过点击点的 [details] 设置曝光和对焦。
-  void setExposurePoint(TapDownDetails details) {
+  void setExposurePoint(TapUpDetails details) {
+    assert(controller != null);
     // Ignore point update when the new point is less than 8% and higher than
     // 92% of the screen's height.
     if (details.globalPosition.dy < Screens.height / 12 ||
@@ -519,11 +538,21 @@ class CameraPickerState extends State<CameraPicker>
     _exposurePointDisplayTimer = Timer(const Duration(seconds: 5), () {
       _lastExposurePoint.value = null;
     });
-    controller
-      ..setExposureMode(ExposureMode.auto)
-      ..setExposurePoint(
-        _lastExposurePoint.value.scale(1 / Screens.width, 1 / Screens.height),
-      );
+    _currentExposureOffset.value = 0;
+    controller.setExposurePoint(
+      _lastExposurePoint.value.scale(1 / Screens.width, 1 / Screens.height),
+    );
+  }
+
+  /// Update the exposure offset using the exposure controller.
+  /// 使用曝光控制器更新曝光值
+  void updateExposureOffset(double value) {
+    assert(controller != null);
+    if (value == _currentExposureOffset.value) {
+      return;
+    }
+    _currentExposureOffset.value = value;
+    controller.setExposureOffset(value);
   }
 
   /// The method to take a picture.
@@ -792,13 +821,91 @@ class CameraPickerState extends State<CameraPicker>
     );
   }
 
+  Widget _exposureSlider(double size, double height, double gap) {
+    Widget _line() {
+      return Center(child: Container(width: 1, color: theme.iconTheme.color));
+    }
+
+    return ValueListenableBuilder<double>(
+      valueListenable: _currentExposureOffset,
+      builder: (_, double exposure, __) {
+        final double _effectiveTop = (size + gap) +
+            (_minAvailableExposureOffset.abs() - exposure) *
+                (height - size * 3) /
+                (_maxAvailableExposureOffset - _minAvailableExposureOffset);
+        final double _effectiveBottom = height - _effectiveTop - size;
+        return Stack(
+          clipBehavior: Clip.none,
+          children: <Widget>[
+            Positioned.fill(
+              top: _effectiveTop + gap,
+              child: _line(),
+            ),
+            Positioned.fill(
+              bottom: _effectiveBottom + gap,
+              child: _line(),
+            ),
+            Positioned(
+              top: (_minAvailableExposureOffset.abs() - exposure) *
+                  (height - size * 3) /
+                  (_maxAvailableExposureOffset - _minAvailableExposureOffset),
+              child: Transform.rotate(
+                angle: exposure,
+                child: Icon(
+                  Icons.wb_sunny_outlined,
+                  size: size,
+                  color: theme.iconTheme.color,
+                ),
+              ),
+            ),
+            Positioned.fill(
+              top: -10,
+              bottom: -10,
+              child: RotatedBox(
+                quarterTurns: 3,
+                child: Opacity(
+                  opacity: 0,
+                  child: Slider(
+                    value: exposure,
+                    min: _minAvailableExposureOffset,
+                    max: _maxAvailableExposureOffset,
+                    onChanged: updateExposureOffset,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   /// The area widget for the last exposure point that user manually set.
   /// 用户手动设置的曝光点的区域显示
   Widget get _focusingAreaWidget {
+    Widget _buildControl(double size, double height) {
+      const double _verticalGap = 3;
+      return Column(
+        children: <Widget>[
+          SizedBox.fromSize(
+            size: Size.square(size),
+            child: Icon(Icons.lock_open_rounded, size: size),
+          ),
+          const SizedBox(height: _verticalGap),
+          Expanded(child: _exposureSlider(size, height, _verticalGap)),
+          const SizedBox(height: _verticalGap),
+          SizedBox.fromSize(size: Size.square(size)),
+        ],
+      );
+    }
+
     Widget _buildFromPoint(Offset point) {
+      const double _controllerWidth = 20;
       final double _pointWidth = Screens.width / 5;
-      const double _exposureControlWidth = 20;
+      final double _exposureControlWidth =
+          enableExposureControlOnPoint ? _controllerWidth : 0;
       final double _width = _pointWidth + _exposureControlWidth + 2;
+
       final bool _shouldReverseLayout = point.dx > Screens.width / 4 * 3;
 
       final double _effectiveLeft = math.min(
@@ -806,15 +913,15 @@ class CameraPickerState extends State<CameraPicker>
         math.max(0, point.dx - _width / 2),
       );
       final double _effectiveTop = math.min(
-        Screens.height - _width,
-        math.max(0, point.dy - _width / 2),
+        Screens.height - _pointWidth * 3,
+        math.max(0, point.dy - _pointWidth * 3 / 2),
       );
 
       return Positioned(
         left: _effectiveLeft,
         top: _effectiveTop,
         width: _width,
-        height: _pointWidth,
+        height: _pointWidth * 3,
         child: Row(
           textDirection:
               _shouldReverseLayout ? TextDirection.rtl : TextDirection.ltr,
@@ -822,15 +929,14 @@ class CameraPickerState extends State<CameraPicker>
             ExposurePointWidget(
               key: ValueKey<int>(currentTimeStamp),
               size: _pointWidth,
+              color: theme.iconTheme.color,
             ),
-            const SizedBox(width: 2),
-            SizedBox.fromSize(
-              size: Size(_exposureControlWidth, _pointWidth),
-              child: const Icon(
-                Icons.wb_sunny_outlined,
-                size: _exposureControlWidth,
+            if (enableExposureControlOnPoint) const SizedBox(width: 2),
+            if (enableExposureControlOnPoint)
+              SizedBox.fromSize(
+                size: Size(_exposureControlWidth, _pointWidth * 3),
+                child: _buildControl(_controllerWidth, _pointWidth * 3),
               ),
-            ),
           ],
         ),
       );
@@ -852,7 +958,7 @@ class CameraPickerState extends State<CameraPicker>
   Widget _exposureDetectorWidget(BuildContext context) {
     return Positioned.fill(
       child: GestureDetector(
-        onTapDown: setExposurePoint,
+        onTapUp: setExposurePoint,
         behavior: HitTestBehavior.translucent,
         child: const SizedBox.expand(),
       ),
@@ -866,8 +972,8 @@ class CameraPickerState extends State<CameraPicker>
       onPointerDown: (_) => _pointers++,
       onPointerUp: (_) => _pointers--,
       child: GestureDetector(
-        onScaleStart: allowPinchToZoom ? _handleScaleStart : null,
-        onScaleUpdate: allowPinchToZoom ? _handleScaleUpdate : null,
+        onScaleStart: enablePinchToZoom ? _handleScaleStart : null,
+        onScaleUpdate: enablePinchToZoom ? _handleScaleUpdate : null,
         // Enabled cameras switching by default if we have multiple cameras.
         onDoubleTap: cameras.length > 1 ? switchCameras : null,
         child: CameraPreview(controller),
@@ -970,7 +1076,7 @@ class CameraPickerState extends State<CameraPicker>
                 return const SizedBox.expand();
               },
             ),
-            _exposureDetectorWidget(context),
+            if (enableSetExposure) _exposureDetectorWidget(context),
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20.0),

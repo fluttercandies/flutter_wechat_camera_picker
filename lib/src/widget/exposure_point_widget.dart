@@ -12,10 +12,13 @@ class ExposurePointWidget extends StatelessWidget {
   const ExposurePointWidget({
     Key key,
     @required this.size,
+    @required this.color,
   })  : assert(size != null),
+        assert(color != null),
         super(key: key);
 
   final double size;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +34,7 @@ class ExposurePointWidget extends StatelessWidget {
           child: SizedBox.fromSize(
             size: Size.square(size),
             child: CustomPaint(
-              painter: ExposurePointPainter(size: size),
+              painter: ExposurePointPainter(size: size, color: color),
             ),
           ),
         ),
@@ -45,11 +48,12 @@ class ExposurePointWidget extends StatelessWidget {
 class ExposurePointPainter extends CustomPainter {
   const ExposurePointPainter({
     @required this.size,
+    @required this.color,
     this.radius = 2,
     this.strokeWidth = 2,
-    this.color = Colors.white,
   })  : assert(size != null),
-        assert(size > 0);
+        assert(size > 0),
+        assert(color != null);
 
   final double size;
   final double radius;

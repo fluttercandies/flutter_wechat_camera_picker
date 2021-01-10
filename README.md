@@ -71,18 +71,20 @@ Reference:
 
 ## Usage 📖
 
-| Name                     | Type                           | Description                                                                                  | Default Value                          |
-| ------------------------ | ------------------------------ | -------------------------------------------------------------------------------------------- | -------------------------------------- |
-| allowPinchToZoom         | `bool`                         | Whether users can zoom the camera by pinch.                                                  | `true`                                 |
-| allowRecording           | `bool`                         | Whether the picker can record video.                                                         | `false`                                |
-| onlyAllowRecording       | `bool`                         | Whether the picker can only record video. Only available when `isAllowRecording` is `true `. | `false`                                |
-| enableAudio              | `bool`                         | Whether Whether the picker should record audio. Only available with recording.               | `true`                                 |
-| maximumRecordingDuration | `Duration`                     | The maximum duration of the video recording process.                                         | `const Duration(seconds: 15)`          |
-| theme                    | `ThemeData`                    | Theme data for the picker.                                                                   | `CameraPicker.themeData(C.themeColor)` |
-| textDelegate             | `CameraPickerTextDelegate`     | Text delegate that controls text in widgets.                                                 | `DefaultCameraPickerTextDelegate`      |
-| resolutionPreset         | `ResolutionPreset`             | Present resolution for the camera.                                                           | `ResolutionPreset.max`                 |
-| cameraQuarterTurns       | `int`                          | The number of clockwise quarter turns the camera view should be rotated.                     | `0`                                    |
-| foregroundBuilder        | `Widget Function(CameraValue)` | The foreground widget builder which will cover the whole camera preview.                     | null                                   |
+| Name                         | Type                           | Description                                                                                  | Default Value                          |
+| ---------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------- | -------------------------------------- |
+| allowRecording               | `bool`                         | Whether the picker can record video.                                                         | `false`                                |
+| onlyAllowRecording           | `bool`                         | Whether the picker can only record video. Only available when `isAllowRecording` is `true `. | `false`                                |
+| enableAudio                  | `bool`                         | Whether Whether the picker should record audio. Only available with recording.               | `true`                                 |
+| enableSetExposure            | `bool`                         | Whether users can set the exposure point by tapping.                                         | `true`                                 |
+| enableExposureControlOnPoint | `bool`                         | Whether users can adjust exposure according to the set point.                                | `true`                                 |
+| enablePinchToZoom            | `bool`                         | Whether users can zoom the camera by pinch.                                                  | `true`                                 |
+| maximumRecordingDuration     | `Duration`                     | The maximum duration of the video recording process.                                         | `const Duration(seconds: 15)`          |
+| theme                        | `ThemeData`                    | Theme data for the picker.                                                                   | `CameraPicker.themeData(C.themeColor)` |
+| textDelegate                 | `CameraPickerTextDelegate`     | Text delegate that controls text in widgets.                                                 | `DefaultCameraPickerTextDelegate`      |
+| resolutionPreset             | `ResolutionPreset`             | Present resolution for the camera.                                                           | `ResolutionPreset.max`                 |
+| cameraQuarterTurns           | `int`                          | The number of clockwise quarter turns the camera view should be rotated.                     | `0`                                    |
+| foregroundBuilder            | `Widget Function(CameraValue)` | The foreground widget builder which will cover the whole camera preview.                     | null                                   |
 
 ### Simple usage
 
