@@ -24,7 +24,6 @@ const Duration _kRouteDuration = Duration(milliseconds: 300);
 /// 通过 [CameraDescription] 整合的拍照选择
 ///
 /// The picker provides create an [AssetEntity] through the camera.
-///
 /// 该选择器可以通过拍照创建 [AssetEntity]。
 class CameraPicker extends StatefulWidget {
   CameraPicker({
@@ -71,7 +70,8 @@ class CameraPicker extends StatefulWidget {
   /// The maximum duration of the video recording process.
   /// 录制视频最长时长
   ///
-  /// Defaults to 15 seconds, also allow `null` for unrestricted video recording.
+  /// Defaults to 15 seconds, allow `null` for unrestricted video recording.
+  /// 默认为 15 秒，可以使用 `null` 来设置无限制的视频录制
   final Duration maximumRecordingDuration;
 
   /// Theme data for the picker.
@@ -179,14 +179,20 @@ class CameraPickerState extends State<CameraPicker>
   /// 最后一次手动聚焦的点坐标
   final ValueNotifier<Offset> _lastExposurePoint = ValueNotifier<Offset>(null);
 
+  /// The [ValueNotifier] to keep the [CameraController].
+  /// 用于保持 [CameraController] 的 [ValueNotifier]
+  final ValueNotifier<CameraController> _controllerNotifier =
+      ValueNotifier<CameraController>(null);
+
   /// The controller for the current camera.
   /// 当前相机实例的控制器
-  CameraController controller;
+  CameraController get controller => _controllerNotifier.value;
 
   /// Available cameras.
   /// 可用的相机实例
   List<CameraDescription> cameras;
 
+  /// Current exposure offset.
   /// 当前曝光值
   final ValueNotifier<double> _currentExposureOffset =
       ValueNotifier<double>(0.0);
@@ -222,7 +228,6 @@ class CameraPickerState extends State<CameraPicker>
   ///
   /// This happens when the [shootingButton] is being long pressed.
   /// It will animate for video recording state.
-  ///
   /// 当长按拍照按钮时，会进入准备录制视频的状态，此时需要执行动画。
   bool isShootingButtonAnimate = false;
 
@@ -236,7 +241,6 @@ class CameraPickerState extends State<CameraPicker>
   /// When the [shootingButton] started animate, this [Timer] will start
   /// at the same time. When the time is more than [recordDetectDuration],
   /// which means we should start recoding, the timer finished.
-  ///
   /// 当拍摄按钮开始执行动画时，定时器会同时启动。时长超过检测时长时，定时器完成。
   Timer _recordDetectTimer;
 
@@ -245,7 +249,6 @@ class CameraPickerState extends State<CameraPicker>
   ///
   /// Stop record When the record time reached the [maximumRecordingDuration].
   /// However, if there's no limitation on record time, this will be useless.
-  ///
   /// 当录像时间达到了最大时长，将通过定时器停止录像。
   /// 但如果录像时间没有限制，定时器将不会起作用。
   Timer _recordCountdownTimer;
@@ -253,11 +256,6 @@ class CameraPickerState extends State<CameraPicker>
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////// Global Getters //////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
-
-  /// Whether the current [CameraDescription] initialized.
-  /// 当前的相机实例是否已完成初始化
-  bool get isInitialized =>
-      controller != null && controller.value?.isInitialized == true;
 
   /// Whether the picker can record video. (A non-null wrapper)
   /// 选择器是否可以录像（非空包装）
@@ -368,49 +366,64 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Initialize cameras instances.
   /// 初始化相机实例
-  Future<void> initCameras([CameraDescription cameraDescription]) async {
-    await controller?.dispose();
+  void initCameras([CameraDescription cameraDescription]) {
+    // Save the current controller to a local variable.
+    final CameraController _c = controller;
+    // Then unbind the controller from widgets, which requires a build frame.
+    setState(() {
+      _controllerNotifier.value = null;
+      // Meanwhile, cancel the existed exposure point.
+      _exposurePointDisplayTimer?.cancel();
+      _lastExposurePoint.value = null;
+    });
+    // **IMPORTANT**: Push methods into a post frame callback, which ensures the
+    // controller has already unbind from widgets.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      // Dispose at last to avoid disposed usage with assertions.
+      await _c?.dispose();
 
-    /// When it's null, which means this is the first time initializing cameras.
-    /// So cameras should fetch.
-    if (cameraDescription == null) {
-      cameras = await availableCameras();
-    }
+      // When the [cameraDescription] is null, which means this is the first
+      // time initializing cameras, so available cameras should be fetched.
+      if (cameraDescription == null) {
+        cameras = await availableCameras();
+      }
 
-    /// After cameras fetched, judge again with the list is empty or not to
-    /// ensure there is at least an available camera for use.
-    if (cameraDescription == null && (cameras?.isEmpty ?? true)) {
-      realDebugPrint('No cameras found.');
-      return;
-    }
+      // After cameras fetched, judge again with the list is empty or not to
+      // ensure there is at least an available camera for use.
+      if (cameraDescription == null && (cameras?.isEmpty ?? true)) {
+        realDebugPrint('No cameras found.');
+        return;
+      }
 
-    /// Initialize the controller with the given resolution preset.
-    controller = CameraController(
-      cameraDescription ?? cameras[0],
-      widget.resolutionPreset,
-      enableAudio: enableAudio,
-    )..addListener(() {
+      // Initialize the controller with the given resolution preset.
+      _controllerNotifier.value = CameraController(
+        cameraDescription ?? cameras[0],
+        widget.resolutionPreset,
+        enableAudio: enableAudio,
+      )..addListener(() {
+          if (controller.value.hasError) {
+            realDebugPrint('Camera error ${controller.value.errorDescription}');
+          }
+        });
+
+      try {
+        await controller.initialize();
+        Future.wait<void>(<Future<dynamic>>[
+          (() async => _maxAvailableExposureOffset =
+              await controller.getMaxExposureOffset())(),
+          (() async => _minAvailableExposureOffset =
+              await controller.getMinExposureOffset())(),
+          (() async =>
+              _maxAvailableZoom = await controller.getMaxZoomLevel())(),
+          (() async =>
+              _minAvailableZoom = await controller.getMinZoomLevel())(),
+        ]);
+      } on CameraException catch (e) {
+        realDebugPrint('CameraException: $e');
+      } finally {
         safeSetState(() {});
-        if (controller.value.hasError) {
-          realDebugPrint('Camera error ${controller.value.errorDescription}');
-        }
-      });
-
-    try {
-      await controller.initialize();
-      Future.wait<void>(<Future<dynamic>>[
-        (() async => _maxAvailableExposureOffset =
-            await controller.getMaxExposureOffset())(),
-        (() async => _minAvailableExposureOffset =
-            await controller.getMinExposureOffset())(),
-        (() async => _maxAvailableZoom = await controller.getMaxZoomLevel())(),
-        (() async => _minAvailableZoom = await controller.getMinZoomLevel())(),
-      ]);
-    } on CameraException catch (e) {
-      realDebugPrint('CameraException: $e');
-    } finally {
-      safeSetState(() {});
-    }
+      }
+    });
   }
 
   /// The method to switch cameras.
@@ -418,7 +431,6 @@ class CameraPickerState extends State<CameraPicker>
   ///
   /// Switch cameras in order. When the [currentCameraIndex] reached the length
   /// of cameras, start from the beginning.
-  ///
   /// 按顺序切换相机。当达到相机数量时从头开始。
   void switchCameras() {
     ++currentCameraIndex;
@@ -493,7 +505,6 @@ class CameraPickerState extends State<CameraPicker>
   ///
   /// The picture will only taken when [isInitialized], and the camera is not
   /// taking pictures.
-  ///
   /// 仅当初始化成功且相机未在拍照时拍照。
   Future<void> takePicture() async {
     if (controller.value.isInitialized && !controller.value.isTakingPicture) {
@@ -520,7 +531,6 @@ class CameraPickerState extends State<CameraPicker>
   /// will be initialized to achieve press time detection. If the duration
   /// reached to same as [recordDetectDuration], and the timer still active,
   /// start recording video.
-  ///
   /// 当 [shootingButton] 触发了长按，初始化一个定时器来实现时间检测。如果长按时间
   /// 达到了 [recordDetectDuration] 且定时器未被销毁，则开始录制视频。
   void recordDetection() {
@@ -536,7 +546,6 @@ class CameraPickerState extends State<CameraPicker>
   /// This will be given to the [Listener] in the [shootingButton]. When it's
   /// called, which means no more pressing on the button, cancel the timer and
   /// reset the status.
-  ///
   /// 这个方法会赋值给 [shootingButton] 中的 [Listener]。当按钮释放了点击后，定时器
   /// 将被取消，并且状态会重置。
   void recordDetectionCancel(PointerUpEvent event) {
@@ -605,22 +614,21 @@ class CameraPickerState extends State<CameraPicker>
   /// This displayed at the top of the screen.
   /// 该区域显示在屏幕上方。
   Widget get settingsAction {
-    if (!isInitialized) {
-      return const SizedBox.shrink();
-    }
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: Row(
-        children: <Widget>[const Spacer(), switchFlashesButton],
+    return _initializeWrapper(
+      builder: (CameraValue v, __) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: Row(
+          children: <Widget>[const Spacer(), switchFlashesButton(v)],
+        ),
       ),
     );
   }
 
   /// The button to switch flash modes.
   /// 切换闪光灯模式的按钮
-  Widget get switchFlashesButton {
+  Widget switchFlashesButton(CameraValue value) {
     IconData icon;
-    switch (controller.value.flashMode) {
+    switch (value.flashMode) {
       case FlashMode.off:
         icon = Icons.flash_off;
         break;
@@ -641,12 +649,9 @@ class CameraPickerState extends State<CameraPicker>
   /// Text widget for shooting tips.
   /// 拍摄的提示文字
   Widget get tipsTextWidget {
-    if (!isInitialized) {
-      return const SizedBox.shrink();
-    }
     return AnimatedOpacity(
       duration: recordDetectDuration,
-      opacity: controller.value.isRecordingVideo ? 0.0 : 1.0,
+      opacity: controller?.value?.isRecordingVideo ?? false ? 0.0 : 1.0,
       child: Padding(
         padding: const EdgeInsets.symmetric(
           vertical: 20.0,
@@ -670,9 +675,9 @@ class CameraPickerState extends State<CameraPicker>
       child: Row(
         children: <Widget>[
           Expanded(
-            child: controller?.value?.isRecordingVideo == false
-                ? Center(child: backButton)
-                : const SizedBox.shrink(),
+            child: controller?.value?.isRecordingVideo == true
+                ? const SizedBox.shrink()
+                : Center(child: backButton),
           ),
           Expanded(child: Center(child: shootingButton)),
           const Spacer(),
@@ -748,7 +753,7 @@ class CameraPickerState extends State<CameraPicker>
                 isInitialized: () =>
                     controller?.value?.isRecordingVideo == true &&
                     isRecordingRestricted,
-                child: CircleProgressBar(
+                builder: (_, __) => CircleProgressBar(
                   duration: maximumRecordingDuration,
                   outerRadius: outerSize.width,
                   ringsWidth: 2.0,
@@ -796,7 +801,7 @@ class CameraPickerState extends State<CameraPicker>
     );
   }
 
-  /// The [GestureDetector] widget for setting exposure poing manually.
+  /// The [GestureDetector] widget for setting exposure point manually.
   /// 用于手动设置曝光点的 [GestureDetector]
   Widget _exposureDetectorWidget(BuildContext context) {
     return Positioned.fill(
@@ -859,15 +864,27 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   Widget _initializeWrapper({
-    @required Widget child,
+    @required Widget Function(CameraValue, Widget) builder,
     bool Function() isInitialized,
+    Widget child,
   }) {
-    assert(child != null);
-    return AnimatedSwitcher(
-      duration: kThemeAnimationDuration,
-      child: isInitialized?.call() ?? this.isInitialized
-          ? child
-          : const SizedBox.shrink(),
+    assert(builder != null);
+    return ValueListenableBuilder<CameraController>(
+      valueListenable: _controllerNotifier,
+      builder: (_, CameraController controller, __) {
+        if (controller != null) {
+          return ValueListenableBuilder<CameraValue>(
+            valueListenable: controller,
+            builder: (_, CameraValue value, Widget w) {
+              return isInitialized?.call() ?? value.isInitialized
+                  ? builder(value, w)
+                  : const SizedBox.shrink();
+            },
+            child: child,
+          );
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 
@@ -881,30 +898,40 @@ class CameraPickerState extends State<CameraPicker>
           fit: StackFit.expand,
           alignment: Alignment.center,
           children: <Widget>[
-            if (isInitialized)
-              RotatedBox(
-                quarterTurns: widget.cameraQuarterTurns ?? 0,
-                child: AspectRatio(
-                  aspectRatio: controller.value.aspectRatio,
-                  child: Stack(
-                    children: <Widget>[
-                      Positioned.fill(child: _cameraPreview(context)),
-                      _focusingAreaWidget,
-                    ],
-                  ),
-                ),
-              ),
+            _initializeWrapper(
+              builder: (CameraValue value, __) {
+                if (value.isInitialized) {
+                  return RotatedBox(
+                    quarterTurns: widget.cameraQuarterTurns ?? 0,
+                    child: AspectRatio(
+                      aspectRatio: controller.value.aspectRatio,
+                      child: RepaintBoundary(
+                        child: Stack(
+                          children: <Widget>[
+                            Positioned.fill(child: _cameraPreview(context)),
+                            _focusingAreaWidget,
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox.expand();},
+            ),
             _exposureDetectorWidget(context),
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20.0),
-                child: Column(
-                  children: <Widget>[
-                    settingsAction,
-                    const Spacer(),
-                    tipsTextWidget,
-                    shootingActions,
-                  ],
+                child: ValueListenableBuilder<CameraController>(
+                  valueListenable: _controllerNotifier,
+                  builder: (_, __, ___) => Column(
+                    children: <Widget>[
+                      settingsAction,
+                      const Spacer(),
+                      tipsTextWidget,
+                      shootingActions,
+                    ],
+                  ),
                 ),
               ),
             ),
