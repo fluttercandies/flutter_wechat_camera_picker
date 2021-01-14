@@ -45,20 +45,20 @@ Flutter SDK：`>=1.20.0` 。
 
 ## 使用方法 📖
 
-| 参数名                       | 类型                           | 描述                                                              | 默认值                                 |
-| ---------------------------- | ------------------------------ | ----------------------------------------------------------------- | -------------------------------------- |
-| allowRecording               | `bool`                         | 选择器是否可以录像                                                | `false`                                |
-| onlyAllowRecording           | `bool`                         | 选择器是否仅可以录像。只在 `isAllowRecording`  为 `true` 时有效。 | `false`                                |
-| enabledAudio                 | `bool`                         | 选择器是否需要录制音频。只于录像配合有效。                           | `true`                                |
-| enableSetExposure            | `bool`                         | 用户是否可以在界面上通过点击设定曝光点                              | `true`                                 |
-| enableExposureControlOnPoint | `bool`                         | 用户是否可以根据已经设置的曝光点调节曝光度                          | `true`                                 |
-| enablePinchToZoom            | `bool`                         | 用户是否可以在界面上双指缩放相机对焦                                | `true`                                 |
-| maximumRecordingDuration     | `Duration`                     | 录制视频最长时长                                                  | `const Duration(seconds: 15)`          |
-| theme                        | `ThemeData`                    | 选择器的主题                                                      | `CameraPicker.themeData(C.themeColor)` |
-| textDelegate                 | `CameraPickerTextDelegate`     | 控制部件中的文字实现                                              | `DefaultCameraPickerTextDelegate`      |
-| resolutionPreset             | `ResolutionPreset`             | 相机的分辨率预设                                                  | `ResolutionPreset.max`                 |
-| cameraQuarterTurns           | `int`                          | 摄像机视图顺时针旋转次数，每次90度                                | `0`                                    |
-| foregroundBuilder            | `Widget Function(CameraValue)` | 覆盖在相机预览上方的前景构建                                    | null                                   |
+| 参数名                       | 类型                           | 描述                                                             | 默认值                                 |
+| ---------------------------- | ------------------------------ | ---------------------------------------------------------------- | -------------------------------------- |
+| enableRecording              | `bool`                         | 选择器是否可以录像                                               | `false`                                |
+| onlyEnableRecording          | `bool`                         | 选择器是否仅可以录像。只在 `enableRecording`  为 `true` 时有效。 | `false`                                |
+| enabledAudio                 | `bool`                         | 选择器是否需要录制音频。只于录像配合有效。                          | `true`                                |
+| enableSetExposure            | `bool`                         | 用户是否可以在界面上通过点击设定曝光点                             | `true`                                 |
+| enableExposureControlOnPoint | `bool`                         | 用户是否可以根据已经设置的曝光点调节曝光度                         | `true`                                 |
+| enablePinchToZoom            | `bool`                         | 用户是否可以在界面上双指缩放相机对焦                               | `true`                                 |
+| maximumRecordingDuration     | `Duration`                     | 录制视频最长时长                                                 | `const Duration(seconds: 15)`          |
+| theme                        | `ThemeData`                    | 选择器的主题                                                     | `CameraPicker.themeData(C.themeColor)` |
+| textDelegate                 | `CameraPickerTextDelegate`     | 控制部件中的文字实现                                             | `DefaultCameraPickerTextDelegate`      |
+| resolutionPreset             | `ResolutionPreset`             | 相机的分辨率预设                                                 | `ResolutionPreset.max`                 |
+| cameraQuarterTurns           | `int`                          | 摄像机视图顺时针旋转次数，每次90度                               | `0`                                    |
+| foregroundBuilder            | `Widget Function(CameraValue)` | 覆盖在相机预览上方的前景构建                                   | null                                   |
 
 ### 简单的使用方法
 

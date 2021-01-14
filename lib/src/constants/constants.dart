@@ -27,7 +27,7 @@ class Constants {
 /// 只在调试模式打印
 void realDebugPrint(dynamic message) {
   if (!kReleaseMode) {
-    log('$message');
+    log('$message', name: 'CameraPicker - LOG');
   }
 }
 

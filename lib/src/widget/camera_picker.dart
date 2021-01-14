@@ -28,8 +28,8 @@ const Duration _kRouteDuration = Duration(milliseconds: 300);
 class CameraPicker extends StatefulWidget {
   CameraPicker({
     Key key,
-    this.allowRecording = false,
-    this.onlyAllowRecording = false,
+    this.enableRecording = false,
+    this.onlyEnableRecording = false,
     this.enableAudio = true,
     this.enableSetExposure = true,
     this.enableExposureControlOnPoint = true,
@@ -40,8 +40,8 @@ class CameraPicker extends StatefulWidget {
     this.cameraQuarterTurns = 0,
     this.foregroundBuilder,
     CameraPickerTextDelegate textDelegate,
-  })  : assert(allowRecording != null),
-        assert(onlyAllowRecording != null),
+  })  : assert(enableRecording != null),
+        assert(onlyEnableRecording != null),
         assert(enableAudio != null),
         assert(enablePinchToZoom != null),
         assert(enableSetExposure != null),
@@ -50,7 +50,7 @@ class CameraPicker extends StatefulWidget {
         assert(resolutionPreset != null),
         assert(cameraQuarterTurns != null),
         assert(
-          allowRecording == true || onlyAllowRecording != true,
+          enableRecording == true || onlyEnableRecording != true,
           'Recording mode error.',
         ),
         assert(
@@ -59,7 +59,7 @@ class CameraPicker extends StatefulWidget {
         ),
         super(key: key) {
     Constants.textDelegate = textDelegate ??
-        (allowRecording
+        (enableRecording
             ? DefaultCameraPickerTextDelegateWithRecording()
             : DefaultCameraPickerTextDelegate());
   }
@@ -70,11 +70,11 @@ class CameraPicker extends StatefulWidget {
 
   /// Whether the picker can record video.
   /// 选择器是否可以录像
-  final bool allowRecording;
+  final bool enableRecording;
 
   /// Whether the picker can record video.
   /// 选择器是否可以录像
-  final bool onlyAllowRecording;
+  final bool onlyEnableRecording;
 
   /// Whether the picker should record audio.
   /// 选择器录像时是否需要录制声音
@@ -115,8 +115,8 @@ class CameraPicker extends StatefulWidget {
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity> pickFromCamera(
     BuildContext context, {
-    bool allowRecording = false,
-    bool onlyAllowRecording = false,
+    bool enableRecording = false,
+    bool onlyEnableRecording = false,
     bool enableAudio = true,
     bool enableSetExposure = true,
     bool enableExposureControlOnPoint = true,
@@ -128,7 +128,7 @@ class CameraPicker extends StatefulWidget {
     ResolutionPreset resolutionPreset = ResolutionPreset.max,
     Widget Function(CameraValue) foregroundBuilder,
   }) async {
-    if (allowRecording != true && onlyAllowRecording == true) {
+    if (enableRecording != true && onlyEnableRecording == true) {
       throw ArgumentError('Recording mode error.');
     }
     if (resolutionPreset == null) {
@@ -140,8 +140,8 @@ class CameraPicker extends StatefulWidget {
     ).push<AssetEntity>(
       SlidePageTransitionBuilder<AssetEntity>(
         builder: CameraPicker(
-          allowRecording: allowRecording,
-          onlyAllowRecording: onlyAllowRecording,
+          enableRecording: enableRecording,
+          onlyEnableRecording: onlyEnableRecording,
           enableAudio: enableAudio,
           enableSetExposure: enableSetExposure,
           enableExposureControlOnPoint: enableExposureControlOnPoint,
@@ -294,13 +294,13 @@ class CameraPickerState extends State<CameraPicker>
   ////////////////////////////// Global Getters //////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
 
-  bool get allowRecording => widget.allowRecording;
+  bool get enableRecording => widget.enableRecording;
 
-  bool get onlyAllowRecording => widget.onlyAllowRecording;
+  bool get onlyEnableRecording => widget.onlyEnableRecording;
 
   /// No audio integration required when it's only for camera.
   /// 在仅允许拍照时不需要启用音频
-  bool get enableAudio => allowRecording && widget.enableAudio;
+  bool get enableAudio => enableRecording && widget.enableAudio;
 
   bool get enableSetExposure => widget.enableSetExposure;
 
@@ -771,11 +771,11 @@ class CameraPickerState extends State<CameraPicker>
     final Size outerSize = Size.square(Screens.width / 3.5);
     return Listener(
       behavior: HitTestBehavior.opaque,
-      onPointerUp: allowRecording ? recordDetectionCancel : null,
+      onPointerUp: enableRecording ? recordDetectionCancel : null,
       child: InkWell(
         borderRadius: maxBorderRadius,
-        onTap: !onlyAllowRecording ? takePicture : null,
-        onLongPress: allowRecording ? recordDetection : null,
+        onTap: !onlyEnableRecording ? takePicture : null,
+        onLongPress: enableRecording ? recordDetection : null,
         child: SizedBox.fromSize(
           size: outerSize,
           child: Stack(

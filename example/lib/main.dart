@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () {
           CameraPicker.pickFromCamera(
             context,
-            allowRecording: true,
+            enableRecording: true,
           );
         },
         tooltip: 'Increment',
