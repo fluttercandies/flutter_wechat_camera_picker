@@ -989,10 +989,10 @@ class CameraPickerState extends State<CameraPicker>
     switch (_effectiveScaleType) {
       case _PreviewScaleType.width:
         _width = Screens.width;
-        _height = Screens.width / controller.value.aspectRatio;
+        _height = Screens.width * controller.value.aspectRatio;
         break;
       case _PreviewScaleType.height:
-        _width = Screens.height * controller.value.aspectRatio;
+        _width = Screens.height / controller.value.aspectRatio;
         _height = Screens.height;
         break;
       default:

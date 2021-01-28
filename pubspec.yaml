@@ -11,13 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  camera:
-    git:
-      url: https://github.com/flutter/plugins.git
-      path: packages/camera/camera
-      ref: cfa709835ab85702ee8a9ed24bbe7a3fe736c3f5
-
+  camera: ^0.7.0
   device_info: ^1.0.0
-  path_provider: ^1.6.24
-  photo_manager: ^0.5.8
+  path_provider: ^1.6.27
+  photo_manager: ^0.6.0
   video_player: ^1.0.1
