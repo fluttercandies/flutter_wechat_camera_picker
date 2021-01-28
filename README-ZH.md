@@ -53,6 +53,7 @@ Flutter SDK：`>=1.20.0` 。
 | enableSetExposure            | `bool`                         | 用户是否可以在界面上通过点击设定曝光点                             | `true`                                 |
 | enableExposureControlOnPoint | `bool`                         | 用户是否可以根据已经设置的曝光点调节曝光度                         | `true`                                 |
 | enablePinchToZoom            | `bool`                         | 用户是否可以在界面上双指缩放相机对焦                               | `true`                                 |
+| shouldDeletePreviewFile      | `bool`                         | 返回页面时是否删除预览文件                                    | `false`                                |
 | maximumRecordingDuration     | `Duration`                     | 录制视频最长时长                                                 | `const Duration(seconds: 15)`          |
 | theme                        | `ThemeData`                    | 选择器的主题                                                     | `CameraPicker.themeData(C.themeColor)` |
 | textDelegate                 | `CameraPickerTextDelegate`     | 控制部件中的文字实现                                             | `DefaultCameraPickerTextDelegate`      |

@@ -12,7 +12,6 @@ import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 export 'package:photo_manager/photo_manager.dart';
 
 export '../delegates/camera_picker_text_delegate.dart';
-export '../utils/device_utils.dart';
 export 'colors.dart';
 export 'screens.dart';
 

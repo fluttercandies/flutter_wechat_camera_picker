@@ -35,6 +35,7 @@ class CameraPicker extends StatefulWidget {
     this.enableSetExposure = true,
     this.enableExposureControlOnPoint = true,
     this.enablePinchToZoom = true,
+    this.shouldDeletePreviewFile = false,
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
     this.resolutionPreset = ResolutionPreset.max,
@@ -48,6 +49,7 @@ class CameraPicker extends StatefulWidget {
         assert(enablePinchToZoom != null),
         assert(enableSetExposure != null),
         assert(enableExposureControlOnPoint != null),
+        assert(shouldDeletePreviewFile != null),
         assert(maximumRecordingDuration != null),
         assert(resolutionPreset != null),
         assert(cameraQuarterTurns != null),
@@ -94,6 +96,10 @@ class CameraPicker extends StatefulWidget {
   /// 用户是否可以在界面上双指缩放相机对焦
   final bool enablePinchToZoom;
 
+  /// Whether the preview file will be delete when pop.
+  /// 返回页面时是否删除预览文件
+  final bool shouldDeletePreviewFile;
+
   /// The maximum duration of the video recording process.
   /// 录制视频最长时长
   ///
@@ -130,6 +136,7 @@ class CameraPicker extends StatefulWidget {
     bool enableSetExposure = true,
     bool enableExposureControlOnPoint = true,
     bool enablePinchToZoom = true,
+    bool shouldDeletePreviewFile = false,
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData theme,
     int cameraQuarterTurns = 0,
@@ -156,6 +163,7 @@ class CameraPicker extends StatefulWidget {
           enableSetExposure: enableSetExposure,
           enableExposureControlOnPoint: enableExposureControlOnPoint,
           enablePinchToZoom: enablePinchToZoom,
+          shouldDeletePreviewFile: shouldDeletePreviewFile,
           maximumRecordingDuration: maximumRecordingDuration,
           theme: theme,
           cameraQuarterTurns: cameraQuarterTurns,
@@ -328,6 +336,8 @@ class CameraPickerState extends State<CameraPicker>
   bool get enableExposureControlOnPoint => widget.enableExposureControlOnPoint;
 
   bool get enablePinchToZoom => widget.enablePinchToZoom;
+
+  bool get shouldDeletePreviewFile => widget.shouldDeletePreviewFile;
 
   /// Getter for `widget.maximumRecordingDuration` .
   Duration get maximumRecordingDuration => widget.maximumRecordingDuration;
@@ -642,6 +652,7 @@ class CameraPickerState extends State<CameraPicker>
           pickerType: CameraPickerViewType.image,
           previewXFile: await controller.takePicture(),
           theme: theme,
+          shouldDeletePreviewFile: shouldDeletePreviewFile,
         );
         if (entity != null) {
           Navigator.of(context).pop(entity);
@@ -721,6 +732,7 @@ class CameraPickerState extends State<CameraPicker>
           pickerType: CameraPickerViewType.video,
           previewXFile: file,
           theme: theme,
+          shouldDeletePreviewFile: shouldDeletePreviewFile,
         );
         if (entity != null) {
           Navigator.of(context).pop(entity);

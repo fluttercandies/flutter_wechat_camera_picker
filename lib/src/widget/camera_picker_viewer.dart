@@ -24,9 +24,12 @@ class CameraPickerViewer extends StatefulWidget {
     @required this.pickerType,
     @required this.previewXFile,
     @required this.theme,
-  })  : assert(
-          theme != null && previewXFile != null && pickerState != null,
-        ),
+    this.shouldDeletePreviewFile = false,
+  })  : assert(pickerState != null),
+        assert(pickerType != null),
+        assert(previewXFile != null),
+        assert(theme != null),
+        assert(shouldDeletePreviewFile != null),
         super(key: key);
 
   /// State of the picker.
@@ -45,6 +48,10 @@ class CameraPickerViewer extends StatefulWidget {
   /// 选择器使用的主题
   final ThemeData theme;
 
+  /// Whether the preview file will be delete when pop.
+  /// 返回页面时是否删除预览文件
+  final bool shouldDeletePreviewFile;
+
   /// Static method to push with the navigator.
   /// 跳转至选择预览的静态方法
   static Future<AssetEntity> pushToViewer(
@@ -53,6 +60,7 @@ class CameraPickerViewer extends StatefulWidget {
     @required CameraPickerViewType pickerType,
     @required XFile previewXFile,
     @required ThemeData theme,
+    bool shouldDeletePreviewFile = false,
   }) async {
     try {
       final Widget viewer = CameraPickerViewer(
@@ -60,6 +68,7 @@ class CameraPickerViewer extends StatefulWidget {
         pickerType: pickerType,
         previewXFile: previewXFile,
         theme: theme,
+        shouldDeletePreviewFile: shouldDeletePreviewFile,
       );
       final PageRouteBuilder<AssetEntity> pageRoute =
           PageRouteBuilder<AssetEntity>(
@@ -105,6 +114,8 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
   File get previewFile => File(previewXFile.path);
 
   ThemeData get theme => widget.theme;
+
+  bool get shouldDeletePreviewFile => widget.shouldDeletePreviewFile;
 
   /* End of widget getter */
 
@@ -216,14 +227,8 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       }
 
       saveFuture.then((AssetEntity entity) {
-        if (Platform.isAndroid) {
-          if (!DeviceUtils.isLowerThanAndroidQ && previewFile.existsSync()) {
-            previewFile.delete();
-          }
-        } else {
-          if (previewFile.existsSync()) {
-            previewFile.delete();
-          }
+        if (shouldDeletePreviewFile && previewFile.existsSync()) {
+          previewFile.delete();
         }
         Navigator.of(context).pop(entity);
       });
