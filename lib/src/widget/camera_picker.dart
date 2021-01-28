@@ -721,12 +721,30 @@ class CameraPickerState extends State<CameraPicker>
   /// This displayed at the top of the screen.
   /// 该区域显示在屏幕上方。
   Widget get settingsAction {
-    return _initializeWrapper(
-      builder: (CameraValue v, __) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: Row(
-          children: <Widget>[const Spacer(), switchFlashesButton(v)],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Row(
+        children: <Widget>[
+          if ((cameras?.length ?? 0) > 1) switchCamerasButton,
+          const Spacer(),
+          _initializeWrapper(
+            builder: (CameraValue v, __) => switchFlashesButton(v),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The button to switch between cameras.
+  /// 切换相机的按钮
+  Widget get switchCamerasButton {
+    return IconButton(
+      onPressed: switchCameras,
+      icon: Icon(
+        Platform.isIOS
+            ? Icons.flip_camera_ios_outlined
+            : Icons.flip_camera_android_outlined,
+        size: 24,
       ),
     );
   }
