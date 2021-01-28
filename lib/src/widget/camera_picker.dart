@@ -38,6 +38,7 @@ class CameraPicker extends StatefulWidget {
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
     this.resolutionPreset = ResolutionPreset.max,
+    this.imageFormatGroup = ImageFormatGroup.jpeg,
     this.cameraQuarterTurns = 0,
     this.foregroundBuilder,
     CameraPickerTextDelegate textDelegate,
@@ -108,6 +109,13 @@ class CameraPicker extends StatefulWidget {
   /// 相机的分辨率预设
   final ResolutionPreset resolutionPreset;
 
+  /// The [ImageFormatGroup] describes the output of the raw image format.
+  /// 输出图像的格式描述
+  ///
+  /// When null the imageFormat will fallback to the platforms default.
+  /// 为空时将使用平台默认值
+  final ImageFormatGroup imageFormatGroup;
+
   /// The foreground widget builder which will cover the whole camera preview.
   /// 覆盖在相机预览上方的前景构建
   final Widget Function(CameraValue) foregroundBuilder;
@@ -127,6 +135,7 @@ class CameraPicker extends StatefulWidget {
     int cameraQuarterTurns = 0,
     CameraPickerTextDelegate textDelegate,
     ResolutionPreset resolutionPreset = ResolutionPreset.max,
+    ImageFormatGroup imageFormatGroup = ImageFormatGroup.jpeg,
     Widget Function(CameraValue) foregroundBuilder,
   }) async {
     if (enableRecording != true && onlyEnableRecording == true) {
@@ -152,6 +161,7 @@ class CameraPicker extends StatefulWidget {
           cameraQuarterTurns: cameraQuarterTurns,
           textDelegate: textDelegate,
           resolutionPreset: resolutionPreset,
+          imageFormatGroup: imageFormatGroup,
           foregroundBuilder: foregroundBuilder,
         ),
         transitionCurve: Curves.easeIn,
@@ -449,6 +459,7 @@ class CameraPickerState extends State<CameraPicker>
         cameraDescription ?? cameras[0],
         widget.resolutionPreset,
         enableAudio: enableAudio,
+        imageFormatGroup: widget.imageFormatGroup,
       )..addListener(() {
           if (controller.value.hasError) {
             realDebugPrint('Camera error ${controller.value.errorDescription}');
