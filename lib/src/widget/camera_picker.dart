@@ -573,7 +573,7 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Use the [details] point to set exposure and focus.
   /// 通过点击点的 [details] 设置曝光和对焦。
-  void setExposurePoint(TapUpDetails details) {
+  void setExposureAndFocusPoint(TapUpDetails details) {
     assert(controller != null);
     // Ignore point update when the new point is less than 8% and higher than
     // 92% of the screen's height.
@@ -596,6 +596,11 @@ class CameraPickerState extends State<CameraPicker>
     controller.setExposurePoint(
       _lastExposurePoint.value.scale(1 / Screens.width, 1 / Screens.height),
     );
+    if (controller.value?.focusPointSupported == true) {
+      controller.setFocusPoint(
+        _lastExposurePoint.value.scale(1 / Screens.width, 1 / Screens.height),
+      );
+    }
     if (_exposureMode.value == ExposureMode.locked) {
       _exposureMode.value = ExposureMode.auto;
     }
@@ -1081,7 +1086,7 @@ class CameraPickerState extends State<CameraPicker>
   Widget _exposureDetectorWidget(BuildContext context) {
     return Positioned.fill(
       child: GestureDetector(
-        onTapUp: setExposurePoint,
+        onTapUp: setExposureAndFocusPoint,
         behavior: HitTestBehavior.translucent,
         child: const SizedBox.expand(),
       ),
