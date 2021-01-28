@@ -573,8 +573,9 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Use the [details] point to set exposure and focus.
   /// 通过点击点的 [details] 设置曝光和对焦。
-  void setExposureAndFocusPoint(TapUpDetails details) {
+  Future<void> setExposureAndFocusPoint(TapUpDetails details) async {
     assert(controller != null);
+    _isExposureModeDisplays.value = false;
     // Ignore point update when the new point is less than 8% and higher than
     // 92% of the screen's height.
     if (details.globalPosition.dy < Screens.height / 12 ||
@@ -593,6 +594,13 @@ class CameraPickerState extends State<CameraPicker>
     );
     _restartPointDisplayTimer();
     _currentExposureOffset.value = 0;
+    if (_exposureMode.value == ExposureMode.locked) {
+      _exposureMode.value = ExposureMode.auto;
+      await Future.wait(<Future<void>>[
+        controller.setExposureOffset(0),
+        controller.setExposureMode(ExposureMode.auto),
+      ]);
+    }
     controller.setExposurePoint(
       _lastExposurePoint.value.scale(1 / Screens.width, 1 / Screens.height),
     );
@@ -601,10 +609,6 @@ class CameraPickerState extends State<CameraPicker>
         _lastExposurePoint.value.scale(1 / Screens.width, 1 / Screens.height),
       );
     }
-    if (_exposureMode.value == ExposureMode.locked) {
-      _exposureMode.value = ExposureMode.auto;
-    }
-    _isExposureModeDisplays.value = false;
   }
 
   /// Update the exposure offset using the exposure controller.
