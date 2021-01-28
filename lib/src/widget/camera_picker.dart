@@ -439,11 +439,18 @@ class CameraPickerState extends State<CameraPicker>
     final CameraController _c = controller;
     // Then unbind the controller from widgets, which requires a build frame.
     setState(() {
+      _currentZoom = 1.0;
+      _baseZoom = 1.0;
+      _maxAvailableZoom = null;
+      _minAvailableZoom = null;
       _controllerNotifier.value = null;
       // Meanwhile, cancel the existed exposure point and mode display.
       _exposureModeDisplayTimer?.cancel();
       _exposurePointDisplayTimer?.cancel();
       _lastExposurePoint.value = null;
+      if (_currentExposureOffset.value != 0.0) {
+        _currentExposureOffset.value = 0.0;
+      }
     });
     // **IMPORTANT**: Push methods into a post frame callback, which ensures the
     // controller has already unbind from widgets.
