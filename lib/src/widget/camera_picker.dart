@@ -18,6 +18,7 @@ import 'builder/slide_page_transition_builder.dart';
 import 'camera_picker_viewer.dart';
 import 'exposure_point_widget.dart';
 
+const Color _lockedColor = Colors.amber;
 const Duration _kRouteDuration = Duration(milliseconds: 300);
 
 /// Create a camera picker integrate with [CameraDescription].
@@ -216,6 +217,14 @@ class CameraPickerState extends State<CameraPicker>
   /// 最后一次手动聚焦的点坐标
   final ValueNotifier<Offset> _lastExposurePoint = ValueNotifier<Offset>(null);
 
+  /// Current exposure mode.
+  /// 当前曝光模式
+  final ValueNotifier<ExposureMode> _exposureMode =
+      ValueNotifier<ExposureMode>(ExposureMode.auto);
+
+  final ValueNotifier<bool> _isExposureModeDisplays =
+      ValueNotifier<bool>(false);
+
   /// The [ValueNotifier] to keep the [CameraController].
   /// 用于保持 [CameraController] 的 [ValueNotifier]
   final ValueNotifier<CameraController> _controllerNotifier =
@@ -271,6 +280,8 @@ class CameraPickerState extends State<CameraPicker>
   /// The [Timer] for keep the [_lastExposurePoint] displays.
   /// 用于控制上次手动聚焦点显示的计时器
   Timer _exposurePointDisplayTimer;
+
+  Timer _exposureModeDisplayTimer;
 
   /// The [Timer] for record start detection.
   /// 用于检测是否开始录制的计时器
@@ -359,7 +370,13 @@ class CameraPickerState extends State<CameraPicker>
     }
     WidgetsBinding.instance.removeObserver(this);
     controller?.dispose();
+    _controllerNotifier?.dispose();
+    _currentExposureOffset?.dispose();
+    _lastExposurePoint?.dispose();
+    _exposureMode?.dispose();
+    _isExposureModeDisplays?.dispose();
     _exposurePointDisplayTimer?.cancel();
+    _exposureModeDisplayTimer?.cancel();
     _recordDetectTimer?.cancel();
     _recordCountdownTimer?.cancel();
     super.dispose();
@@ -371,17 +388,12 @@ class CameraPickerState extends State<CameraPicker>
     if (controller == null || !controller.value.isInitialized) {
       return;
     }
-    switch (state) {
-      case AppLifecycleState.resumed:
-        if (controller != null) {
-          initCameras(currentCamera);
-        }
-        break;
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.paused:
-      case AppLifecycleState.detached:
-        controller?.dispose();
-        break;
+    if (state == AppLifecycleState.inactive) {
+      controller?.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      if (controller != null) {
+        initCameras(currentCamera);
+      }
     }
   }
 
@@ -408,7 +420,8 @@ class CameraPickerState extends State<CameraPicker>
     // Then unbind the controller from widgets, which requires a build frame.
     setState(() {
       _controllerNotifier.value = null;
-      // Meanwhile, cancel the existed exposure point.
+      // Meanwhile, cancel the existed exposure point and mode display.
+      _exposureModeDisplayTimer?.cancel();
       _exposurePointDisplayTimer?.cancel();
       _lastExposurePoint.value = null;
     });
@@ -514,6 +527,39 @@ class CameraPickerState extends State<CameraPicker>
     await controller.setZoomLevel(_currentZoom);
   }
 
+  void _restartPointDisplayTimer() {
+    _exposurePointDisplayTimer?.cancel();
+    _exposurePointDisplayTimer = Timer(const Duration(seconds: 5), () {
+      _lastExposurePoint.value = null;
+    });
+  }
+
+  void _restartModeDisplayTimer() {
+    _exposureModeDisplayTimer?.cancel();
+    _exposureModeDisplayTimer = Timer(const Duration(seconds: 2), () {
+      _isExposureModeDisplays.value = false;
+    });
+  }
+
+  /// Use the specific [mode] to update the exposure mode.
+  /// 设置曝光模式
+  void switchExposureMode() {
+    assert(controller != null);
+    if (_exposureMode.value == ExposureMode.auto) {
+      _exposureMode.value = ExposureMode.locked;
+    } else {
+      _exposureMode.value = ExposureMode.auto;
+    }
+    _exposurePointDisplayTimer?.cancel();
+    if (_exposureMode.value == ExposureMode.auto) {
+      _exposurePointDisplayTimer = Timer(const Duration(seconds: 5), () {
+        _lastExposurePoint.value = null;
+      });
+    }
+    controller.setExposureMode(_exposureMode.value);
+    _restartModeDisplayTimer();
+  }
+
   /// Use the [details] point to set exposure and focus.
   /// 通过点击点的 [details] 设置曝光和对焦。
   void setExposurePoint(TapUpDetails details) {
@@ -534,14 +580,15 @@ class CameraPickerState extends State<CameraPicker>
       details.globalPosition.dx,
       details.globalPosition.dy,
     );
-    _exposurePointDisplayTimer?.cancel();
-    _exposurePointDisplayTimer = Timer(const Duration(seconds: 5), () {
-      _lastExposurePoint.value = null;
-    });
+    _restartPointDisplayTimer();
     _currentExposureOffset.value = 0;
     controller.setExposurePoint(
       _lastExposurePoint.value.scale(1 / Screens.width, 1 / Screens.height),
     );
+    if (_exposureMode.value == ExposureMode.locked) {
+      _exposureMode.value = ExposureMode.auto;
+    }
+    _isExposureModeDisplays.value = false;
   }
 
   /// Update the exposure offset using the exposure controller.
@@ -553,6 +600,11 @@ class CameraPickerState extends State<CameraPicker>
     }
     _currentExposureOffset.value = value;
     controller.setExposureOffset(value);
+    if (!_isExposureModeDisplays.value) {
+      _isExposureModeDisplays.value = true;
+    }
+    _restartModeDisplayTimer();
+    _restartPointDisplayTimer();
   }
 
   /// The method to take a picture.
@@ -793,7 +845,7 @@ class CameraPickerState extends State<CameraPicker>
                     Screens.width / (isShootingButtonAnimate ? 10 : 35),
                   ),
                   decoration: BoxDecoration(
-                    color: theme.canvasColor.withOpacity(0.95),
+                    color: theme.canvasColor.withOpacity(0.85),
                     shape: BoxShape.circle,
                   ),
                   child: const DecoratedBox(
@@ -821,9 +873,25 @@ class CameraPickerState extends State<CameraPicker>
     );
   }
 
-  Widget _exposureSlider(double size, double height, double gap) {
+  Widget _exposureSlider(
+    ExposureMode mode,
+    double size,
+    double height,
+    double gap,
+  ) {
+    final bool isLocked = mode == ExposureMode.locked;
+    final Color color = isLocked ? _lockedColor : theme.iconTheme.color;
+
     Widget _line() {
-      return Center(child: Container(width: 1, color: theme.iconTheme.color));
+      return ValueListenableBuilder<bool>(
+        valueListenable: _isExposureModeDisplays,
+        builder: (_, bool value, Widget child) => AnimatedOpacity(
+          duration: _kRouteDuration,
+          opacity: value ? 1 : 0,
+          child: child,
+        ),
+        child: Center(child: Container(width: 1, color: color)),
+      );
     }
 
     return ValueListenableBuilder<double>(
@@ -854,7 +922,7 @@ class CameraPickerState extends State<CameraPicker>
                 child: Icon(
                   Icons.wb_sunny_outlined,
                   size: size,
-                  color: theme.iconTheme.color,
+                  color: color,
                 ),
               ),
             ),
@@ -888,17 +956,40 @@ class CameraPickerState extends State<CameraPicker>
   Widget get _focusingAreaWidget {
     Widget _buildControl(double size, double height) {
       const double _verticalGap = 3;
-      return Column(
-        children: <Widget>[
-          SizedBox.fromSize(
-            size: Size.square(size),
-            child: Icon(Icons.lock_open_rounded, size: size),
-          ),
-          const SizedBox(height: _verticalGap),
-          Expanded(child: _exposureSlider(size, height, _verticalGap)),
-          const SizedBox(height: _verticalGap),
-          SizedBox.fromSize(size: Size.square(size)),
-        ],
+      return ValueListenableBuilder<ExposureMode>(
+        valueListenable: _exposureMode,
+        builder: (_, ExposureMode mode, __) {
+          final bool isLocked = mode == ExposureMode.locked;
+          return Column(
+            children: <Widget>[
+              ValueListenableBuilder<bool>(
+                valueListenable: _isExposureModeDisplays,
+                builder: (_, bool value, Widget child) => AnimatedOpacity(
+                  duration: _kRouteDuration,
+                  opacity: value ? 1 : 0,
+                  child: child,
+                ),
+                child: GestureDetector(
+                  onTap: switchExposureMode,
+                  child: SizedBox.fromSize(
+                    size: Size.square(size),
+                    child: Icon(
+                      isLocked ? Icons.lock_rounded : Icons.lock_open_rounded,
+                      size: size,
+                      color: isLocked ? _lockedColor : null,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: _verticalGap),
+              Expanded(
+                child: _exposureSlider(mode, size, height, _verticalGap),
+              ),
+              const SizedBox(height: _verticalGap),
+              SizedBox.fromSize(size: Size.square(size)),
+            ],
+          );
+        },
       );
     }
 
@@ -1065,7 +1156,6 @@ class CameraPickerState extends State<CameraPicker>
                         child: Stack(
                           children: <Widget>[
                             Positioned.fill(child: _cameraPreview(context)),
-                            _focusingAreaWidget,
                             if (widget.foregroundBuilder != null)
                               Positioned.fill(
                                 child: widget.foregroundBuilder(value),
@@ -1080,6 +1170,7 @@ class CameraPickerState extends State<CameraPicker>
               },
             ),
             if (enableSetExposure) _exposureDetectorWidget(context),
+            _initializeWrapper(builder: (_, __) => _focusingAreaWidget),
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20.0),
