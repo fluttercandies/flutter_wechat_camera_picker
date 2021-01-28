@@ -72,7 +72,7 @@ Reference:
 ## Usage 📖
 
 | Name                         | Type                           | Description                                                                                 | Default Value                          |
-| ---------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------- - | -------------------------------------- |
+| ---------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------- | -------------------------------------- |
 | enableRecording              | `bool`                         | Whether the picker can record video.                                                        | `false`                                |
 | onlyEnableRecording          | `bool`                         | Whether the picker can only record video. Only available when `enableRecording` is `true `. | `false`                                |
 | enableAudio                  | `bool`                         | Whether Whether the picker should record audio. Only available with recording.              | `true`                                 |
