@@ -863,13 +863,16 @@ class CameraPickerState extends State<CameraPicker>
               bottom: -10,
               child: RotatedBox(
                 quarterTurns: 3,
-                child: Opacity(
-                  opacity: 0,
-                  child: Slider(
-                    value: exposure,
-                    min: _minAvailableExposureOffset,
-                    max: _maxAvailableExposureOffset,
-                    onChanged: updateExposureOffset,
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Opacity(
+                    opacity: 0,
+                    child: Slider(
+                      value: exposure,
+                      min: _minAvailableExposureOffset,
+                      max: _maxAvailableExposureOffset,
+                      onChanged: updateExposureOffset,
+                    ),
                   ),
                 ),
               ),
