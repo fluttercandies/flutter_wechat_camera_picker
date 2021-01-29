@@ -1,6 +1,8 @@
 name: Pub Publish plugin
 
-on: [release]
+on:
+  release:
+    types: [published]
 
 jobs:
   publish:
