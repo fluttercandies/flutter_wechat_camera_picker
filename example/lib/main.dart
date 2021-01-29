@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -37,20 +38,47 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  AssetEntity entity;
+  Uint8List data;
+
+  Future<void> pick(BuildContext context) async {
+    final AssetEntity _entity = await CameraPicker.pickFromCamera(
+      context,
+      enableRecording: true,
+    );
+    if (_entity != null && entity != _entity) {
+      entity = _entity;
+      if (mounted) {
+        setState(() {});
+      }
+      data = await entity.thumbData;
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: const Center(child: Text('Click the button to start picking.')),
+      body: SizedBox.expand(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            if (entity != null && data != null)
+              Image.memory(data)
+            else if (entity != null && data == null)
+              const CircularProgressIndicator()
+            else
+              const Text('Click the button to start picking.'),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          CameraPicker.pickFromCamera(
-            context,
-            enableRecording: true,
-          );
-        },
+        onPressed: () => pick(context),
         tooltip: 'Increment',
         child: const Icon(Icons.camera_enhance),
       ),
