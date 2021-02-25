@@ -23,26 +23,26 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const MyHomePage(title: 'WeChat Camera Picker Demo'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  AssetEntity entity;
-  Uint8List data;
+  AssetEntity? entity;
+  Uint8List? data;
 
   Future<void> pick(BuildContext context) async {
-    final AssetEntity _entity = await CameraPicker.pickFromCamera(
+    final Size size = MediaQuery.of(context).size;
+    final double scale = MediaQuery.of(context).devicePixelRatio;
+    final AssetEntity? _entity = await CameraPicker.pickFromCamera(
       context,
       enableRecording: true,
     );
@@ -51,7 +51,10 @@ class _MyHomePageState extends State<MyHomePage> {
       if (mounted) {
         setState(() {});
       }
-      data = await entity.thumbData;
+      data = await _entity.thumbDataWithSize(
+        (size.width * scale).toInt(),
+        (size.height * scale).toInt(),
+      );
       if (mounted) {
         setState(() {});
       }
@@ -61,21 +64,16 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: SizedBox.expand(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            if (entity != null && data != null)
-              Image.memory(data)
-            else if (entity != null && data == null)
-              const CircularProgressIndicator()
-            else
-              const Text('Click the button to start picking.'),
-          ],
-        ),
+      appBar: AppBar(title: const Text('WeChat Camera Picker Demo')),
+      body: Stack(
+        children: <Widget>[
+          if (entity != null && data != null)
+            Positioned.fill(child: Image.memory(data!, fit: BoxFit.contain))
+          else if (entity != null && data == null)
+            const Center(child: CircularProgressIndicator())
+          else
+            const Center(child: Text('Click the button to start picking.')),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => pick(context),
