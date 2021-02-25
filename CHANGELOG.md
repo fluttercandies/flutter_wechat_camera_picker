@@ -4,24 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 2.0.0-dev.2
-
-- Add `shouldDeletePreviewFile`, allow users to choose whether the captured file should be deleted.
-
-## 2.0.0-dev.1
-
-### Breaking Changes
-
-- `isAllowRecording` -> `enableRecording`
-- `isOnlyAllowRecording` -> `onlyAllowRecording`
+## 2.0.0-dev.3
 
 ### New Features
 
 - Add `enableSetExposure`, allow users to update the exposure from the point tapped on the screen.
 - Add `enableExposureControlOnPoint`, allow users to control the exposure offset with a offset slide from the exposure point.
 - Add `enablePinchToZoom`, allow users to zoom by pinch the screen.
+- Add `enablePullToZoomInRecord`, allow users to zoom by pulling up when recording video.
 - Add `foregroundBuilder`, allow users to build customize widget beyond the camera preview.
+- Add `shouldDeletePreviewFile`, allow users to choose whether the captured file should be deleted.
 - Sync `imageFormatGroup` from the `camera` plugin.
+
+### Breaking Changes
+
+- `isAllowRecording` -> `enableRecording`
+- `isOnlyAllowRecording` -> `onlyAllowRecording`
 
 ### Fixes
 
