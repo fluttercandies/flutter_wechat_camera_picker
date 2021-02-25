@@ -35,6 +35,7 @@ class CameraPicker extends StatefulWidget {
     this.enableSetExposure = true,
     this.enableExposureControlOnPoint = true,
     this.enablePinchToZoom = true,
+    this.enablePullToZoomInRecord = true,
     this.shouldDeletePreviewFile = false,
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
@@ -47,6 +48,7 @@ class CameraPicker extends StatefulWidget {
         assert(onlyEnableRecording != null),
         assert(enableAudio != null),
         assert(enablePinchToZoom != null),
+        assert(enablePullToZoomInRecord != null),
         assert(enableSetExposure != null),
         assert(enableExposureControlOnPoint != null),
         assert(shouldDeletePreviewFile != null),
@@ -95,6 +97,10 @@ class CameraPicker extends StatefulWidget {
   /// Whether users can zoom the camera by pinch.
   /// 用户是否可以在界面上双指缩放相机对焦
   final bool enablePinchToZoom;
+
+  /// Whether users can zoom by pulling up when recording video.
+  /// 用户是否可以在录制视频时上拉缩放
+  final bool enablePullToZoomInRecord;
 
   /// Whether the preview file will be delete when pop.
   /// 返回页面时是否删除预览文件
@@ -235,6 +241,10 @@ class CameraPickerState extends State<CameraPicker>
   /// 最后一次手动聚焦的点坐标
   final ValueNotifier<Offset> _lastExposurePoint = ValueNotifier<Offset>(null);
 
+  /// The last pressed position on the shooting button before starts recording.
+  /// 在开始录像前，最后一次在拍照按钮按下的位置
+  Offset _lastShootingButtonPressedPosition;
+
   /// Current exposure mode.
   /// 当前曝光模式
   final ValueNotifier<ExposureMode> _exposureMode =
@@ -336,6 +346,8 @@ class CameraPickerState extends State<CameraPicker>
   bool get enableExposureControlOnPoint => widget.enableExposureControlOnPoint;
 
   bool get enablePinchToZoom => widget.enablePinchToZoom;
+
+  bool get enablePullToZoomInRecord => widget.enablePullToZoomInRecord;
 
   bool get shouldDeletePreviewFile => widget.shouldDeletePreviewFile;
 
@@ -534,25 +546,33 @@ class CameraPickerState extends State<CameraPicker>
     }
   }
 
+  Future<void> zoom(double scale) async {
+    final double _zoom = (_baseZoom * scale)
+        .clamp(_minAvailableZoom, _maxAvailableZoom)
+        .toDouble();
+    if (_zoom == _currentZoom) {
+      return;
+    }
+    _currentZoom = _zoom;
+
+    await controller.setZoomLevel(_currentZoom);
+  }
+
   /// Handle when the scale gesture start.
   /// 处理缩放开始的手势
   void _handleScaleStart(ScaleStartDetails details) {
     _baseZoom = _currentZoom;
   }
 
-  /// Handle when the scale details is updating.
-  /// 处理缩放更新
+  /// Handle when the double tap scale details is updating.
+  /// 处理双指缩放更新
   Future<void> _handleScaleUpdate(ScaleUpdateDetails details) async {
     // When there are not exactly two fingers on screen don't scale
     if (_pointers != 2) {
       return;
     }
 
-    _currentZoom = (_baseZoom * details.scale)
-        .clamp(_minAvailableZoom, _maxAvailableZoom)
-        .toDouble();
-
-    await controller.setZoomLevel(_currentZoom);
+    zoom(details.scale);
   }
 
   void _restartPointDisplayTimer() {
@@ -644,6 +664,20 @@ class CameraPickerState extends State<CameraPicker>
     _restartPointDisplayTimer();
   }
 
+  void onShootingButtonMove(PointerMoveEvent event) {
+    _lastShootingButtonPressedPosition ??= event.position;
+    if (controller.value.isRecordingVideo) {
+      // First calculate relative offset.
+      final Offset _offset =
+          event.position - _lastShootingButtonPressedPosition;
+      // Then turn negative,
+      // multiply double with 10 * 1.5 - 1 = 14,
+      // plus 1 to ensure always scale.
+      final double _scale = _offset.dy / Screens.height * -14 + 1;
+      zoom(_scale);
+    }
+  }
+
   /// The method to take a picture.
   /// 拍照方法
   ///
@@ -696,6 +730,7 @@ class CameraPickerState extends State<CameraPicker>
   void recordDetectionCancel(PointerUpEvent event) {
     _recordDetectTimer?.cancel();
     if (controller.value.isRecordingVideo) {
+      _lastShootingButtonPressedPosition = null;
       stopRecordingVideo();
       safeSetState(() {});
     }
@@ -760,17 +795,22 @@ class CameraPickerState extends State<CameraPicker>
   /// This displayed at the top of the screen.
   /// 该区域显示在屏幕上方。
   Widget get settingsAction {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: Row(
-        children: <Widget>[
-          if ((cameras?.length ?? 0) > 1) switchCamerasButton,
-          const Spacer(),
-          _initializeWrapper(
-            builder: (CameraValue v, __) => switchFlashesButton(v),
+    return _initializeWrapper(
+      builder: (CameraValue v, __) {
+        if (v.isRecordingVideo) {
+          return const SizedBox.shrink();
+        }
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: Row(
+            children: <Widget>[
+              if ((cameras?.length ?? 0) > 1) switchCamerasButton,
+              const Spacer(),
+              switchFlashesButton(v),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -881,6 +921,7 @@ class CameraPickerState extends State<CameraPicker>
     return Listener(
       behavior: HitTestBehavior.opaque,
       onPointerUp: enableRecording ? recordDetectionCancel : null,
+      onPointerMove: enablePullToZoomInRecord ? onShootingButtonMove : null,
       child: InkWell(
         borderRadius: maxBorderRadius,
         onTap: !onlyEnableRecording ? takePicture : null,
