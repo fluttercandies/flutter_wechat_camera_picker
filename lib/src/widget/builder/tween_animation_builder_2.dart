@@ -14,14 +14,7 @@ class TweenAnimationBuilder2<A, B> extends StatelessWidget {
     this.secondTweenDuration = kThemeAnimationDuration,
     this.firstTweenCurve = Curves.linear,
     this.secondTweenCurve = Curves.linear,
-  })  : assert(firstTween != null),
-        assert(secondTween != null),
-        assert(builder != null),
-        assert(firstTweenDuration != null),
-        assert(secondTweenDuration != null),
-        assert(firstTweenCurve != null),
-        assert(secondTweenCurve != null),
-        super(key: key);
+  }) : super(key: key);
 
   final Tween<A> firstTween;
   final Tween<B> secondTween;

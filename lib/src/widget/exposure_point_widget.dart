@@ -13,9 +13,7 @@ class ExposurePointWidget extends StatelessWidget {
     Key? key,
     required this.size,
     required this.color,
-  })  : assert(size != null),
-        assert(color != null),
-        super(key: key);
+  }) : super(key: key);
 
   final double size;
   final Color color;
@@ -51,9 +49,7 @@ class ExposurePointPainter extends CustomPainter {
     required this.color,
     this.radius = 2,
     this.strokeWidth = 2,
-  })  : assert(size != null),
-        assert(size > 0),
-        assert(color != null);
+  }) : assert(size > 0);
 
   final double size;
   final double radius;

@@ -44,23 +44,9 @@ class CameraPicker extends StatefulWidget {
     this.cameraQuarterTurns = 0,
     this.foregroundBuilder,
     CameraPickerTextDelegate? textDelegate,
-  })  : assert(enableRecording != null),
-        assert(onlyEnableRecording != null),
-        assert(enableAudio != null),
-        assert(enablePinchToZoom != null),
-        assert(enablePullToZoomInRecord != null),
-        assert(enableSetExposure != null),
-        assert(enableExposureControlOnPoint != null),
-        assert(shouldDeletePreviewFile != null),
-        assert(resolutionPreset != null),
-        assert(cameraQuarterTurns != null),
-        assert(
+  })  : assert(
           enableRecording == true || onlyEnableRecording != true,
           'Recording mode error.',
-        ),
-        assert(
-          resolutionPreset != null,
-          'Resolution preset must not be null.',
         ),
         super(key: key) {
     Constants.textDelegate = textDelegate ??
@@ -152,9 +138,6 @@ class CameraPicker extends StatefulWidget {
   }) async {
     if (enableRecording != true && onlyEnableRecording == true) {
       throw ArgumentError('Recording mode error.');
-    }
-    if (resolutionPreset == null) {
-      throw ArgumentError('Resolution preset must not be null.');
     }
     final AssetEntity? result = await Navigator.of(
       context,
@@ -430,7 +413,6 @@ class CameraPickerState extends State<CameraPicker>
   /// Adjust the proper scale type according to the [controller].
   /// 通过 [controller] 的预览大小，判断相机预览适用的缩放类型。
   _PreviewScaleType get _effectiveScaleType {
-    assert(controller != null);
     final Size _size = controller.value.previewSize!;
     final Size _scaledSize = _size * (Screens.widthPixels / _size.height);
     if (_scaledSize.width > Screens.heightPixels) {
@@ -594,7 +576,6 @@ class CameraPickerState extends State<CameraPicker>
   /// Use the specific [mode] to update the exposure mode.
   /// 设置曝光模式
   void switchExposureMode() {
-    assert(controller != null);
     if (_exposureMode.value == ExposureMode.auto) {
       _exposureMode.value = ExposureMode.locked;
     } else {
@@ -613,7 +594,6 @@ class CameraPickerState extends State<CameraPicker>
   /// Use the [details] point to set exposure and focus.
   /// 通过点击点的 [details] 设置曝光和对焦。
   Future<void> setExposureAndFocusPoint(TapUpDetails details) async {
-    assert(controller != null);
     _isExposureModeDisplays.value = false;
     // Ignore point update when the new point is less than 8% and higher than
     // 92% of the screen's height.
@@ -653,7 +633,6 @@ class CameraPickerState extends State<CameraPicker>
   /// Update the exposure offset using the exposure controller.
   /// 使用曝光控制器更新曝光值
   void updateExposureOffset(double value) {
-    assert(controller != null);
     if (value == _currentExposureOffset.value) {
       return;
     }
@@ -1159,8 +1138,6 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   Widget _cameraPreview(BuildContext context) {
-    assert(controller != null);
-
     Widget _preview = Listener(
       onPointerDown: (_) => _pointers++,
       onPointerUp: (_) => _pointers--,
@@ -1214,7 +1191,6 @@ class CameraPickerState extends State<CameraPicker>
     bool Function()? isInitialized,
     Widget? child,
   }) {
-    assert(builder != null);
     return ValueListenableBuilder<CameraController?>(
       valueListenable: _controllerNotifier,
       builder: (_, CameraController? controller, __) {

@@ -25,12 +25,7 @@ class CameraPickerViewer extends StatefulWidget {
     required this.previewXFile,
     required this.theme,
     this.shouldDeletePreviewFile = false,
-  })  : assert(pickerState != null),
-        assert(pickerType != null),
-        assert(previewXFile != null),
-        assert(theme != null),
-        assert(shouldDeletePreviewFile != null),
-        super(key: key);
+  }) : super(key: key);
 
   /// State of the picker.
   /// 选择器的状态实例
