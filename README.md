@@ -13,7 +13,6 @@ Language: English | [中文简体](README-ZH.md)
 
 A **camera picker** which is an extension for [wechat_assets_picker](https://fluttercandies.github.io/flutter_wechat_assets_picker). Based on `camera` for camera functions and `photo_manager` for asset implementation.
 
-
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
@@ -48,10 +47,15 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ## Features ✨
 
-- [x] 💚 99% simillar to WeChat style.
+- [x] 🔐 Non-nullable by default
+- [x] 💚 99% similar to WeChat style
 - [x] 📷 Picture taking support
+  - [x] ☀️ Exposure adjust support
+  - [x] 🔍️ Scale with pinch support
 - [x] 🎥 Video recording support
   - [x] ⏱ Duration limitation support
+  - [x] 🔍 Scale when recording support
+- [x] 🖾 Foreground custom widget builder support
 
 ## Screenshots 📸
 
@@ -63,34 +67,35 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 ### Version constraints
 
-Flutter SDK: `>=1.20.0` .
+Flutter SDK: `>=2.0.0` .
 
-Reference:
+### Setup
+
 - [wechat_assets_picker#preparing-for-use](https://github.com/fluttercandies/flutter_wechat_assets_picker#preparing-for-use-)
 - [camera#installation](https://pub.dev/packages/camera#installation)
 
 ## Usage 📖
 
-| Name                         | Type                           | Description                                                                                 | Default Value                          |
-| ---------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------- | -------------------------------------- |
-| enableRecording              | `bool`                         | Whether the picker can record video.                                                        | `false`                                |
-| onlyEnableRecording          | `bool`                         | Whether the picker can only record video. Only available when `enableRecording` is `true `. | `false`                                |
-| enableAudio                  | `bool`                         | Whether Whether the picker should record audio. Only available with recording.              | `true`                                 |
-| enableSetExposure            | `bool`                         | Whether users can set the exposure point by tapping.                                        | `true`                                 |
-| enableExposureControlOnPoint | `bool`                         | Whether users can adjust exposure according to the set point.                               | `true`                                 |
-| enablePinchToZoom            | `bool`                         | Whether users can zoom the camera by pinch.                                                 | `true`                                 |
-| enablePullToZoomInRecord     | `bool`                         | Whether users can zoom by pulling up when recording video.                                  | `true`                                 |
-| shouldDeletePreviewFile      | `bool`                         | Whether the preview file will be delete when pop.                                           | `false`                                |
-| maximumRecordingDuration     | `Duration`                     | The maximum duration of the video recording process.                                        | `const Duration(seconds: 15)`          |
-| theme                        | `ThemeData`                    | Theme data for the picker.                                                                  | `CameraPicker.themeData(C.themeColor)` |
-| textDelegate                 | `CameraPickerTextDelegate`     | Text delegate that controls text in widgets.                                                | `DefaultCameraPickerTextDelegate`      |
-| resolutionPreset             | `ResolutionPreset`             | Present resolution for the camera.                                                          | `ResolutionPreset.max`                 |
-| cameraQuarterTurns           | `int`                          | The number of clockwise quarter turns the camera view should be rotated.                    | `0`                                    |
-| imageFormatGroup             | `ImageFormatGroup`             | Describes the output of the raw image format.                                               | `ImageFormatGroup.jpeg`                |
-| foregroundBuilder            | `Widget Function(CameraValue)` | The foreground widget builder which will cover the whole camera preview.                    | null                                   |
+| Name                         | Type                            | Description                                                                                 | Default Value                          |
+| ---------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------- | -------------------------------------- |
+| enableRecording              | `bool`                          | Whether the picker can record video.                                                        | `false`                                |
+| onlyEnableRecording          | `bool`                          | Whether the picker can only record video. Only available when `enableRecording` is `true `. | `false`                                |
+| enableAudio                  | `bool`                          | Whether Whether the picker should record audio. Only available with recording.              | `true`                                 |
+| enableSetExposure            | `bool`                          | Whether users can set the exposure point by tapping.                                        | `true`                                 |
+| enableExposureControlOnPoint | `bool`                          | Whether users can adjust exposure according to the set point.                               | `true`                                 |
+| enablePinchToZoom            | `bool`                          | Whether users can zoom the camera by pinch.                                                 | `true`                                 |
+| enablePullToZoomInRecord     | `bool`                          | Whether users can zoom by pulling up when recording video.                                  | `true`                                 |
+| shouldDeletePreviewFile      | `bool`                          | Whether the preview file will be delete when pop.                                           | `false`                                |
+| maximumRecordingDuration     | `Duration`                      | The maximum duration of the video recording process.                                        | `const Duration(seconds: 15)`          |
+| theme                        | `ThemeData`                     | Theme data for the picker.                                                                  | `CameraPicker.themeData(C.themeColor)` |
+| textDelegate                 | `CameraPickerTextDelegate?`     | Text delegate that controls text in widgets.                                                | `DefaultCameraPickerTextDelegate`      |
+| resolutionPreset             | `ResolutionPreset`              | Present resolution for the camera.                                                          | `ResolutionPreset.max`                 |
+| cameraQuarterTurns           | `int`                           | The number of clockwise quarter turns the camera view should be rotated.                    | `0`                                    |
+| imageFormatGroup             | `ImageFormatGroup`              | Describes the output of the raw image format.                                               | `ImageFormatGroup.jpeg`                |
+| foregroundBuilder            | `Widget Function(CameraValue)?` | The foreground widget builder which will cover the whole camera preview.                    | null                                   |
 
 ### Simple usage
 
 ```dart
-final AssetEntity entity = await CameraPicker.pickFromCamera(context);
+final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
 ```
