@@ -613,12 +613,10 @@ class CameraPickerState extends State<CameraPicker>
     );
     _restartPointDisplayTimer();
     _currentExposureOffset.value = 0;
+    await controller.setExposureOffset(0);
     if (_exposureMode.value == ExposureMode.locked) {
+      await controller.setExposureMode(ExposureMode.auto);
       _exposureMode.value = ExposureMode.auto;
-      await Future.wait(<Future<void>>[
-        controller.setExposureOffset(0),
-        controller.setExposureMode(ExposureMode.auto),
-      ]);
     }
     controller.setExposurePoint(
       _lastExposurePoint.value!.scale(1 / Screens.width, 1 / Screens.height),
