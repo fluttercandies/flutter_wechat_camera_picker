@@ -44,6 +44,8 @@ This project follows the [all-contributors](https://github.com/all-contributors/
   - [Preparing for use 🍭](#preparing-for-use-)
   - [Usage 📖](#usage-)
     - [Simple usage](#simple-usage)
+  - [Frequent asked question 💭](#frequent-asked-question-)
+    - [Why there are over-scaled issue when `shouldLockPortrait` set to false ?](#why-there-are-over-scales-issue-when-shouldLockPortrait-set-to-false-)
 
 ## Features ✨
 
@@ -86,8 +88,9 @@ Flutter SDK: `>=2.0.0` .
 | enablePinchToZoom            | `bool`                          | Whether users can zoom the camera by pinch.                                                 | `true`                                 |
 | enablePullToZoomInRecord     | `bool`                          | Whether users can zoom by pulling up when recording video.                                  | `true`                                 |
 | shouldDeletePreviewFile      | `bool`                          | Whether the preview file will be delete when pop.                                           | `false`                                |
+| shouldLockPortrait           | `bool`                          | Whether the orientation should be set to portrait                                           | `true`                                 |
 | maximumRecordingDuration     | `Duration`                      | The maximum duration of the video recording process.                                        | `const Duration(seconds: 15)`          |
-| theme                        | `ThemeData`                     | Theme data for the picker.                                                                  | `CameraPicker.themeData(C.themeColor)` |
+| theme                        | `ThemeData?`                    | Theme data for the picker.                                                                  | `CameraPicker.themeData(C.themeColor)` |
 | textDelegate                 | `CameraPickerTextDelegate?`     | Text delegate that controls text in widgets.                                                | `DefaultCameraPickerTextDelegate`      |
 | resolutionPreset             | `ResolutionPreset`              | Present resolution for the camera.                                                          | `ResolutionPreset.max`                 |
 | cameraQuarterTurns           | `int`                           | The number of clockwise quarter turns the camera view should be rotated.                    | `0`                                    |
@@ -99,3 +102,12 @@ Flutter SDK: `>=2.0.0` .
 ```dart
 final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
 ```
+
+## Frequent asked question 💭
+
+### Why there are over-scaled issue when `shouldLockPortrait` set to false?
+
+Currently the rotate synchronization is not supported.
+The `DeviceOrientation` from the `CameraValue` is different from the one
+comes from flutter when the user is rotating devices.
+The preview widget is synchronized when both orientation is the same.

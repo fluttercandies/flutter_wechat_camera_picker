@@ -15,10 +15,16 @@ Language: [English](README.md) | 中文简体
 
 ## 目录 🗂
 
-* [特性](#特性-)
-* [截图](#截图-)
-* [准备工作](#准备工作-)
-* [使用方法](#使用方法-)
+- [Flutter WeChat Camera Picker](#flutter-wechat-camera-picker)
+  - [目录 🗂](#目录-)
+  - [特性 ✨](#特性-)
+  - [截图 📸](#截图-)
+  - [准备工作 🍭](#准备工作-)
+  - [使用方法 📖](#使用方法-)
+    - [简单的使用方法](#简单的使用方法)
+  - [常见问题 💭](#常见问题-)
+    - [当 `shouldLockPortrait` 为 false 时为何有缩放问题？](#当-shouldLockPortrait-为-false-时为何有缩放问题-)
+
 
 ## 特性 ✨
 
@@ -62,7 +68,7 @@ Flutter SDK：`>=2.0.0` 。
 | enablePullToZoomInRecord     | `bool`                          | 用户是否可以在录制视频时上拉缩放                                 | `true`                                 |
 | shouldDeletePreviewFile      | `bool`                          | 返回页面时是否删除预览文件                                    | `false`                                |
 | maximumRecordingDuration     | `Duration`                      | 录制视频最长时长                                                 | `const Duration(seconds: 15)`          |
-| theme                        | `ThemeData`                     | 选择器的主题                                                     | `CameraPicker.themeData(C.themeColor)` |
+| theme                        | `ThemeData?`                    | 选择器的主题                                                     | `CameraPicker.themeData(C.themeColor)` |
 | textDelegate                 | `CameraPickerTextDelegate?`     | 控制部件中的文字实现                                             | `DefaultCameraPickerTextDelegate`      |
 | resolutionPreset             | `ResolutionPreset`              | 相机的分辨率预设                                                 | `ResolutionPreset.max`                 |
 | cameraQuarterTurns           | `int`                           | 摄像机视图顺时针旋转次数，每次90度                               | `0`                                    |
@@ -74,3 +80,11 @@ Flutter SDK：`>=2.0.0` 。
 ```dart
 final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
 ```
+
+## 常见问题 💭
+
+### 当 `shouldLockPortrait` 为 false 时为何有缩放问题？
+
+当前旋转同步尚未支持。
+当用户在旋转设备时，来自 `CameraValue` 的 `DeviceOrientation` 与 Flutter 的不同。
+在两者匹配时，缩放问题会消失。
