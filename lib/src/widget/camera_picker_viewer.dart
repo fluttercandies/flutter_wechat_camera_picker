@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:path/path.dart' as path;
 import 'package:video_player/video_player.dart';
 
 import '../constants/constants.dart';
@@ -208,13 +209,13 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
           final Uint8List data = await previewFile.readAsBytes();
           saveFuture = PhotoManager.editor.saveImage(
             data,
-            title: previewFile.path,
+            title: path.basename(previewFile.path),
           );
           break;
         case CameraPickerViewType.video:
           saveFuture = PhotoManager.editor.saveVideo(
             previewFile,
-            title: previewFile.path,
+            title: path.basename(previewFile.path),
           );
           break;
       }
