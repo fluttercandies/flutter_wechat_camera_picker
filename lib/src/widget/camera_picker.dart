@@ -44,6 +44,7 @@ class CameraPicker extends StatefulWidget {
     this.imageFormatGroup = ImageFormatGroup.jpeg,
     this.cameraQuarterTurns = 0,
     this.foregroundBuilder,
+    this.onEntitySaving,
     CameraPickerTextDelegate? textDelegate,
   })  : assert(
           enableRecording == true || onlyEnableRecording != true,
@@ -122,6 +123,9 @@ class CameraPicker extends StatefulWidget {
   /// 覆盖在相机预览上方的前景构建
   final Widget Function(CameraValue)? foregroundBuilder;
 
+  /// {@macro wechat_camera_picker.SaveEntityCallback}
+  final EntitySaveCallback? onEntitySaving;
+
   /// Static method to create [AssetEntity] through camera.
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity?> pickFromCamera(
@@ -141,6 +145,7 @@ class CameraPicker extends StatefulWidget {
     ResolutionPreset resolutionPreset = ResolutionPreset.max,
     ImageFormatGroup imageFormatGroup = ImageFormatGroup.jpeg,
     Widget Function(CameraValue)? foregroundBuilder,
+    EntitySaveCallback? onEntitySaving,
   }) async {
     if (enableRecording != true && onlyEnableRecording == true) {
       throw ArgumentError('Recording mode error.');
@@ -166,6 +171,7 @@ class CameraPicker extends StatefulWidget {
           resolutionPreset: resolutionPreset,
           imageFormatGroup: imageFormatGroup,
           foregroundBuilder: foregroundBuilder,
+          onEntitySaving: onEntitySaving,
         ),
         transitionCurve: Curves.easeIn,
         transitionDuration: _kRouteDuration,
@@ -733,6 +739,7 @@ class CameraPickerState extends State<CameraPicker>
           previewXFile: await controller.takePicture(),
           theme: theme,
           shouldDeletePreviewFile: shouldDeletePreviewFile,
+          onEntitySaving: widget.onEntitySaving,
         );
         if (entity != null) {
           Navigator.of(context).pop(entity);

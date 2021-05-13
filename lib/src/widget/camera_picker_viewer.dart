@@ -2,6 +2,7 @@
 /// [Author] Alex (https://github.com/AlexV525)
 /// [Date] 2020/7/16 22:02
 ///
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -18,6 +19,27 @@ import 'camera_picker.dart';
 /// 两种预览类型：图片和视频
 enum CameraPickerViewType { image, video }
 
+/// {@template wechat_camera_picker.SaveEntityCallback}
+/// The callback type define for saving entity in the viewer.
+/// 在查看器中保存图片时的回调
+///
+/// ### Notice about the implementation
+///  * After the callback is implemented, the default saving method
+///    won't called anymore.
+///  * Don't call `Navigator.of(context).pop/maybePop` without popping `null` or
+///    `AssetEntity`, otherwise there will be a type cast error occurred.
+///
+/// ### 在实现时需要注意
+///  * 实现该方法后，原本的保存方法不会再被调用；
+///  * 不要使用 `Navigator.of(context).pop/maybePop` 返回 `null` 或 `AssetEntity`
+///    以外类型的内容，否则会抛出类型转换异常。
+/// {@endtemplate}
+typedef EntitySaveCallback = FutureOr<dynamic> Function({
+  BuildContext context,
+  CameraPickerViewType viewType,
+  File file,
+});
+
 class CameraPickerViewer extends StatefulWidget {
   const CameraPickerViewer({
     Key? key,
@@ -26,6 +48,7 @@ class CameraPickerViewer extends StatefulWidget {
     required this.previewXFile,
     required this.theme,
     this.shouldDeletePreviewFile = false,
+    this.onEntitySaving,
   }) : super(key: key);
 
   /// State of the picker.
@@ -48,6 +71,9 @@ class CameraPickerViewer extends StatefulWidget {
   /// 返回页面时是否删除预览文件
   final bool shouldDeletePreviewFile;
 
+  /// {@macro wechat_camera_picker.SaveEntityCallback}
+  final EntitySaveCallback? onEntitySaving;
+
   /// Static method to push with the navigator.
   /// 跳转至选择预览的静态方法
   static Future<AssetEntity?> pushToViewer(
@@ -57,6 +83,7 @@ class CameraPickerViewer extends StatefulWidget {
     required XFile previewXFile,
     required ThemeData theme,
     bool shouldDeletePreviewFile = false,
+    EntitySaveCallback? onEntitySaving,
   }) async {
     try {
       final Widget viewer = CameraPickerViewer(
@@ -65,6 +92,7 @@ class CameraPickerViewer extends StatefulWidget {
         previewXFile: previewXFile,
         theme: theme,
         shouldDeletePreviewFile: shouldDeletePreviewFile,
+        onEntitySaving: onEntitySaving,
       );
       final PageRouteBuilder<AssetEntity?> pageRoute =
           PageRouteBuilder<AssetEntity?>(
@@ -201,6 +229,14 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
   /// While the entity might returned null, there's no side effects if popping `null`
   /// because the parent picker will ignore it.
   Future<void> createAssetEntityAndPop() async {
+    if (widget.onEntitySaving != null) {
+      await widget.onEntitySaving!(
+        context: context,
+        viewType: pickerType,
+        file: previewFile,
+      );
+      return;
+    }
     try {
       Future<AssetEntity?> saveFuture;
 
