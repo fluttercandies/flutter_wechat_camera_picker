@@ -41,7 +41,7 @@ class CameraPicker extends StatefulWidget {
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
     this.resolutionPreset = ResolutionPreset.max,
-    this.imageFormatGroup = ImageFormatGroup.jpeg,
+    this.imageFormatGroup = ImageFormatGroup.unknown,
     this.cameraQuarterTurns = 0,
     this.foregroundBuilder,
     this.onEntitySaving,
@@ -114,9 +114,6 @@ class CameraPicker extends StatefulWidget {
 
   /// The [ImageFormatGroup] describes the output of the raw image format.
   /// 输出图像的格式描述
-  ///
-  /// When null the imageFormat will fallback to the platforms default.
-  /// 为空时将使用平台默认值
   final ImageFormatGroup imageFormatGroup;
 
   /// The foreground widget builder which will cover the whole camera preview.
@@ -143,7 +140,7 @@ class CameraPicker extends StatefulWidget {
     int cameraQuarterTurns = 0,
     CameraPickerTextDelegate? textDelegate,
     ResolutionPreset resolutionPreset = ResolutionPreset.max,
-    ImageFormatGroup imageFormatGroup = ImageFormatGroup.jpeg,
+    ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
     Widget Function(CameraValue)? foregroundBuilder,
     EntitySaveCallback? onEntitySaving,
   }) async {
@@ -182,47 +179,45 @@ class CameraPicker extends StatefulWidget {
 
   /// Build a dark theme according to the theme color.
   /// 通过主题色构建一个默认的暗黑主题
-  static ThemeData themeData(Color themeColor) => ThemeData.dark().copyWith(
-        buttonColor: themeColor,
+  static ThemeData themeData(Color themeColor) {
+    return ThemeData.dark().copyWith(
+      buttonColor: themeColor,
+      primaryColor: Colors.grey[900],
+      primaryColorBrightness: Brightness.dark,
+      primaryColorLight: Colors.grey[900],
+      primaryColorDark: Colors.grey[900],
+      accentColor: themeColor,
+      accentColorBrightness: Brightness.dark,
+      canvasColor: Colors.grey[850],
+      scaffoldBackgroundColor: Colors.grey[900],
+      bottomAppBarColor: Colors.grey[900],
+      cardColor: Colors.grey[900],
+      highlightColor: Colors.transparent,
+      toggleableActiveColor: themeColor,
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: themeColor,
+        selectionColor: themeColor.withAlpha(100),
+        selectionHandleColor: themeColor,
+      ),
+      indicatorColor: themeColor,
+      appBarTheme: const AppBarTheme(brightness: Brightness.dark, elevation: 0),
+      colorScheme: ColorScheme(
+        primary: Colors.grey[900]!,
+        primaryVariant: Colors.grey[900]!,
+        secondary: themeColor,
+        secondaryVariant: themeColor,
+        background: Colors.grey[900]!,
+        surface: Colors.grey[900]!,
         brightness: Brightness.dark,
-        primaryColor: Colors.grey[900],
-        primaryColorBrightness: Brightness.dark,
-        primaryColorLight: Colors.grey[900],
-        primaryColorDark: Colors.grey[900],
-        accentColor: themeColor,
-        accentColorBrightness: Brightness.dark,
-        canvasColor: Colors.grey[850],
-        scaffoldBackgroundColor: Colors.grey[900],
-        bottomAppBarColor: Colors.grey[900],
-        cardColor: Colors.grey[900],
-        highlightColor: Colors.transparent,
-        toggleableActiveColor: themeColor,
-        textSelectionTheme: TextSelectionThemeData(
-          cursorColor: themeColor,
-          selectionColor: themeColor.withAlpha(100),
-          selectionHandleColor: themeColor,
-        ),
-        indicatorColor: themeColor,
-        appBarTheme: const AppBarTheme(
-          brightness: Brightness.dark,
-          elevation: 0,
-        ),
-        colorScheme: ColorScheme(
-          primary: Colors.grey[900]!,
-          primaryVariant: Colors.grey[900]!,
-          secondary: themeColor,
-          secondaryVariant: themeColor,
-          background: Colors.grey[900]!,
-          surface: Colors.grey[900]!,
-          brightness: Brightness.dark,
-          error: const Color(0xffcf6679),
-          onPrimary: Colors.black,
-          onSecondary: Colors.black,
-          onSurface: Colors.white,
-          onBackground: Colors.white,
-          onError: Colors.black,
-        ),
-      );
+        error: const Color(0xffcf6679),
+        onPrimary: Colors.black,
+        onSecondary: Colors.black,
+        onSurface: Colors.white,
+        onBackground: Colors.white,
+        onError: Colors.black,
+      ),
+    );
+  }
 
   @override
   CameraPickerState createState() => CameraPickerState();
