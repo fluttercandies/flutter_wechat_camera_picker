@@ -72,7 +72,7 @@ Flutter SDK：`>=2.0.0` 。
 | textDelegate                 | `CameraPickerTextDelegate?`     | 控制部件中的文字实现                                             | `DefaultCameraPickerTextDelegate`      |
 | resolutionPreset             | `ResolutionPreset`              | 相机的分辨率预设                                                 | `ResolutionPreset.max`                 |
 | cameraQuarterTurns           | `int`                           | 摄像机视图顺时针旋转次数，每次90度                               | `0`                                    |
-| imageFormatGroup             | `ImageFormatGroup`              | 输出图像的格式描述                                        | `ImageFormatGroup.jpeg`                |
+| imageFormatGroup             | `ImageFormatGroup`              | 输出图像的格式描述                                        | `ImageFormatGroup.unknown`             |
 | foregroundBuilder            | `Widget Function(CameraValue)?` | 覆盖在相机预览上方的前景构建                                   | null                                   |
 | onEntitySaving               | `SaveEntityCallback?`           | 在查看器中保存图片时的回调                                    | null                                   |
 
