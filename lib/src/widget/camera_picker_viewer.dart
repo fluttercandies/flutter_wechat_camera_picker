@@ -227,10 +227,20 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       }
 
       saveFuture.then((AssetEntity entity) {
+        //jy
+        //部分机型保存到相册失败，返回null
+        AssetEntity newEntity;
+        if(entity == null) {
+          newEntity = AssetEntity(id: previewFile.path);
+        }
+        else {
+          newEntity = entity;
+        }
+
         if (shouldDeletePreviewFile && previewFile.existsSync()) {
           previewFile.delete();
         }
-        Navigator.of(context).pop(entity);
+        Navigator.of(context).pop(newEntity);
       });
     } catch (e) {
       realDebugPrint('Error when creating entity: $e');
