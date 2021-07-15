@@ -253,7 +253,7 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Available cameras.
   /// 可用的相机实例
-  late final List<CameraDescription> cameras;
+  late List<CameraDescription> cameras;
 
   /// Current exposure offset.
   /// 当前曝光值
@@ -763,15 +763,15 @@ class CameraPickerState extends State<CameraPicker>
   /// 将被取消，并且状态会重置。
   void recordDetectionCancel(PointerUpEvent event) {
     _recordDetectTimer?.cancel();
-    if (controller.value.isRecordingVideo) {
-      _lastShootingButtonPressedPosition = null;
-      stopRecordingVideo();
-      safeSetState(() {});
-    }
     if (isShootingButtonAnimate) {
       safeSetState(() {
         isShootingButtonAnimate = false;
       });
+    }
+    if (controller.value.isRecordingVideo) {
+      _lastShootingButtonPressedPosition = null;
+      safeSetState(() {});
+      stopRecordingVideo();
     }
   }
 
@@ -790,8 +790,10 @@ class CameraPickerState extends State<CameraPicker>
         realDebugPrint('Error when start recording video: $e');
         if (controller.value.isRecordingVideo) {
           controller.stopVideoRecording().catchError((Object e) {
-            realDebugPrint('Error when stop recording video: $e');
-            throw e;
+            realDebugPrint(
+              'Error when stop recording video after an error start: $e',
+            );
+            stopRecordingVideo();
           });
         }
         throw e;
@@ -802,6 +804,12 @@ class CameraPickerState extends State<CameraPicker>
   /// Stop the recording process.
   /// 停止录制视频
   Future<void> stopRecordingVideo() async {
+    void _handleError() {
+      _recordCountdownTimer?.cancel();
+      isShootingButtonAnimate = false;
+      safeSetState(() {});
+    }
+
     if (controller.value.isRecordingVideo) {
       controller.stopVideoRecording().then((XFile file) async {
         final AssetEntity? entity = await CameraPickerViewer.pushToViewer(
@@ -814,16 +822,20 @@ class CameraPickerState extends State<CameraPicker>
         );
         if (entity != null) {
           Navigator.of(context).pop(entity);
-        } else {
-          safeSetState(() {});
         }
       }).catchError((Object e) {
         realDebugPrint('Error when stop recording video: $e');
+        realDebugPrint('Try to initialize a new CameraController...');
+        initCameras();
+        _handleError();
         throw e;
       }).whenComplete(() {
         isShootingButtonAnimate = false;
+        safeSetState(() {});
       });
+      return;
     }
+    _handleError();
   }
 
   ////////////////////////////////////////////////////////////////////////////

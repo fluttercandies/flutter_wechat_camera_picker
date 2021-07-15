@@ -369,7 +369,12 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
   @override
   Widget build(BuildContext context) {
     if (hasErrorWhenInitializing) {
-      return Center(child: Text(Constants.textDelegate.loadFailed));
+      return Center(
+        child: Text(
+          Constants.textDelegate.loadFailed,
+          style: const TextStyle(inherit: false),
+        ),
+      );
     }
     if (!hasLoaded) {
       return const SizedBox.shrink();
