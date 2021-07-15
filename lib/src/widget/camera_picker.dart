@@ -333,6 +333,11 @@ class CameraPickerState extends State<CameraPicker>
   /// 在仅允许拍照时不需要启用音频
   bool get enableAudio => enableRecording && widget.enableAudio;
 
+  /// Whether the picker needs to prepare for video recording on iOS.
+  /// 是否需要为 iOS 的录制视频执行准备操作
+  bool get shouldPrepareForVideoRecording =>
+      enableRecording && enableAudio && Platform.isIOS;
+
   bool get enableSetExposure => widget.enableSetExposure;
 
   bool get enableExposureControlOnPoint => widget.enableExposureControlOnPoint;
@@ -972,6 +977,9 @@ class CameraPickerState extends State<CameraPicker>
     const Size innerSize = Size.square(82);
     return Listener(
       behavior: HitTestBehavior.opaque,
+      onPointerDown: shouldPrepareForVideoRecording
+          ? (_) => controller.prepareForVideoRecording()
+          : null,
       onPointerUp: enableRecording ? recordDetectionCancel : null,
       onPointerMove: enablePullToZoomInRecord
           ? (PointerMoveEvent e) => onShootingButtonMove(e, constraints)
