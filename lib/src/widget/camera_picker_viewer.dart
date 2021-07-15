@@ -288,7 +288,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
         ),
         child: const Center(
           child: Icon(
-            Icons.close,
+            Icons.keyboard_return_rounded,
             color: Colors.black,
             size: 18.0,
           ),
