@@ -1,4 +1,4 @@
-# Flutter仿微信相机资源选择器
+# Flutter WeChat Camera Picker
 
 [![pub package](https://img.shields.io/pub/v/wechat_camera_picker?logo=dart&label=%E7%A8%B3%E5%AE%9A%E7%89%88&style=flat-square)](https://pub.flutter-io.cn/packages/wechat_camera_picker)
 [![pub package](https://img.shields.io/pub/v/wechat_camera_picker?color=42a012&include_prereleases&label=%E5%BC%80%E5%8F%91%E7%89%88&logo=dart&style=flat-square)](https://pub.flutter-io.cn/packages/wechat_camera_picker)
@@ -11,7 +11,8 @@
 
 Language: [English](README.md) | 中文简体
 
-[**仿微信资源选择器**](https://fluttercandies.github.io/flutter_wechat_assets_picker)的扩展。基于 `camera` 实现相机相关功能， `photo_manager` 实现资源相关内容。
+[**仿微信资源选择器**](https://pub.flutter-io.cn/packages/wechat_assets_picker) 的扩展。
+基于 `camera` 实现相机相关功能，`photo_manager` 实现资源相关内容。
 
 ## 目录 🗂
 
@@ -23,7 +24,7 @@ Language: [English](README.md) | 中文简体
   - [使用方法 📖](#使用方法-)
     - [简单的使用方法](#简单的使用方法)
   - [常见问题 💭](#常见问题-)
-    - [当 `shouldLockPortrait` 为 false 时为何有缩放问题？](#当-shouldLockPortrait-为-false-时为何有缩放问题-)
+    - [当 `shouldLockPortrait` 为 false 时为何有缩放问题？](#当-shouldlockportrait-为-false-时为何有缩放问题)
 
 
 ## 特性 ✨
@@ -53,7 +54,7 @@ Flutter SDK：`>=2.0.0` 。
 ### 配置
 
 - [wechat_assets_picker#准备工作](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/README-ZH.md#preparing-for-use-)
-- [camera#installation](https://pub.dev/packages/camera#installation)
+- [camera#installation](https://pub.flutter-io.cn/packages/camera#installation)
 
 ## 使用方法 📖
 
@@ -89,3 +90,4 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
 当前旋转同步尚未支持。
 当用户在旋转设备时，来自 `CameraValue` 的 `DeviceOrientation` 与 Flutter 的不同。
 在两者匹配时，缩放问题会消失。
+Issue 链接：https://github.com/flutter/flutter/issues/78685
