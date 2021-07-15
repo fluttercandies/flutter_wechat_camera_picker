@@ -143,14 +143,11 @@ class CameraPicker extends StatefulWidget {
     ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
     Widget Function(CameraValue)? foregroundBuilder,
     EntitySaveCallback? onEntitySaving,
-  }) async {
+  }) {
     if (enableRecording != true && onlyEnableRecording == true) {
       throw ArgumentError('Recording mode error.');
     }
-    final AssetEntity? result = await Navigator.of(
-      context,
-      rootNavigator: true,
-    ).push<AssetEntity>(
+    return Navigator.of(context, rootNavigator: true).push<AssetEntity>(
       SlidePageTransitionBuilder<AssetEntity>(
         builder: CameraPicker(
           enableRecording: enableRecording,
@@ -174,7 +171,6 @@ class CameraPicker extends StatefulWidget {
         transitionDuration: _kRouteDuration,
       ),
     );
-    return result;
   }
 
   /// Build a dark theme according to the theme color.
@@ -387,12 +383,7 @@ class CameraPickerState extends State<CameraPicker>
 
     Future<void>.delayed(_kRouteDuration, () {
       if (mounted) {
-        try {
-          initCameras();
-        } catch (e) {
-          realDebugPrint('Error when initializing: $e');
-          Navigator.of(context).pop();
-        }
+        initCameras();
       }
     });
   }
@@ -511,8 +502,10 @@ class CameraPickerState extends State<CameraPicker>
       // After cameras fetched, judge again with the list is empty or not to
       // ensure there is at least an available camera for use.
       if (cameraDescription == null && (cameras.isEmpty)) {
-        realDebugPrint('No cameras found.');
-        return;
+        throw CameraException(
+          'No CameraDescription found.',
+          'No cameras are available in the controller.',
+        );
       }
 
       // Initialize the controller with the given resolution preset.
@@ -523,7 +516,10 @@ class CameraPickerState extends State<CameraPicker>
         imageFormatGroup: widget.imageFormatGroup,
       )..addListener(() {
           if (controller.value.hasError) {
-            realDebugPrint('Camera error ${controller.value.errorDescription}');
+            throw CameraException(
+              'CameraController exception',
+              controller.value.errorDescription,
+            );
           }
         });
 
@@ -539,8 +535,8 @@ class CameraPickerState extends State<CameraPicker>
           (() async =>
               _minAvailableZoom = await controller.getMinZoomLevel())(),
         ]);
-      } on CameraException catch (e) {
-        realDebugPrint('CameraException: $e');
+      } catch (_) {
+        rethrow;
       } finally {
         safeSetState(() {});
       }
@@ -564,21 +560,17 @@ class CameraPickerState extends State<CameraPicker>
   /// The method to switch between flash modes.
   /// 切换闪光灯模式的方法
   Future<void> switchFlashesMode() async {
-    try {
-      switch (controller.value.flashMode) {
-        case FlashMode.off:
-          await controller.setFlashMode(FlashMode.auto);
-          break;
-        case FlashMode.auto:
-          await controller.setFlashMode(FlashMode.always);
-          break;
-        case FlashMode.always:
-        case FlashMode.torch:
-          await controller.setFlashMode(FlashMode.off);
-          break;
-      }
-    } catch (e) {
-      realDebugPrint('Error when switch flash mode: $e');
+    switch (controller.value.flashMode) {
+      case FlashMode.off:
+        await controller.setFlashMode(FlashMode.auto);
+        break;
+      case FlashMode.auto:
+        await controller.setFlashMode(FlashMode.always);
+        break;
+      case FlashMode.always:
+      case FlashMode.torch:
+        await controller.setFlashMode(FlashMode.off);
+        break;
     }
   }
 
@@ -731,23 +723,19 @@ class CameraPickerState extends State<CameraPicker>
   /// 仅当初始化成功且相机未在拍照时拍照。
   Future<void> takePicture() async {
     if (controller.value.isInitialized && !controller.value.isTakingPicture) {
-      try {
-        final AssetEntity? entity = await CameraPickerViewer.pushToViewer(
-          context,
-          pickerState: this,
-          pickerType: CameraPickerViewType.image,
-          previewXFile: await controller.takePicture(),
-          theme: theme,
-          shouldDeletePreviewFile: shouldDeletePreviewFile,
-          onEntitySaving: widget.onEntitySaving,
-        );
-        if (entity != null) {
-          Navigator.of(context).pop(entity);
-        } else {
-          safeSetState(() {});
-        }
-      } catch (e) {
-        realDebugPrint('Error when taking pictures: $e');
+      final AssetEntity? entity = await CameraPickerViewer.pushToViewer(
+        context,
+        pickerState: this,
+        pickerType: CameraPickerViewType.image,
+        previewXFile: await controller.takePicture(),
+        theme: theme,
+        shouldDeletePreviewFile: shouldDeletePreviewFile,
+        onEntitySaving: widget.onEntitySaving,
+      );
+      if (entity != null) {
+        Navigator.of(context).pop(entity);
+      } else {
+        safeSetState(() {});
       }
     }
   }
@@ -798,13 +786,15 @@ class CameraPickerState extends State<CameraPicker>
             stopRecordingVideo();
           });
         }
-      }).catchError((dynamic e) {
-        realDebugPrint('Error when recording video: $e');
+      }).catchError((Object e) {
+        realDebugPrint('Error when start recording video: $e');
         if (controller.value.isRecordingVideo) {
-          controller.stopVideoRecording().catchError((dynamic e) {
+          controller.stopVideoRecording().catchError((Object e) {
             realDebugPrint('Error when stop recording video: $e');
+            throw e;
           });
         }
+        throw e;
       });
     }
   }
@@ -827,8 +817,9 @@ class CameraPickerState extends State<CameraPicker>
         } else {
           safeSetState(() {});
         }
-      }).catchError((dynamic e) {
+      }).catchError((Object e) {
         realDebugPrint('Error when stop recording video: $e');
+        throw e;
       }).whenComplete(() {
         isShootingButtonAnimate = false;
       });

@@ -84,25 +84,17 @@ class CameraPickerViewer extends StatefulWidget {
     required ThemeData theme,
     bool shouldDeletePreviewFile = false,
     EntitySaveCallback? onEntitySaving,
-  }) async {
-    try {
-      final Widget viewer = CameraPickerViewer(
-        pickerState: pickerState,
-        pickerType: pickerType,
-        previewXFile: previewXFile,
-        theme: theme,
-        shouldDeletePreviewFile: shouldDeletePreviewFile,
-        onEntitySaving: onEntitySaving,
-      );
-      final PageRouteBuilder<AssetEntity?> pageRoute =
-          PageRouteBuilder<AssetEntity?>(
-        pageBuilder: (
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-        ) {
-          return viewer;
-        },
+  }) {
+    return Navigator.of(context).push<AssetEntity?>(
+      PageRouteBuilder<AssetEntity?>(
+        pageBuilder: (_, __, ___) => CameraPickerViewer(
+          pickerState: pickerState,
+          pickerType: pickerType,
+          previewXFile: previewXFile,
+          theme: theme,
+          shouldDeletePreviewFile: shouldDeletePreviewFile,
+          onEntitySaving: onEntitySaving,
+        ),
         transitionsBuilder: (
           BuildContext context,
           Animation<double> animation,
@@ -111,14 +103,8 @@ class CameraPickerViewer extends StatefulWidget {
         ) {
           return FadeTransition(opacity: animation, child: child);
         },
-      );
-      final AssetEntity? result =
-          await Navigator.of(context).push<AssetEntity?>(pageRoute);
-      return result;
-    } catch (e) {
-      realDebugPrint('Error when calling camera picker viewer: $e');
-      return null;
-    }
+      ),
+    );
   }
 
   @override
@@ -188,8 +174,9 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       videoController.addListener(videoPlayerListener);
       hasLoaded = true;
     } catch (e) {
-      realDebugPrint('Error when initialize video controller: $e');
       hasErrorWhenInitializing = true;
+      realDebugPrint('Error when initializing video controller: $e');
+      rethrow;
     } finally {
       if (mounted) {
         setState(() {});
@@ -237,34 +224,30 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       );
       return;
     }
-    try {
-      Future<AssetEntity?> saveFuture;
+    Future<AssetEntity?> saveFuture;
 
-      switch (pickerType) {
-        case CameraPickerViewType.image:
-          final Uint8List data = await previewFile.readAsBytes();
-          saveFuture = PhotoManager.editor.saveImage(
-            data,
-            title: path.basename(previewFile.path),
-          );
-          break;
-        case CameraPickerViewType.video:
-          saveFuture = PhotoManager.editor.saveVideo(
-            previewFile,
-            title: path.basename(previewFile.path),
-          );
-          break;
-      }
-
-      saveFuture.then((AssetEntity? entity) {
-        if (shouldDeletePreviewFile && previewFile.existsSync()) {
-          previewFile.delete();
-        }
-        Navigator.of(context).pop(entity);
-      });
-    } catch (e) {
-      realDebugPrint('Error when creating entity: $e');
+    switch (pickerType) {
+      case CameraPickerViewType.image:
+        final Uint8List data = await previewFile.readAsBytes();
+        saveFuture = PhotoManager.editor.saveImage(
+          data,
+          title: path.basename(previewFile.path),
+        );
+        break;
+      case CameraPickerViewType.video:
+        saveFuture = PhotoManager.editor.saveVideo(
+          previewFile,
+          title: path.basename(previewFile.path),
+        );
+        break;
     }
+
+    saveFuture.then((AssetEntity? entity) {
+      if (shouldDeletePreviewFile && previewFile.existsSync()) {
+        previewFile.delete();
+      }
+      Navigator.of(context).pop(entity);
+    });
   }
 
   /// The back button for the preview section.
