@@ -143,11 +143,15 @@ class CameraPicker extends StatefulWidget {
     ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
     Widget Function(CameraValue)? foregroundBuilder,
     EntitySaveCallback? onEntitySaving,
+    bool useRootNavigator = true,
   }) {
     if (enableRecording != true && onlyEnableRecording == true) {
       throw ArgumentError('Recording mode error.');
     }
-    return Navigator.of(context, rootNavigator: true).push<AssetEntity>(
+    return Navigator.of(
+      context,
+      rootNavigator: useRootNavigator,
+    ).push<AssetEntity>(
       SlidePageTransitionBuilder<AssetEntity>(
         builder: CameraPicker(
           enableRecording: enableRecording,
