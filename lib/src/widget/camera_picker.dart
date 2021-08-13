@@ -363,7 +363,7 @@ class CameraPickerState extends State<CameraPicker>
 
   /// A getter to the current [CameraDescription].
   /// 获取当前相机实例
-  CameraDescription get currentCamera => cameras.elementAt(currentCameraIndex >= cameras.length ? cameras.length-1 : currentCameraIndex);
+  CameraDescription get currentCamera => cameras.elementAt(currentCameraIndex);
 
   /// If there's no theme provided from the user, use [CameraPicker.themeData] .
   /// 如果用户未提供主题，
@@ -510,7 +510,7 @@ class CameraPickerState extends State<CameraPicker>
         cameras = await availableCameras();
         if(cameras.isNotEmpty) {
           if (cameras.length <= widget.initCameraIndex) {
-            currentCameraIndex = cameras.length - 1;
+            currentCameraIndex = 0;
           } else {
             currentCameraIndex = widget.initCameraIndex;
           }
@@ -569,7 +569,7 @@ class CameraPickerState extends State<CameraPicker>
   /// 按顺序切换相机。当达到相机数量时从头开始。
   void switchCameras() {
     ++currentCameraIndex;
-    if (currentCameraIndex >= cameras.length) {
+    if (currentCameraIndex == cameras.length) {
       currentCameraIndex = 0;
     }
     initCameras(currentCamera);
