@@ -59,7 +59,7 @@ class CameraPicker extends StatefulWidget {
   }
 
   /// The number of Initializing the Camera.
-  /// 摄像机摄像头，用于调用后置摄像头，如果没有后置摄像头会变为最后一个
+  /// 摄像机摄像头，用于调用后置摄像头，如果没有后置摄像头会变为0
   final int initCameraIndex;
 
   /// The number of clockwise quarter turns the camera view should be rotated.
