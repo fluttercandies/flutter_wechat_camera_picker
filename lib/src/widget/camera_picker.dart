@@ -43,6 +43,7 @@ class CameraPicker extends StatefulWidget {
     this.resolutionPreset = ResolutionPreset.max,
     this.imageFormatGroup = ImageFormatGroup.unknown,
     this.cameraQuarterTurns = 0,
+    this.initCameraIndex = 0,
     this.foregroundBuilder,
     this.onEntitySaving,
     CameraPickerTextDelegate? textDelegate,
@@ -56,6 +57,10 @@ class CameraPicker extends StatefulWidget {
             ? DefaultCameraPickerTextDelegateWithRecording()
             : DefaultCameraPickerTextDelegate());
   }
+
+  /// The number of Initializing the Camera.
+  /// 摄像机摄像头，用于调用后置摄像头，如果没有后置摄像头会变为最后一个
+  final int initCameraIndex;
 
   /// The number of clockwise quarter turns the camera view should be rotated.
   /// 摄像机视图顺时针旋转次数，每次90度
@@ -138,6 +143,7 @@ class CameraPicker extends StatefulWidget {
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData? theme,
     int cameraQuarterTurns = 0,
+    int initCameraIndex = 0,
     CameraPickerTextDelegate? textDelegate,
     ResolutionPreset resolutionPreset = ResolutionPreset.max,
     ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
@@ -165,6 +171,7 @@ class CameraPicker extends StatefulWidget {
           maximumRecordingDuration: maximumRecordingDuration,
           theme: theme,
           cameraQuarterTurns: cameraQuarterTurns,
+          initCameraIndex: initCameraIndex,
           textDelegate: textDelegate,
           resolutionPreset: resolutionPreset,
           imageFormatGroup: imageFormatGroup,
@@ -356,7 +363,7 @@ class CameraPickerState extends State<CameraPicker>
 
   /// A getter to the current [CameraDescription].
   /// 获取当前相机实例
-  CameraDescription get currentCamera => cameras.elementAt(currentCameraIndex);
+  CameraDescription get currentCamera => cameras.elementAt(currentCameraIndex >= cameras.length ? cameras.length-1 : currentCameraIndex);
 
   /// If there's no theme provided from the user, use [CameraPicker.themeData] .
   /// 如果用户未提供主题，
@@ -501,6 +508,13 @@ class CameraPickerState extends State<CameraPicker>
       // time initializing cameras, so available cameras should be fetched.
       if (cameraDescription == null) {
         cameras = await availableCameras();
+        if(cameras.isNotEmpty) {
+          if (cameras.length <= widget.initCameraIndex) {
+            currentCameraIndex = cameras.length - 1;
+          } else {
+            currentCameraIndex = widget.initCameraIndex;
+          }
+        }
       }
 
       // After cameras fetched, judge again with the list is empty or not to
@@ -514,7 +528,7 @@ class CameraPickerState extends State<CameraPicker>
 
       // Initialize the controller with the given resolution preset.
       _controllerNotifier.value = CameraController(
-        cameraDescription ?? cameras[0],
+        cameraDescription ?? cameras[currentCameraIndex],
         widget.resolutionPreset,
         enableAudio: enableAudio,
         imageFormatGroup: widget.imageFormatGroup,
@@ -555,7 +569,7 @@ class CameraPickerState extends State<CameraPicker>
   /// 按顺序切换相机。当达到相机数量时从头开始。
   void switchCameras() {
     ++currentCameraIndex;
-    if (currentCameraIndex == cameras.length) {
+    if (currentCameraIndex >= cameras.length) {
       currentCameraIndex = 0;
     }
     initCameras(currentCamera);
