@@ -369,6 +369,8 @@ class CameraPickerState extends State<CameraPicker>
   /// 通过常量全局 Key 获取当前选择器的主题
   ThemeData get theme => _theme;
 
+  bool _isPreparedForIOSRecording = false;
+
   @override
   void initState() {
     super.initState();
@@ -783,8 +785,12 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Set record file path and start recording.
   /// 设置拍摄文件路径并开始录制视频
-  void startRecordingVideo() {
+  Future<void> startRecordingVideo() async {
     if (!controller.value.isRecordingVideo) {
+      if (!_isPreparedForIOSRecording) {
+        await controller.prepareForVideoRecording();
+        _isPreparedForIOSRecording = true;
+      }
       controller.startVideoRecording().then((dynamic _) {
         safeSetState(() {});
         if (isRecordingRestricted) {
@@ -986,9 +992,6 @@ class CameraPickerState extends State<CameraPicker>
     const Size innerSize = Size.square(82);
     return Listener(
       behavior: HitTestBehavior.opaque,
-      onPointerDown: shouldPrepareForVideoRecording
-          ? (_) => controller.prepareForVideoRecording()
-          : null,
       onPointerUp: enableRecording ? recordDetectionCancel : null,
       onPointerMove: enablePullToZoomInRecord
           ? (PointerMoveEvent e) => onShootingButtonMove(e, constraints)
