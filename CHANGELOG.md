@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.1
+
+- Expose `enablePullToZoomInRecord` for the `pickFromCamera` method.
+- Trigger shooting preparation only when start recording on iOS.
+
 ## 2.3.0
 
 - Expose `useRootNavigator` while picking.
