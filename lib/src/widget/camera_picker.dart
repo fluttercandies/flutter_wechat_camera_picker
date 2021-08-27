@@ -6,10 +6,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:camera/camera.dart';
 
 import '../constants/constants.dart';
 import '../widget/circular_progress_bar.dart';
@@ -43,7 +43,7 @@ class CameraPicker extends StatefulWidget {
     this.resolutionPreset = ResolutionPreset.max,
     this.imageFormatGroup = ImageFormatGroup.unknown,
     this.cameraQuarterTurns = 0,
-    this.initCameraIndex = 0,
+    this.preferredCameraIndex = 0,
     this.foregroundBuilder,
     this.onEntitySaving,
     CameraPickerTextDelegate? textDelegate,
@@ -57,10 +57,6 @@ class CameraPicker extends StatefulWidget {
             ? DefaultCameraPickerTextDelegateWithRecording()
             : DefaultCameraPickerTextDelegate());
   }
-
-  /// The number of Initializing the Camera.
-  /// 摄像机摄像头，用于调用后置摄像头，如果没有后置摄像头会变为0
-  final int initCameraIndex;
 
   /// The number of clockwise quarter turns the camera view should be rotated.
   /// 摄像机视图顺时针旋转次数，每次90度
@@ -121,6 +117,10 @@ class CameraPicker extends StatefulWidget {
   /// 输出图像的格式描述
   final ImageFormatGroup imageFormatGroup;
 
+  /// Which camera is preferred to use when initializing.
+  /// 指定初始化时期望使用第几个摄像头
+  final int preferredCameraIndex;
+
   /// The foreground widget builder which will cover the whole camera preview.
   /// 覆盖在相机预览上方的前景构建
   final Widget Function(CameraValue)? foregroundBuilder;
@@ -144,7 +144,7 @@ class CameraPicker extends StatefulWidget {
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData? theme,
     int cameraQuarterTurns = 0,
-    int initCameraIndex = 0,
+    int preferredCameraIndex = 0,
     CameraPickerTextDelegate? textDelegate,
     ResolutionPreset resolutionPreset = ResolutionPreset.max,
     ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
@@ -173,7 +173,7 @@ class CameraPicker extends StatefulWidget {
           maximumRecordingDuration: maximumRecordingDuration,
           theme: theme,
           cameraQuarterTurns: cameraQuarterTurns,
-          initCameraIndex: initCameraIndex,
+          preferredCameraIndex: preferredCameraIndex,
           textDelegate: textDelegate,
           resolutionPreset: resolutionPreset,
           imageFormatGroup: imageFormatGroup,
@@ -512,13 +512,6 @@ class CameraPickerState extends State<CameraPicker>
       // time initializing cameras, so available cameras should be fetched.
       if (cameraDescription == null) {
         cameras = await availableCameras();
-        if (cameras.isNotEmpty) {
-          if (cameras.length <= widget.initCameraIndex) {
-            currentCameraIndex = 0;
-          } else {
-            currentCameraIndex = widget.initCameraIndex;
-          }
-        }
       }
 
       // After cameras fetched, judge again with the list is empty or not to
@@ -528,6 +521,13 @@ class CameraPickerState extends State<CameraPicker>
           'No CameraDescription found.',
           'No cameras are available in the controller.',
         );
+      }
+
+      // Pick the preferred camera if it exist, otherwise use the default one.
+      if (cameras.length > widget.preferredCameraIndex) {
+        currentCameraIndex = widget.preferredCameraIndex;
+      } else {
+        currentCameraIndex = 0;
       }
 
       // Initialize the controller with the given resolution preset.
