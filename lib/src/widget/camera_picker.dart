@@ -512,7 +512,7 @@ class CameraPickerState extends State<CameraPicker>
       // time initializing cameras, so available cameras should be fetched.
       if (cameraDescription == null) {
         cameras = await availableCameras();
-        if(cameras.isNotEmpty) {
+        if (cameras.isNotEmpty) {
           if (cameras.length <= widget.initCameraIndex) {
             currentCameraIndex = 0;
           } else {
