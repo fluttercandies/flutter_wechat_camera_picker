@@ -138,6 +138,7 @@ class CameraPicker extends StatefulWidget {
     bool enableSetExposure = true,
     bool enableExposureControlOnPoint = true,
     bool enablePinchToZoom = true,
+    bool enablePullToZoomInRecord = true,
     bool shouldDeletePreviewFile = false,
     bool shouldLockPortrait = true,
     Duration maximumRecordingDuration = const Duration(seconds: 15),
@@ -166,6 +167,7 @@ class CameraPicker extends StatefulWidget {
           enableSetExposure: enableSetExposure,
           enableExposureControlOnPoint: enableExposureControlOnPoint,
           enablePinchToZoom: enablePinchToZoom,
+          enablePullToZoomInRecord: enablePullToZoomInRecord,
           shouldDeletePreviewFile: shouldDeletePreviewFile,
           shouldLockPortrait: shouldLockPortrait,
           maximumRecordingDuration: maximumRecordingDuration,
@@ -373,6 +375,8 @@ class CameraPickerState extends State<CameraPicker>
   /// Get [ThemeData] of the [AssetPicker] through [Constants.pickerKey].
   /// 通过常量全局 Key 获取当前选择器的主题
   ThemeData get theme => _theme;
+
+  bool _isPreparedForIOSRecording = false;
 
   @override
   void initState() {
@@ -795,8 +799,12 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Set record file path and start recording.
   /// 设置拍摄文件路径并开始录制视频
-  void startRecordingVideo() {
+  Future<void> startRecordingVideo() async {
     if (!controller.value.isRecordingVideo) {
+      if (!_isPreparedForIOSRecording) {
+        await controller.prepareForVideoRecording();
+        _isPreparedForIOSRecording = true;
+      }
       controller.startVideoRecording().then((dynamic _) {
         safeSetState(() {});
         if (isRecordingRestricted) {
@@ -998,9 +1006,6 @@ class CameraPickerState extends State<CameraPicker>
     const Size innerSize = Size.square(82);
     return Listener(
       behavior: HitTestBehavior.opaque,
-      onPointerDown: shouldPrepareForVideoRecording
-          ? (_) => controller.prepareForVideoRecording()
-          : null,
       onPointerUp: enableRecording ? recordDetectionCancel : null,
       onPointerMove: enablePullToZoomInRecord
           ? (PointerMoveEvent e) => onShootingButtonMove(e, constraints)
