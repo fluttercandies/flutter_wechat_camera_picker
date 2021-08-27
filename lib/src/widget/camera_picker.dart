@@ -51,6 +51,7 @@ class CameraPicker extends StatefulWidget {
           enableRecording == true || onlyEnableRecording != true,
           'Recording mode error.',
         ),
+        assert(preferredCameraIndex >= 0, 'Preferred camera is not valid.'),
         super(key: key) {
     Constants.textDelegate = textDelegate ??
         (enableRecording
@@ -524,7 +525,8 @@ class CameraPickerState extends State<CameraPicker>
       }
 
       // Pick the preferred camera if it exist, otherwise use the default one.
-      if (cameras.length > widget.preferredCameraIndex) {
+      if (widget.preferredCameraIndex > 0 &&
+          cameras.length > widget.preferredCameraIndex) {
         currentCameraIndex = widget.preferredCameraIndex;
       } else {
         currentCameraIndex = 0;
