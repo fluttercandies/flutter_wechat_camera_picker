@@ -1238,7 +1238,7 @@ class CameraPickerState extends State<CameraPicker>
           top: _offsetVertical,
           bottom: _offsetVertical,
           child: RotatedBox(
-            quarterTurns: widget.cameraQuarterTurns,
+            quarterTurns: -widget.cameraQuarterTurns,
             child: _preview,
           ),
         ),
