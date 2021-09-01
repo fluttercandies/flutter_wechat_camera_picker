@@ -37,7 +37,6 @@ class CameraPicker extends StatefulWidget {
     this.enablePinchToZoom = true,
     this.enablePullToZoomInRecord = true,
     this.shouldDeletePreviewFile = false,
-    this.shouldLockPortrait = true,
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
     this.resolutionPreset = ResolutionPreset.max,
@@ -93,10 +92,6 @@ class CameraPicker extends StatefulWidget {
   /// 返回页面时是否删除预览文件
   final bool shouldDeletePreviewFile;
 
-  /// Whether the orientation should be set to portrait.
-  /// 相机是否需要强制竖屏
-  final bool shouldLockPortrait;
-
   /// The maximum duration of the video recording process.
   /// 录制视频最长时长
   ///
@@ -135,7 +130,6 @@ class CameraPicker extends StatefulWidget {
     bool enablePinchToZoom = true,
     bool enablePullToZoomInRecord = true,
     bool shouldDeletePreviewFile = false,
-    bool shouldLockPortrait = true,
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData? theme,
     int cameraQuarterTurns = 0,
@@ -163,7 +157,6 @@ class CameraPicker extends StatefulWidget {
           enablePinchToZoom: enablePinchToZoom,
           enablePullToZoomInRecord: enablePullToZoomInRecord,
           shouldDeletePreviewFile: shouldDeletePreviewFile,
-          shouldLockPortrait: shouldLockPortrait,
           maximumRecordingDuration: maximumRecordingDuration,
           theme: theme,
           cameraQuarterTurns: cameraQuarterTurns,
@@ -374,12 +367,6 @@ class CameraPickerState extends State<CameraPicker>
   @override
   void initState() {
     super.initState();
-    if (widget.shouldLockPortrait) {
-      SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ]);
-    }
     WidgetsBinding.instance?.removeObserver(this);
 
     // TODO(Alex): Currently hide status bar will cause the viewport shaking on Android.
@@ -398,9 +385,6 @@ class CameraPickerState extends State<CameraPicker>
 
   @override
   void dispose() {
-    if (widget.shouldLockPortrait) {
-      SystemChrome.setPreferredOrientations(DeviceOrientation.values);
-    }
     if (!Platform.isAndroid) {
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     }
@@ -429,35 +413,6 @@ class CameraPickerState extends State<CameraPicker>
     } else if (state == AppLifecycleState.resumed) {
       initCameras(currentCamera);
     }
-  }
-
-  /// Turn camera preview according to the camera's orientation.
-  /// 根据相机的旋转调整预览的旋转角度
-  ///
-  /// Note: turns only takes effect when the orientation is locked.
-  /// 注意：仅在设备自动旋转锁定的情况下生效。
-  int _previewQuarterTurns(
-    DeviceOrientation orientation,
-    BoxConstraints constraints,
-  ) {
-    int turns = -widget.cameraQuarterTurns;
-    if (!widget.shouldLockPortrait) {
-      return turns;
-    }
-    switch (orientation) {
-      case DeviceOrientation.landscapeLeft:
-        turns += -1;
-        break;
-      case DeviceOrientation.landscapeRight:
-        turns += 1;
-        break;
-      case DeviceOrientation.portraitDown:
-        turns += 2;
-        break;
-      default:
-        break;
-    }
-    return turns;
   }
 
   /// Adjust the proper scale type according to the [controller].
@@ -1275,12 +1230,6 @@ class CameraPickerState extends State<CameraPicker>
     }
     final double _offsetHorizontal = (_width - constraints.maxWidth).abs() / -2;
     final double _offsetVertical = (_height - constraints.maxHeight).abs() / -2;
-    if (widget.shouldLockPortrait) {
-      _preview = RotatedBox(
-        quarterTurns: _previewQuarterTurns(orientation, constraints),
-        child: _preview,
-      );
-    }
     _preview = Stack(
       children: <Widget>[
         Positioned(
@@ -1288,7 +1237,10 @@ class CameraPickerState extends State<CameraPicker>
           right: _offsetHorizontal,
           top: _offsetVertical,
           bottom: _offsetVertical,
-          child: _preview,
+          child: RotatedBox(
+            quarterTurns: -widget.cameraQuarterTurns,
+            child: _preview,
+          ),
         ),
       ],
     );
