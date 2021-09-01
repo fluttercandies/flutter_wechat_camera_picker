@@ -24,8 +24,8 @@ Based on `camera` for camera functions and `photo_manager` for asset implementat
   - [Preparing for use 🍭](#preparing-for-use-)
   - [Usage 📖](#usage-)
     - [Simple usage](#simple-usage)
-  - [Frequent asked question 💭](#frequent-asked-question-)
-    - [Why there are over-scaled issue when `shouldLockPortrait` set to false ?](#why-there-are-over-scaled-issue-when-shouldlockportrait-set-to-false)
+  - [Frequently asked question 💭](#frequently-asked-question-)
+    - [Why the orientation behavior is strange on iOS?](#why-the-orientation-behavior-is-strange-on-ios)
   - [Contributors ✨](#contributors-)
 
 ## Features ✨
@@ -85,19 +85,18 @@ Flutter SDK: `>=2.0.0` .
 final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
 ```
 
-## Frequent asked question 💭
+## Frequently asked question 💭
 
-### Why there are over-scaled issue when `shouldLockPortrait` set to false?
+### Why the orientation behavior is strange on iOS?
 
-Currently the rotate synchronization is not supported.
-The `DeviceOrientation` from the `CameraValue` is different from the one
-comes from flutter when the user is rotating devices.
-The preview widget is synchronized when both orientation is the same.
-Issue: https://github.com/flutter/flutter/issues/78685
+Currently, the preview is not correctly synced on the iOS.
+You can find more details in this issue:
+https://github.com/flutter/flutter/issues/89216 .
+Other than that, please submit issues to describe your question.
 
 ## Contributors ✨
 
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+Thank goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
