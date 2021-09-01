@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.4.0
+
+- Bump `camera` to `0.9.x` .
+- Remove `shouldLockPortrait` in picking.
+
 ## 2.3.1
 
 - Expose `enablePullToZoomInRecord` for the `pickFromCamera` method.
