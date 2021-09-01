@@ -241,14 +241,10 @@ class CameraPickerState extends State<CameraPicker>
   final ValueNotifier<bool> _isExposureModeDisplays =
       ValueNotifier<bool>(false);
 
-  /// The [ValueNotifier] to keep the [CameraController].
-  /// 用于保持 [CameraController] 的 [ValueNotifier]
-  final ValueNotifier<CameraController?> _controllerNotifier =
-      ValueNotifier<CameraController?>(null);
-
   /// The controller for the current camera.
   /// 当前相机实例的控制器
-  CameraController get controller => _controllerNotifier.value!;
+  CameraController get controller => _controller!;
+  CameraController? _controller;
 
   /// Available cameras.
   /// 可用的相机实例
@@ -390,7 +386,7 @@ class CameraPickerState extends State<CameraPicker>
     }
     WidgetsBinding.instance?.removeObserver(this);
     controller.dispose();
-    _controllerNotifier.dispose();
+    _controller?.dispose();
     _currentExposureOffset.dispose();
     _lastExposurePoint.dispose();
     _exposureMode.dispose();
@@ -405,7 +401,7 @@ class CameraPickerState extends State<CameraPicker>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // App state changed before we got the chance to initialize.
-    if (_controllerNotifier.value == null || !controller.value.isInitialized) {
+    if (_controller == null || !controller.value.isInitialized) {
       return;
     }
     if (state == AppLifecycleState.inactive) {
@@ -434,14 +430,14 @@ class CameraPickerState extends State<CameraPicker>
   /// 初始化相机实例
   void initCameras([CameraDescription? cameraDescription]) {
     // Save the current controller to a local variable.
-    final CameraController? _c = _controllerNotifier.value;
+    final CameraController? _c = _controller;
     // Then unbind the controller from widgets, which requires a build frame.
-    setState(() {
+    safeSetState(() {
       _maxAvailableZoom = 1;
       _minAvailableZoom = 1;
       _currentZoom = 1;
       _baseZoom = 1;
-      _controllerNotifier.value = null;
+      _controller = null;
       // Meanwhile, cancel the existed exposure point and mode display.
       _exposureModeDisplayTimer?.cancel();
       _exposurePointDisplayTimer?.cancel();
@@ -472,7 +468,7 @@ class CameraPickerState extends State<CameraPicker>
       }
 
       // Initialize the controller with the given resolution preset.
-      _controllerNotifier.value = CameraController(
+      _controller = CameraController(
         cameraDescription ?? cameras[0],
         widget.resolutionPreset,
         enableAudio: enableAudio,
@@ -1252,23 +1248,18 @@ class CameraPickerState extends State<CameraPicker>
     bool Function()? isInitialized,
     Widget? child,
   }) {
-    return ValueListenableBuilder<CameraController?>(
-      valueListenable: _controllerNotifier,
-      builder: (_, CameraController? controller, __) {
-        if (controller != null) {
-          return ValueListenableBuilder<CameraValue>(
-            valueListenable: controller,
-            builder: (_, CameraValue value, Widget? w) {
-              return isInitialized?.call() ?? value.isInitialized
-                  ? builder(value, w)
-                  : const SizedBox.shrink();
-            },
-            child: child,
-          );
-        }
-        return const SizedBox.shrink();
-      },
-    );
+    if (_controller != null) {
+      return ValueListenableBuilder<CameraValue>(
+        valueListenable: controller,
+        builder: (_, CameraValue value, Widget? w) {
+          return isInitialized?.call() ?? value.isInitialized
+              ? builder(value, w)
+              : const SizedBox.shrink();
+        },
+        child: child,
+      );
+    }
+    return const SizedBox.shrink();
   }
 
   Widget _cameraBuilder({
@@ -1277,7 +1268,7 @@ class CameraPickerState extends State<CameraPicker>
     required BoxConstraints constraints,
   }) {
     return AspectRatio(
-      aspectRatio: controller.value.aspectRatio,
+      aspectRatio: value.aspectRatio,
       child: RepaintBoundary(
         child: Stack(
           children: <Widget>[
@@ -1300,21 +1291,13 @@ class CameraPickerState extends State<CameraPicker>
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(bottom: 20.0),
-        child: ValueListenableBuilder<CameraController?>(
-          valueListenable: _controllerNotifier,
-          builder: (
-            BuildContext context,
-            CameraController? controller,
-            _,
-          ) =>
-              Column(
-            children: <Widget>[
-              settingsAction,
-              const Spacer(),
-              tipsTextWidget(controller),
-              shootingActions(context, controller, constraints),
-            ],
-          ),
+        child: Column(
+          children: <Widget>[
+            settingsAction,
+            const Spacer(),
+            tipsTextWidget(_controller),
+            shootingActions(context, _controller, constraints),
+          ],
         ),
       ),
     );
