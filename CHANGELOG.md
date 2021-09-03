@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.4.1
+
+- Handle save exceptions more graceful.
+- Dispose the controller when previewing for better performance.
+
 ## 2.4.0
 
 - Bump `camera` to `0.9.x` .
