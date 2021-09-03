@@ -681,20 +681,26 @@ class CameraPickerState extends State<CameraPicker>
   /// 仅当初始化成功且相机未在拍照时拍照。
   Future<void> takePicture() async {
     if (controller.value.isInitialized && !controller.value.isTakingPicture) {
+      final XFile _file = await controller.takePicture();
+      // Delay disposing the controller to hold the preview.
+      Future<void>.delayed(const Duration(milliseconds: 500), () {
+        controller.dispose();
+      });
       final AssetEntity? entity = await CameraPickerViewer.pushToViewer(
         context,
         pickerState: this,
         pickerType: CameraPickerViewType.image,
-        previewXFile: await controller.takePicture(),
+        previewXFile: _file,
         theme: theme,
         shouldDeletePreviewFile: shouldDeletePreviewFile,
         onEntitySaving: widget.onEntitySaving,
       );
       if (entity != null) {
         Navigator.of(context).pop(entity);
-      } else {
-        safeSetState(() {});
+        return;
       }
+      initCameras(currentCamera);
+      safeSetState(() {});
     }
   }
 
