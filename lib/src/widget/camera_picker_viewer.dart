@@ -242,12 +242,18 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
         break;
     }
 
-    saveFuture.then((AssetEntity? entity) {
+    AssetEntity? entity;
+    try {
+      entity = await saveFuture;
       if (shouldDeletePreviewFile && previewFile.existsSync()) {
         previewFile.delete();
       }
+    } catch (e) {
+      realDebugPrint('Saving entity failed: $e');
+      rethrow;
+    } finally {
       Navigator.of(context).pop(entity);
-    });
+    }
   }
 
   /// The back button for the preview section.
