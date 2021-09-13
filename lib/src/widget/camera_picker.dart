@@ -6,10 +6,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:camera/camera.dart';
 
 import '../constants/constants.dart';
 import '../widget/circular_progress_bar.dart';
@@ -176,13 +176,10 @@ class CameraPicker extends StatefulWidget {
   /// 通过主题色构建一个默认的暗黑主题
   static ThemeData themeData(Color themeColor) {
     return ThemeData.dark().copyWith(
-      buttonColor: themeColor,
       primaryColor: Colors.grey[900],
       primaryColorBrightness: Brightness.dark,
       primaryColorLight: Colors.grey[900],
       primaryColorDark: Colors.grey[900],
-      accentColor: themeColor,
-      accentColorBrightness: Brightness.dark,
       canvasColor: Colors.grey[850],
       scaffoldBackgroundColor: Colors.grey[900],
       bottomAppBarColor: Colors.grey[900],
@@ -195,7 +192,14 @@ class CameraPicker extends StatefulWidget {
         selectionHandleColor: themeColor,
       ),
       indicatorColor: themeColor,
-      appBarTheme: const AppBarTheme(brightness: Brightness.dark, elevation: 0),
+      appBarTheme: const AppBarTheme(
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.light,
+        ),
+        elevation: 0,
+      ),
+      buttonTheme: ButtonThemeData(buttonColor: themeColor),
       colorScheme: ColorScheme(
         primary: Colors.grey[900]!,
         primaryVariant: Colors.grey[900]!,
@@ -369,6 +373,7 @@ class CameraPickerState extends State<CameraPicker>
     /// Hide system status bar automatically when the platform is not Android.
     /// 在非 Android 设备上自动隐藏状态栏
     if (!Platform.isAndroid) {
+      // ignore: deprecated_member_use
       SystemChrome.setEnabledSystemUIOverlays(<SystemUiOverlay>[]);
     }
 
@@ -382,6 +387,7 @@ class CameraPickerState extends State<CameraPicker>
   @override
   void dispose() {
     if (!Platform.isAndroid) {
+      // ignore: deprecated_member_use
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     }
     WidgetsBinding.instance?.removeObserver(this);
