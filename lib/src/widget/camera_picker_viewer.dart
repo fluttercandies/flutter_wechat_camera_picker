@@ -6,8 +6,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 import 'package:video_player/video_player.dart';
 

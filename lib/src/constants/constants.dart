@@ -5,8 +5,8 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 export 'package:photo_manager/photo_manager.dart';
