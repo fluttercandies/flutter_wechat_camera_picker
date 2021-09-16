@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.2
+
+- Flip the preview if the user is using a front camera.
+
 ## 2.4.1
 
 - Handle save exceptions more graceful.
