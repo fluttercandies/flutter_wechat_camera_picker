@@ -12,7 +12,12 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
 import '../constants/constants.dart';
-import '../widget/circular_progress_bar.dart';
+import '../constants/styles.dart';
+import '../internals/enums.dart';
+import '../internals/extensions.dart';
+import '../internals/methods.dart';
+import '../internals/type_defs.dart';
+import '../widgets/circular_progress_bar.dart';
 
 import 'builder/slide_page_transition_builder.dart';
 import 'camera_picker_viewer.dart';
@@ -686,7 +691,13 @@ class CameraPickerState extends State<CameraPicker>
   /// taking pictures.
   /// 仅当初始化成功且相机未在拍照时拍照。
   Future<void> takePicture() async {
-    if (controller.value.isInitialized && !controller.value.isTakingPicture) {
+    if (!controller.value.isInitialized) {
+      throw StateError('Camera has not initialized.');
+    }
+    if (controller.value.isTakingPicture) {
+      return;
+    }
+    try {
       final XFile _file = await controller.takePicture();
       // Delay disposing the controller to hold the preview.
       Future<void>.delayed(const Duration(milliseconds: 500), () {
@@ -707,6 +718,9 @@ class CameraPickerState extends State<CameraPicker>
       }
       initCameras(currentCamera);
       safeSetState(() {});
+    } catch (e) {
+      realDebugPrint('Error when preview the captured file: $e');
+      rethrow;
     }
   }
 
@@ -1152,7 +1166,7 @@ class CameraPickerState extends State<CameraPicker>
               _shouldReverseLayout ? TextDirection.rtl : TextDirection.ltr,
           children: <Widget>[
             ExposurePointWidget(
-              key: ValueKey<int>(currentTimeStamp),
+              key: ValueKey<int>(DateTime.now().millisecondsSinceEpoch),
               size: _pointWidth,
               color: theme.iconTheme.color!,
             ),

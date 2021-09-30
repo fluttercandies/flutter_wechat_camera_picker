@@ -7,7 +7,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import '../constants/colors.dart';
+import '../constants/styles.dart';
 
 class CircleProgressBar extends StatefulWidget {
   const CircleProgressBar({

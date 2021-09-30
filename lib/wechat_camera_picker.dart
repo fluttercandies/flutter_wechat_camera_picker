@@ -4,4 +4,4 @@ export 'package:camera/camera.dart';
 export 'package:photo_manager/photo_manager.dart';
 
 export 'src/delegates/camera_picker_text_delegate.dart';
-export 'src/widget/camera_picker.dart';
+export 'src/widgets/camera_picker.dart';
