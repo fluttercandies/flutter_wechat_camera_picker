@@ -120,7 +120,7 @@ class CameraPicker extends StatefulWidget {
   /// 覆盖在相机预览上方的前景构建
   final Widget Function(CameraValue)? foregroundBuilder;
 
-  /// {@macro wechat_camera_picker.SaveEntityCallback}
+  /// {@macro wechat_camera_picker.EntitySaveCallback}
   final EntitySaveCallback? onEntitySaving;
 
   /// Static method to create [AssetEntity] through camera.

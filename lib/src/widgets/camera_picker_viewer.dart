@@ -50,7 +50,7 @@ class CameraPickerViewer extends StatefulWidget {
   /// 返回页面时是否删除预览文件
   final bool shouldDeletePreviewFile;
 
-  /// {@macro wechat_camera_picker.SaveEntityCallback}
+  /// {@macro wechat_camera_picker.EntitySaveCallback}
   final EntitySaveCallback? onEntitySaving;
 
   /// Static method to push with the navigator.

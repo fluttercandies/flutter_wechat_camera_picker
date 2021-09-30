@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 
 import '../internals/enums.dart';
 
-/// {@template wechat_camera_picker.SaveEntityCallback}
+/// {@template wechat_camera_picker.EntitySaveCallback}
 /// The callback type define for saving entity in the viewer.
 /// 在查看器中保存图片时的回调
 ///
