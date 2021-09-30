@@ -29,3 +29,12 @@ typedef EntitySaveCallback = FutureOr<dynamic> Function({
   CameraPickerViewType viewType,
   File file,
 });
+
+/// {@template wechat_camera_picker.CameraErrorHandler}
+/// The error handler when any error occurred during the picking process.
+/// 拍摄照片过程中的自定义错误处理
+/// {@endtemplate}
+typedef CameraErrorHandler = void Function(
+  Object error,
+  StackTrace? stackTrace,
+);

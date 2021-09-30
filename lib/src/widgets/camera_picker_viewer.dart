@@ -28,6 +28,7 @@ class CameraPickerViewer extends StatefulWidget {
     required this.theme,
     this.shouldDeletePreviewFile = false,
     this.onEntitySaving,
+    this.onError,
   }) : super(key: key);
 
   /// State of the picker.
@@ -53,6 +54,9 @@ class CameraPickerViewer extends StatefulWidget {
   /// {@macro wechat_camera_picker.EntitySaveCallback}
   final EntitySaveCallback? onEntitySaving;
 
+  /// {@macro wechat_camera_picker.CameraErrorHandler}
+  final CameraErrorHandler? onError;
+
   /// Static method to push with the navigator.
   /// 跳转至选择预览的静态方法
   static Future<AssetEntity?> pushToViewer(
@@ -63,6 +67,7 @@ class CameraPickerViewer extends StatefulWidget {
     required ThemeData theme,
     bool shouldDeletePreviewFile = false,
     EntitySaveCallback? onEntitySaving,
+    CameraErrorHandler? onError,
   }) {
     return Navigator.of(context).push<AssetEntity?>(
       PageRouteBuilder<AssetEntity?>(
@@ -73,6 +78,7 @@ class CameraPickerViewer extends StatefulWidget {
           theme: theme,
           shouldDeletePreviewFile: shouldDeletePreviewFile,
           onEntitySaving: onEntitySaving,
+          onError: onError,
         ),
         transitionsBuilder: (
           BuildContext context,
@@ -155,7 +161,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
     } catch (e) {
       hasErrorWhenInitializing = true;
       realDebugPrint('Error when initializing video controller: $e');
-      rethrow;
+      handleErrorWithHandler(e, widget.onError);
     } finally {
       if (mounted) {
         setState(() {});
@@ -229,7 +235,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       }
     } catch (e) {
       realDebugPrint('Saving entity failed: $e');
-      rethrow;
+      handleErrorWithHandler(e, widget.onError);
     } finally {
       Navigator.of(context).pop(entity);
     }

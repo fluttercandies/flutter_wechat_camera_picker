@@ -49,6 +49,7 @@ class CameraPicker extends StatefulWidget {
     this.cameraQuarterTurns = 0,
     this.foregroundBuilder,
     this.onEntitySaving,
+    this.onError,
     CameraPickerTextDelegate? textDelegate,
   })  : assert(
           enableRecording == true || onlyEnableRecording != true,
@@ -123,6 +124,9 @@ class CameraPicker extends StatefulWidget {
   /// {@macro wechat_camera_picker.EntitySaveCallback}
   final EntitySaveCallback? onEntitySaving;
 
+  /// {@macro wechat_camera_picker.CameraErrorHandler}
+  final CameraErrorHandler? onError;
+
   /// Static method to create [AssetEntity] through camera.
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity?> pickFromCamera(
@@ -143,6 +147,7 @@ class CameraPicker extends StatefulWidget {
     ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
     Widget Function(CameraValue)? foregroundBuilder,
     EntitySaveCallback? onEntitySaving,
+    CameraErrorHandler? onError,
     bool useRootNavigator = true,
   }) {
     if (enableRecording != true && onlyEnableRecording == true) {
@@ -170,6 +175,7 @@ class CameraPicker extends StatefulWidget {
           imageFormatGroup: imageFormatGroup,
           foregroundBuilder: foregroundBuilder,
           onEntitySaving: onEntitySaving,
+          onError: onError,
         ),
         transitionCurve: Curves.easeIn,
         transitionDuration: _kRouteDuration,
@@ -472,9 +478,12 @@ class CameraPickerState extends State<CameraPicker>
       // After cameras fetched, judge again with the list is empty or not to
       // ensure there is at least an available camera for use.
       if (cameraDescription == null && (cameras.isEmpty)) {
-        throw CameraException(
-          'No CameraDescription found.',
-          'No cameras are available in the controller.',
+        handleErrorWithHandler(
+          CameraException(
+            'No CameraDescription found.',
+            'No cameras are available in the controller.',
+          ),
+          widget.onError,
         );
       }
 
@@ -486,9 +495,12 @@ class CameraPickerState extends State<CameraPicker>
         imageFormatGroup: widget.imageFormatGroup,
       )..addListener(() {
           if (controller.value.hasError) {
-            throw CameraException(
-              'CameraController exception',
-              controller.value.errorDescription,
+            handleErrorWithHandler(
+              CameraException(
+                'CameraController exception',
+                controller.value.errorDescription,
+              ),
+              widget.onError,
             );
           }
         });
@@ -505,8 +517,8 @@ class CameraPickerState extends State<CameraPicker>
           (() async =>
               _minAvailableZoom = await controller.getMinZoomLevel())(),
         ]);
-      } catch (_) {
-        rethrow;
+      } catch (e) {
+        handleErrorWithHandler(e, widget.onError);
       } finally {
         safeSetState(() {});
       }
@@ -692,7 +704,10 @@ class CameraPickerState extends State<CameraPicker>
   /// 仅当初始化成功且相机未在拍照时拍照。
   Future<void> takePicture() async {
     if (!controller.value.isInitialized) {
-      throw StateError('Camera has not initialized.');
+      handleErrorWithHandler(
+        StateError('Camera has not initialized.'),
+        widget.onError,
+      );
     }
     if (controller.value.isTakingPicture) {
       return;
@@ -720,7 +735,7 @@ class CameraPickerState extends State<CameraPicker>
       safeSetState(() {});
     } catch (e) {
       realDebugPrint('Error when preview the captured file: $e');
-      rethrow;
+      handleErrorWithHandler(e, widget.onError);
     }
   }
 
@@ -784,7 +799,7 @@ class CameraPickerState extends State<CameraPicker>
             stopRecordingVideo();
           });
         }
-        throw e;
+        handleErrorWithHandler(e, widget.onError);
       });
     }
   }
@@ -816,7 +831,7 @@ class CameraPickerState extends State<CameraPicker>
         realDebugPrint('Try to initialize a new CameraController...');
         initCameras();
         _handleError();
-        throw e;
+        handleErrorWithHandler(e, widget.onError);
       }).whenComplete(() {
         isShootingButtonAnimate = false;
         safeSetState(() {});

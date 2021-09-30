@@ -1,4 +1,3 @@
-
 ///
 /// [Author] Alex (https://github.com/AlexV525)
 /// [Date] 2021/9/30 17:02
@@ -14,5 +13,14 @@ extension SafeSetStateExtension on State {
       // ignore: invalid_use_of_protected_member
       setState(() {});
     }
+  }
+}
+
+extension NullableObjectExtension on Object? {
+  StackTrace? get nullableStackTrace {
+    if (this is Error?) {
+      return (this as Error?)?.stackTrace;
+    }
+    return null;
   }
 }
