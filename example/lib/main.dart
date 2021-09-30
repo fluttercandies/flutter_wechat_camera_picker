@@ -42,22 +42,26 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> pick(BuildContext context) async {
     final Size size = MediaQuery.of(context).size;
     final double scale = MediaQuery.of(context).devicePixelRatio;
-    final AssetEntity? _entity = await CameraPicker.pickFromCamera(
-      context,
-      enableRecording: true,
-    );
-    if (_entity != null && entity != _entity) {
-      entity = _entity;
-      if (mounted) {
-        setState(() {});
-      }
-      data = await _entity.thumbDataWithSize(
-        (size.width * scale).toInt(),
-        (size.height * scale).toInt(),
+    try {
+      final AssetEntity? _entity = await CameraPicker.pickFromCamera(
+        context,
+        enableRecording: true,
       );
-      if (mounted) {
-        setState(() {});
+      if (_entity != null && entity != _entity) {
+        entity = _entity;
+        if (mounted) {
+          setState(() {});
+        }
+        data = await _entity.thumbDataWithSize(
+          (size.width * scale).toInt(),
+          (size.height * scale).toInt(),
+        );
+        if (mounted) {
+          setState(() {});
+        }
       }
+    } catch (e) {
+      rethrow;
     }
   }
 
