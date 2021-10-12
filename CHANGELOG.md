@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.0
+
+- Add `onError` to handle errors during the picking process.
+- `SaveEntityCallback` -> `EntitySaveCallback`.
+- Improve folder structure of the plugin.
+
 ## 2.4.2
 
 - Flip the preview if the user is using a front camera.
