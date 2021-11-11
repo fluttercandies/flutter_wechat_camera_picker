@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5.1
+
+- Fix invalid widgets binding observer caller.
+
 ## 2.5.0
 
 - Add `onError` to handle errors during the picking process.
