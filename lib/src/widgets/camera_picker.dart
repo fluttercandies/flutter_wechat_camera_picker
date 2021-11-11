@@ -378,7 +378,7 @@ class CameraPickerState extends State<CameraPicker>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
 
     // TODO(Alex): Currently hide status bar will cause the viewport shaking on Android.
     /// Hide system status bar automatically when the platform is not Android.
