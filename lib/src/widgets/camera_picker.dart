@@ -373,8 +373,6 @@ class CameraPickerState extends State<CameraPicker>
   /// 通过常量全局 Key 获取当前选择器的主题
   ThemeData get theme => _theme;
 
-  bool _isPreparedForIOSRecording = false;
-
   @override
   void initState() {
     super.initState();
@@ -507,7 +505,10 @@ class CameraPickerState extends State<CameraPicker>
 
       try {
         await controller.initialize();
-        Future.wait<void>(<Future<dynamic>>[
+        if (shouldPrepareForVideoRecording) {
+          await controller.prepareForVideoRecording();
+        }
+        Future.wait(<Future<void>>[
           (() async => _maxAvailableExposureOffset =
               await controller.getMaxExposureOffset())(),
           (() async => _minAvailableExposureOffset =
@@ -778,10 +779,6 @@ class CameraPickerState extends State<CameraPicker>
   /// 设置拍摄文件路径并开始录制视频
   Future<void> startRecordingVideo() async {
     if (!controller.value.isRecordingVideo) {
-      if (!_isPreparedForIOSRecording) {
-        await controller.prepareForVideoRecording();
-        _isPreparedForIOSRecording = true;
-      }
       controller.startVideoRecording().then((dynamic _) {
         safeSetState(() {});
         if (isRecordingRestricted) {
