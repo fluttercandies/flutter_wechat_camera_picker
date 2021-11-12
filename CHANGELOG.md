@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.2
+
+- Request the permission state again when saving.
+- Provide better experiences when video record need to prepare.
+
 ## 2.5.1
 
 - Fix invalid widgets binding observer caller.
