@@ -229,10 +229,20 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
 
     AssetEntity? entity;
     try {
-      entity = await saveFuture;
-      if (shouldDeletePreviewFile && previewFile.existsSync()) {
-        previewFile.delete();
+      final PermissionState _ps = await PhotoManager.requestPermissionExtend();
+      if (_ps.isAuth) {
+        entity = await saveFuture;
+        if (shouldDeletePreviewFile && previewFile.existsSync()) {
+          previewFile.delete();
+        }
+        return;
       }
+      handleErrorWithHandler(
+        StateError(
+          'Permission is not fully granted to save the captured file.',
+        ),
+        widget.onError,
+      );
     } catch (e) {
       realDebugPrint('Saving entity failed: $e');
       handleErrorWithHandler(e, widget.onError);
