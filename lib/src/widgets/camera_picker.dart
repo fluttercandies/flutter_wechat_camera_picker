@@ -46,6 +46,7 @@ class CameraPicker extends StatefulWidget {
     this.theme,
     this.resolutionPreset = ResolutionPreset.max,
     this.imageFormatGroup = ImageFormatGroup.unknown,
+    this.preferredLensDirection = CameraLensDirection.back,
     this.cameraQuarterTurns = 0,
     this.foregroundBuilder,
     this.onEntitySaving,
@@ -117,6 +118,11 @@ class CameraPicker extends StatefulWidget {
   /// 输出图像的格式描述
   final ImageFormatGroup imageFormatGroup;
 
+  /// Which lens direction is preferred when first using the camera,
+  /// typically with the front or the back direction.
+  /// 首次使用相机时首选的镜头方向，通常是前置或后置。
+  final CameraLensDirection preferredLensDirection;
+
   /// The foreground widget builder which will cover the whole camera preview.
   /// 覆盖在相机预览上方的前景构建
   final Widget Function(CameraValue)? foregroundBuilder;
@@ -145,6 +151,7 @@ class CameraPicker extends StatefulWidget {
     CameraPickerTextDelegate? textDelegate,
     ResolutionPreset resolutionPreset = ResolutionPreset.max,
     ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
+    CameraLensDirection preferredLensDirection = CameraLensDirection.back,
     Widget Function(CameraValue)? foregroundBuilder,
     EntitySaveCallback? onEntitySaving,
     CameraErrorHandler? onError,
@@ -173,6 +180,7 @@ class CameraPicker extends StatefulWidget {
           textDelegate: textDelegate,
           resolutionPreset: resolutionPreset,
           imageFormatGroup: imageFormatGroup,
+          preferredLensDirection: preferredLensDirection,
           foregroundBuilder: foregroundBuilder,
           onEntitySaving: onEntitySaving,
           onError: onError,
@@ -485,9 +493,20 @@ class CameraPickerState extends State<CameraPicker>
         );
       }
 
+      final int preferredIndex = cameras.indexWhere(
+        (CameraDescription e) =>
+            e.lensDirection == widget.preferredLensDirection,
+      );
+      final int index;
+      if (preferredIndex != -1 && _c == null) {
+        index = preferredIndex;
+        currentCameraIndex = preferredIndex;
+      } else {
+        index = currentCameraIndex;
+      }
       // Initialize the controller with the given resolution preset.
       _controller = CameraController(
-        cameraDescription ?? cameras[0],
+        cameraDescription ?? cameras[index],
         widget.resolutionPreset,
         enableAudio: enableAudio,
         imageFormatGroup: widget.imageFormatGroup,
