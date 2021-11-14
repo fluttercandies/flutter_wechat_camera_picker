@@ -382,7 +382,7 @@ class CameraPickerState extends State<CameraPicker>
   bool get enablePinchToZoom => widget.enablePinchToZoom;
 
   bool get enablePullToZoomInRecord =>
-      enableRecording && !enableTapRecording && widget.enablePullToZoomInRecord;
+      enableRecording && widget.enablePullToZoomInRecord;
 
   bool get shouldDeletePreviewFile => widget.shouldDeletePreviewFile;
 
@@ -901,7 +901,7 @@ class CameraPickerState extends State<CameraPicker>
 
   GestureTapCallback? get onTap {
     if (enableTapRecording) {
-      if (controller.value.isRecordingVideo) {
+      if (_controller?.value.isRecordingVideo == true) {
         return stopRecordingVideo;
       }
       return () {
