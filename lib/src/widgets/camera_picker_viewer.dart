@@ -27,6 +27,7 @@ class CameraPickerViewer extends StatefulWidget {
     required this.previewXFile,
     required this.theme,
     this.shouldDeletePreviewFile = false,
+    this.shouldAutoPreviewVideo = false,
     this.onEntitySaving,
     this.onError,
   }) : super(key: key);
@@ -47,9 +48,11 @@ class CameraPickerViewer extends StatefulWidget {
   /// 选择器使用的主题
   final ThemeData theme;
 
-  /// Whether the preview file will be delete when pop.
-  /// 返回页面时是否删除预览文件
+  /// {@macro wechat_camera_picker.shouldDeletePreviewFile}
   final bool shouldDeletePreviewFile;
+
+  /// {@macro wechat_camera_picker.shouldAutoPreviewVideo}
+  final bool shouldAutoPreviewVideo;
 
   /// {@macro wechat_camera_picker.EntitySaveCallback}
   final EntitySaveCallback? onEntitySaving;
@@ -66,6 +69,7 @@ class CameraPickerViewer extends StatefulWidget {
     required XFile previewXFile,
     required ThemeData theme,
     bool shouldDeletePreviewFile = false,
+    bool shouldAutoPreviewVideo = false,
     EntitySaveCallback? onEntitySaving,
     CameraErrorHandler? onError,
   }) {
@@ -77,6 +81,7 @@ class CameraPickerViewer extends StatefulWidget {
           previewXFile: previewXFile,
           theme: theme,
           shouldDeletePreviewFile: shouldDeletePreviewFile,
+          shouldAutoPreviewVideo: shouldAutoPreviewVideo,
           onEntitySaving: onEntitySaving,
           onError: onError,
         ),
@@ -132,6 +137,8 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
 
   bool get shouldDeletePreviewFile => widget.shouldDeletePreviewFile;
 
+  bool get shouldAutoPreviewVideo => widget.shouldAutoPreviewVideo;
+
   @override
   void initState() {
     super.initState();
@@ -158,6 +165,9 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       await videoController.initialize();
       videoController.addListener(videoPlayerListener);
       hasLoaded = true;
+      if (shouldAutoPreviewVideo) {
+        videoController.play();
+      }
     } catch (e) {
       hasErrorWhenInitializing = true;
       realDebugPrint('Error when initializing video controller: $e');

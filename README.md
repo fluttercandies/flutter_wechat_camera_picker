@@ -70,6 +70,7 @@ Flutter SDK: `>=2.0.0` .
 | enablePinchToZoom            | `bool`                          | Whether users can zoom the camera by pinch.                                                           | `true`                                 |
 | enablePullToZoomInRecord     | `bool`                          | Whether users can zoom by pulling up when recording video.                                            | `true`                                 |
 | shouldDeletePreviewFile      | `bool`                          | Whether the preview file will be delete when pop.                                                     | `false`                                |
+| shouldAutoPreviewVideo       | `bool`                          | Whether the video should be played instantly in the preview.                                          | `false`                                |
 | maximumRecordingDuration     | `Duration`                      | The maximum duration of the video recording process.                                                  | `const Duration(seconds: 15)`          |
 | theme                        | `ThemeData?`                    | Theme data for the picker.                                                                            | `CameraPicker.themeData(C.themeColor)` |
 | textDelegate                 | `CameraPickerTextDelegate?`     | Text delegate that controls text in widgets.                                                          | `DefaultCameraPickerTextDelegate`      |
