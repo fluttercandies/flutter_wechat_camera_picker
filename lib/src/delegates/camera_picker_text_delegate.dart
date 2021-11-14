@@ -8,95 +8,87 @@
 abstract class CameraPickerTextDelegate {
   /// Confirm string for the confirm button.
   /// 确认按钮的字段
-  late String confirm;
+  String get confirm;
 
   /// Tips string above the shooting button before shooting.
   /// 拍摄前确认按钮上方的提示文字
-  late String shootingTips;
+  String get shootingTips;
 
   /// Load failed string for item.
   /// 资源加载失败时的字段
-  late final String loadFailed;
+  String get loadFailed;
 }
 
 /// Default text delegate implements with Chinese.
 /// 中文文字实现
-class DefaultCameraPickerTextDelegate implements CameraPickerTextDelegate {
-  factory DefaultCameraPickerTextDelegate() => _instance;
-
-  DefaultCameraPickerTextDelegate._internal();
-
-  static final DefaultCameraPickerTextDelegate _instance =
-      DefaultCameraPickerTextDelegate._internal();
+class DefaultCameraPickerTextDelegate extends CameraPickerTextDelegate {
+  @override
+  String get confirm => '确认';
 
   @override
-  String confirm = '确认';
+  String get shootingTips => '轻触拍照';
 
   @override
-  String shootingTips = '轻触拍照';
-
-  @override
-  String loadFailed = '加载失败';
+  String get loadFailed => '加载失败';
 }
 
 /// Default text delegate including recording implements with Chinese.
-/// 中文文字实现
+/// 中文文字实现（包括摄像）
 class DefaultCameraPickerTextDelegateWithRecording
-    implements CameraPickerTextDelegate {
-  factory DefaultCameraPickerTextDelegateWithRecording() => _instance;
-
-  DefaultCameraPickerTextDelegateWithRecording._internal();
-
-  static final DefaultCameraPickerTextDelegateWithRecording _instance =
-      DefaultCameraPickerTextDelegateWithRecording._internal();
-
+    extends DefaultCameraPickerTextDelegate {
   @override
-  String confirm = '确认';
+  String get shootingTips => '轻触拍照，长按摄像';
+}
 
+/// Default text delegate including only recording implements with Chinese.
+/// 中文文字实现（仅摄像）
+class DefaultCameraPickerTextDelegateWithOnlyRecording
+    extends DefaultCameraPickerTextDelegate {
   @override
-  String shootingTips = '轻触拍照，长按摄像';
+  String get shootingTips => '长按摄像';
+}
 
+/// Default text delegate including tap recording implements with Chinese.
+/// 中文文字实现（仅轻触摄像）
+class DefaultCameraPickerTextDelegateWithTapRecording
+    extends DefaultCameraPickerTextDelegate {
   @override
-  String loadFailed = '加载失败';
+  String get shootingTips => '轻触摄像';
 }
 
 /// Default text delegate implements with English.
 /// 英文文字实现
 class EnglishCameraPickerTextDelegate implements CameraPickerTextDelegate {
-  factory EnglishCameraPickerTextDelegate() => _instance;
-
-  EnglishCameraPickerTextDelegate._internal();
-
-  static final EnglishCameraPickerTextDelegate _instance =
-      EnglishCameraPickerTextDelegate._internal();
+  @override
+  String get confirm => 'Confirm';
 
   @override
-  String confirm = 'Confirm';
+  String get shootingTips => 'Tap to take photo.';
 
   @override
-  String shootingTips = 'Tap to take photo.';
-
-  @override
-  String loadFailed = 'Load failed';
+  String get loadFailed => 'Load failed';
 }
 
 /// Default text delegate including recording implements with English.
-/// 英文文字实现
+/// 英文文字实现（包括摄像）
 class EnglishCameraPickerTextDelegateWithRecording
-    implements CameraPickerTextDelegate {
-  factory EnglishCameraPickerTextDelegateWithRecording() => _instance;
-
-  EnglishCameraPickerTextDelegateWithRecording._internal();
-
-  static final EnglishCameraPickerTextDelegateWithRecording _instance =
-      EnglishCameraPickerTextDelegateWithRecording._internal();
-
+    extends EnglishCameraPickerTextDelegate {
   @override
-  String confirm = 'Confirm';
+  String get shootingTips => 'Tap to take photo. Long press to record video.';
+}
 
+/// Default text delegate including only recording implements with English.
+/// 英文文字实现（仅摄像）
+class EnglishCameraPickerTextDelegateWithOnlyRecording
+    extends EnglishCameraPickerTextDelegate {
   @override
-  String shootingTips = 'Tap to take photo. Long press to record video.';
+  String get shootingTips => 'Long press to record video.';
+}
 
+/// Default text delegate including tap recording implements with English.
+/// 英文文字实现（仅轻触摄像）
+class EnglishCameraPickerTextDelegateWithTapRecording
+    extends EnglishCameraPickerTextDelegate {
   @override
-  String loadFailed = 'Load failed';
+  String get shootingTips => 'Tap to record video.';
 }

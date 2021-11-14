@@ -36,6 +36,7 @@ class CameraPicker extends StatefulWidget {
     Key? key,
     this.enableRecording = false,
     this.onlyEnableRecording = false,
+    this.enableTapRecording = false,
     this.enableAudio = true,
     this.enableSetExposure = true,
     this.enableExposureControlOnPoint = true,
@@ -57,10 +58,20 @@ class CameraPicker extends StatefulWidget {
           'Recording mode error.',
         ),
         super(key: key) {
-    Constants.textDelegate = textDelegate ??
-        (enableRecording
-            ? DefaultCameraPickerTextDelegateWithRecording()
-            : DefaultCameraPickerTextDelegate());
+    // Set text delegate accordingly.
+    if (textDelegate != null) {
+      Constants.textDelegate = textDelegate;
+    } else if (enableRecording && onlyEnableRecording && enableTapRecording) {
+      Constants.textDelegate =
+          DefaultCameraPickerTextDelegateWithTapRecording();
+    } else if (enableRecording && onlyEnableRecording) {
+      Constants.textDelegate =
+          DefaultCameraPickerTextDelegateWithOnlyRecording();
+    } else if (enableRecording) {
+      Constants.textDelegate = DefaultCameraPickerTextDelegateWithRecording();
+    } else {
+      Constants.textDelegate = DefaultCameraPickerTextDelegate();
+    }
   }
 
   /// The number of clockwise quarter turns the camera view should be rotated.
@@ -74,6 +85,13 @@ class CameraPicker extends StatefulWidget {
   /// Whether the picker can record video.
   /// 选择器是否可以录像
   final bool onlyEnableRecording;
+
+  /// Whether allow the record can start with single tap.
+  /// 选择器是否可以单击录像
+  ///
+  /// It only works when [onlyEnableRecording] is true.
+  /// 仅在 [onlyEnableRecording] 为 true 时生效。
+  final bool enableTapRecording;
 
   /// Whether the picker should record audio.
   /// 选择器录像时是否需要录制声音
@@ -139,6 +157,7 @@ class CameraPicker extends StatefulWidget {
     BuildContext context, {
     bool enableRecording = false,
     bool onlyEnableRecording = false,
+    bool enableTapRecording = false,
     bool enableAudio = true,
     bool enableSetExposure = true,
     bool enableExposureControlOnPoint = true,
@@ -168,6 +187,7 @@ class CameraPicker extends StatefulWidget {
         builder: CameraPicker(
           enableRecording: enableRecording,
           onlyEnableRecording: onlyEnableRecording,
+          enableTapRecording: enableTapRecording,
           enableAudio: enableAudio,
           enableSetExposure: enableSetExposure,
           enableExposureControlOnPoint: enableExposureControlOnPoint,
@@ -341,7 +361,10 @@ class CameraPickerState extends State<CameraPicker>
 
   bool get enableRecording => widget.enableRecording;
 
-  bool get onlyEnableRecording => widget.onlyEnableRecording;
+  bool get onlyEnableRecording => enableRecording && widget.onlyEnableRecording;
+
+  bool get enableTapRecording =>
+      onlyEnableRecording && widget.enableTapRecording;
 
   /// No audio integration required when it's only for camera.
   /// 在仅允许拍照时不需要启用音频
@@ -358,7 +381,8 @@ class CameraPickerState extends State<CameraPicker>
 
   bool get enablePinchToZoom => widget.enablePinchToZoom;
 
-  bool get enablePullToZoomInRecord => widget.enablePullToZoomInRecord;
+  bool get enablePullToZoomInRecord =>
+      enableRecording && widget.enablePullToZoomInRecord;
 
   bool get shouldDeletePreviewFile => widget.shouldDeletePreviewFile;
 
@@ -863,6 +887,47 @@ class CameraPickerState extends State<CameraPicker>
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
 
+  PointerUpEventListener? get onPointerUp {
+    if (enableRecording && !enableTapRecording) {
+      return recordDetectionCancel;
+    }
+  }
+
+  PointerMoveEventListener? onPointerMove(BoxConstraints c) {
+    if (enablePullToZoomInRecord) {
+      return (PointerMoveEvent e) => onShootingButtonMove(e, c);
+    }
+  }
+
+  GestureTapCallback? get onTap {
+    if (enableTapRecording) {
+      if (_controller?.value.isRecordingVideo == true) {
+        return stopRecordingVideo;
+      }
+      return () {
+        startRecordingVideo();
+        setState(() {
+          isShootingButtonAnimate = true;
+        });
+      };
+    }
+    if (!onlyEnableRecording) {
+      return takePicture;
+    }
+  }
+
+  GestureLongPressCallback? get onLongPress {
+    if (enableRecording && !enableTapRecording) {
+      return recordDetection;
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  /////////////////////////// Just a line breaker ////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////
+
   /// Settings action section widget.
   /// 设置操作区
   ///
@@ -999,14 +1064,12 @@ class CameraPickerState extends State<CameraPicker>
     const Size innerSize = Size.square(82);
     return Listener(
       behavior: HitTestBehavior.opaque,
-      onPointerUp: enableRecording ? recordDetectionCancel : null,
-      onPointerMove: enablePullToZoomInRecord
-          ? (PointerMoveEvent e) => onShootingButtonMove(e, constraints)
-          : null,
+      onPointerUp: onPointerUp,
+      onPointerMove: onPointerMove(constraints),
       child: InkWell(
         borderRadius: maxBorderRadius,
-        onTap: !onlyEnableRecording ? takePicture : null,
-        onLongPress: enableRecording ? recordDetection : null,
+        onTap: onTap,
+        onLongPress: onLongPress,
         child: SizedBox.fromSize(
           size: outerSize,
           child: Stack(
