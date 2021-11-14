@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.6.0
+
+- Add `preferredLensDirection`, allow users to choose which lens direction is preferred when first using the camera.
+- Add `enableTapRecording`, allow users to determine whether to allow the record can start with single tap.
+- Add `shouldAutoPreviewVideo`, allow users to determine whether the video should be played instantly in the preview.
+
 ## 2.5.2
 
 - Request the permission state again when saving.
