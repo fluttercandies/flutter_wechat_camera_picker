@@ -58,10 +58,20 @@ class CameraPicker extends StatefulWidget {
           'Recording mode error.',
         ),
         super(key: key) {
-    Constants.textDelegate = textDelegate ??
-        (enableRecording
-            ? DefaultCameraPickerTextDelegateWithRecording()
-            : DefaultCameraPickerTextDelegate());
+    // Set text delegate accordingly.
+    if (textDelegate != null) {
+      Constants.textDelegate = textDelegate;
+    } else if (enableRecording && onlyEnableRecording && enableTapRecording) {
+      Constants.textDelegate =
+          DefaultCameraPickerTextDelegateWithTapRecording();
+    } else if (enableRecording && onlyEnableRecording) {
+      Constants.textDelegate =
+          DefaultCameraPickerTextDelegateWithOnlyRecording();
+    } else if (enableRecording) {
+      Constants.textDelegate = DefaultCameraPickerTextDelegateWithRecording();
+    } else {
+      Constants.textDelegate = DefaultCameraPickerTextDelegate();
+    }
   }
 
   /// The number of clockwise quarter turns the camera view should be rotated.
