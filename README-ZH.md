@@ -75,6 +75,7 @@ Flutter SDK：`>=2.0.0` 。
 | resolutionPreset             | `ResolutionPreset`              | 相机的分辨率预设                                                  | `ResolutionPreset.max`                 |
 | cameraQuarterTurns           | `int`                           | 摄像机视图顺时针旋转次数，每次 90 度                                | `0`                                    |
 | imageFormatGroup             | `ImageFormatGroup`              | 输出图像的格式描述                                                | `ImageFormatGroup.unknown`             |
+| preferredLensDirection       | `CameraLensDirection`           | 首次使用相机时首选的镜头方向                                       | `CameraLensDirection.back`             |
 | foregroundBuilder            | `Widget Function(CameraValue)?` | 覆盖在相机预览上方的前景构建                                       | null                                   |
 | onEntitySaving               | `EntitySaveCallback?`           | 在查看器中保存图片时的回调                                         | null                                   |
 | onError                      | `CameraErrorHandler?`           | 拍摄照片过程中的自定义错误处理                                     | null                                   |
