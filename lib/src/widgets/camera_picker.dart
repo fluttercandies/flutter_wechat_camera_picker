@@ -43,6 +43,7 @@ class CameraPicker extends StatefulWidget {
     this.enablePinchToZoom = true,
     this.enablePullToZoomInRecord = true,
     this.shouldDeletePreviewFile = false,
+    this.shouldAutoPreviewVideo = false,
     this.maximumRecordingDuration = const Duration(seconds: 15),
     this.theme,
     this.resolutionPreset = ResolutionPreset.max,
@@ -113,9 +114,17 @@ class CameraPicker extends StatefulWidget {
   /// 用户是否可以在录制视频时上拉缩放
   final bool enablePullToZoomInRecord;
 
+  /// {@template wechat_camera_picker.shouldDeletePreviewFile}
   /// Whether the preview file will be delete when pop.
   /// 返回页面时是否删除预览文件
+  /// {@endtemplate}
   final bool shouldDeletePreviewFile;
+
+  /// {@template wechat_camera_picker.shouldAutoPreviewVideo}
+  /// Whether the video should be played instantly in the preview.
+  /// 在预览时是否直接播放视频
+  /// {@endtemplate}
+  final bool shouldAutoPreviewVideo;
 
   /// The maximum duration of the video recording process.
   /// 录制视频最长时长
@@ -164,6 +173,7 @@ class CameraPicker extends StatefulWidget {
     bool enablePinchToZoom = true,
     bool enablePullToZoomInRecord = true,
     bool shouldDeletePreviewFile = false,
+    bool shouldAutoPreviewVideo = false,
     Duration maximumRecordingDuration = const Duration(seconds: 15),
     ThemeData? theme,
     int cameraQuarterTurns = 0,
@@ -194,6 +204,7 @@ class CameraPicker extends StatefulWidget {
           enablePinchToZoom: enablePinchToZoom,
           enablePullToZoomInRecord: enablePullToZoomInRecord,
           shouldDeletePreviewFile: shouldDeletePreviewFile,
+          shouldAutoPreviewVideo: shouldAutoPreviewVideo,
           maximumRecordingDuration: maximumRecordingDuration,
           theme: theme,
           cameraQuarterTurns: cameraQuarterTurns,
@@ -385,6 +396,8 @@ class CameraPickerState extends State<CameraPicker>
       enableRecording && widget.enablePullToZoomInRecord;
 
   bool get shouldDeletePreviewFile => widget.shouldDeletePreviewFile;
+
+  bool get shouldAutoPreviewVideo => widget.shouldAutoPreviewVideo;
 
   Duration? get maximumRecordingDuration => widget.maximumRecordingDuration;
 
@@ -769,6 +782,7 @@ class CameraPickerState extends State<CameraPicker>
         previewXFile: _file,
         theme: theme,
         shouldDeletePreviewFile: shouldDeletePreviewFile,
+        shouldAutoPreviewVideo: shouldAutoPreviewVideo,
         onEntitySaving: widget.onEntitySaving,
       );
       if (entity != null) {
@@ -862,6 +876,7 @@ class CameraPickerState extends State<CameraPicker>
           previewXFile: file,
           theme: theme,
           shouldDeletePreviewFile: shouldDeletePreviewFile,
+          shouldAutoPreviewVideo: shouldAutoPreviewVideo,
         );
         if (entity != null) {
           Navigator.of(context).pop(entity);
