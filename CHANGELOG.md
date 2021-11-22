@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.1
+
+- Allow saving entities when the permission is limited on iOS.
+
 ## 2.6.0
 
 - Add `preferredLensDirection`, allow users to choose which lens direction is preferred when first using the camera.
