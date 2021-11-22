@@ -240,7 +240,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
     AssetEntity? entity;
     try {
       final PermissionState _ps = await PhotoManager.requestPermissionExtend();
-      if (_ps.isAuth) {
+      if (_ps == PermissionState.authorized || _ps == PermissionState.limited) {
         entity = await saveFuture;
         if (shouldDeletePreviewFile && previewFile.existsSync()) {
           previewFile.delete();
