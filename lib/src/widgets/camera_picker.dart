@@ -479,7 +479,7 @@ class CameraPickerState extends State<CameraPicker>
   ) {
     // Fetch the biggest size from the constraints.
     Size size = constraints.biggest;
-    // Flip the size is the preview needs to turn with an odd count of quarters.
+    // Flip the size when the preview needs to turn with an odd count of quarters.
     if (widget.cameraQuarterTurns % 2 != 0) {
       size = size.flipped;
     }
