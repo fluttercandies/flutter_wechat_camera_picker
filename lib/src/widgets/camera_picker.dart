@@ -471,19 +471,25 @@ class CameraPickerState extends State<CameraPicker>
     }
   }
 
-  /// Adjust the proper scale type according to the [controller].
-  /// 通过 [controller] 的预览大小，判断相机预览适用的缩放类型。
-  _PreviewScaleType _effectiveScaleType(BoxConstraints constraints) {
-    final Size _size = controller.value.previewSize!;
-    final Size _scaledSize =
-        _size * constraints.maxWidth * Screens.scale / _size.height;
-    if (_scaledSize.width > constraints.maxHeight * Screens.scale) {
-      return _PreviewScaleType.width;
-    } else if (_scaledSize.width < constraints.maxHeight * Screens.scale) {
-      return _PreviewScaleType.height;
-    } else {
-      return _PreviewScaleType.none;
+  /// Adjust the proper scale type according to the [constraints].
+  /// 根据 [constraints] 获取相机预览适用的缩放。
+  double _effectiveCameraScale(
+    BoxConstraints constraints,
+    CameraController controller,
+  ) {
+    // Fetch the biggest size from the constraints.
+    Size size = constraints.biggest;
+    // Flip the size is the preview needs to turn with an odd count of quarters.
+    if (widget.cameraQuarterTurns % 2 != 0) {
+      size = size.flipped;
     }
+    // Calculate scale depending on the size and camera ratios.
+    double scale = size.aspectRatio * controller.value.aspectRatio;
+    // Prevent scaling down.
+    if (scale < 1) {
+      scale = 1 / scale;
+    }
+    return scale;
   }
 
   /// Initialize cameras instances.
@@ -1333,33 +1339,6 @@ class CameraPickerState extends State<CameraPicker>
       ),
     );
 
-    final _PreviewScaleType scale = _effectiveScaleType(constraints);
-    if (scale == _PreviewScaleType.none) {
-      return _preview;
-    }
-
-    double _width;
-    double _height;
-    switch (scale) {
-      case _PreviewScaleType.width:
-        _width = constraints.maxWidth;
-        if (constraints.maxWidth <= constraints.maxHeight) {
-          _height = constraints.maxWidth * controller.value.aspectRatio;
-        } else {
-          _height = constraints.maxWidth / controller.value.aspectRatio;
-        }
-        break;
-      case _PreviewScaleType.height:
-        _width = constraints.maxHeight / controller.value.aspectRatio;
-        _height = constraints.maxHeight;
-        break;
-      default:
-        _width = constraints.maxWidth;
-        _height = constraints.maxHeight;
-        break;
-    }
-    final double _offsetHorizontal = (_width - constraints.maxWidth).abs() / -2;
-    final double _offsetVertical = (_height - constraints.maxHeight).abs() / -2;
     // Flip the preview if the user is using a front camera to match the result.
     if (currentCamera.lensDirection == CameraLensDirection.front) {
       _preview = Transform(
@@ -1368,19 +1347,13 @@ class CameraPickerState extends State<CameraPicker>
         child: _preview,
       );
     }
-    _preview = Stack(
-      children: <Widget>[
-        Positioned(
-          left: _offsetHorizontal,
-          right: _offsetHorizontal,
-          top: _offsetVertical,
-          bottom: _offsetVertical,
-          child: RotatedBox(
-            quarterTurns: -widget.cameraQuarterTurns,
-            child: _preview,
-          ),
-        ),
-      ],
+
+    _preview = RotatedBox(
+      quarterTurns: -widget.cameraQuarterTurns,
+      child: Transform.scale(
+        scale: _effectiveCameraScale(constraints, controller),
+        child: Center(child: _preview),
+      ),
     );
     return _preview;
   }
@@ -1409,22 +1382,19 @@ class CameraPickerState extends State<CameraPicker>
     required CameraValue value,
     required BoxConstraints constraints,
   }) {
-    return AspectRatio(
-      aspectRatio: value.aspectRatio,
-      child: RepaintBoundary(
-        child: Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: _cameraPreview(
-                context,
-                orientation: value.deviceOrientation,
-                constraints: constraints,
-              ),
+    return RepaintBoundary(
+      child: Stack(
+        children: <Widget>[
+          Positioned.fill(
+            child: _cameraPreview(
+              context,
+              orientation: value.deviceOrientation,
+              constraints: constraints,
             ),
-            if (widget.foregroundBuilder != null)
-              Positioned.fill(child: widget.foregroundBuilder!(value)),
-          ],
-        ),
+          ),
+          if (widget.foregroundBuilder != null)
+            Positioned.fill(child: widget.foregroundBuilder!(value)),
+        ],
       ),
     );
   }
@@ -1487,5 +1457,3 @@ class CameraPickerState extends State<CameraPicker>
     );
   }
 }
-
-enum _PreviewScaleType { none, width, height }
