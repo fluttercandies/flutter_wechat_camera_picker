@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.2
+
+- Bind circular progress color with theme.
+
 ## 2.6.1
 
 - Allow saving entities when the permission is limited on iOS.
