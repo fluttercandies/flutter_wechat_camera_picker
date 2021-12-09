@@ -9,8 +9,8 @@ import 'package:flutter/scheduler.dart';
 
 import '../constants/styles.dart';
 
-class CircleProgressBar extends StatefulWidget {
-  const CircleProgressBar({
+class CircularProgressBar extends StatefulWidget {
+  const CircularProgressBar({
     Key? key,
     required this.outerRadius,
     required this.ringsWidth,
@@ -26,10 +26,10 @@ class CircleProgressBar extends StatefulWidget {
   final Duration duration;
 
   @override
-  State<StatefulWidget> createState() => CircleProgressState();
+  _CircleProgressState createState() => _CircleProgressState();
 }
 
-class CircleProgressState extends State<CircleProgressBar>
+class _CircleProgressState extends State<CircularProgressBar>
     with SingleTickerProviderStateMixin {
   final GlobalKey paintKey = GlobalKey();
 

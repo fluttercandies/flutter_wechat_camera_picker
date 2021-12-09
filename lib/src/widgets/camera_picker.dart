@@ -414,7 +414,7 @@ class CameraPickerState extends State<CameraPicker>
   late final ThemeData _theme =
       widget.theme ?? CameraPicker.themeData(C.themeColor);
 
-  /// Get [ThemeData] of the [AssetPicker] through [Constants.pickerKey].
+  /// Get [ThemeData] of the [CameraPicker] through [Constants.pickerKey].
   /// 通过常量全局 Key 获取当前选择器的主题
   ThemeData get theme => _theme;
 
@@ -1120,9 +1120,10 @@ class CameraPickerState extends State<CameraPicker>
               _initializeWrapper(
                 isInitialized: () =>
                     controller.value.isRecordingVideo && isRecordingRestricted,
-                builder: (_, __) => CircleProgressBar(
+                builder: (_, __) => CircularProgressBar(
                   duration: maximumRecordingDuration!,
                   outerRadius: outerSize.width,
+                  ringsColor: theme.indicatorColor,
                   ringsWidth: 2.0,
                 ),
               ),
