@@ -1316,7 +1316,12 @@ class CameraPickerState extends State<CameraPicker>
   ) {
     return Positioned.fill(
       child: GestureDetector(
-        onTapUp: (TapUpDetails d) => setExposureAndFocusPoint(d, constraints),
+        onTapUp: (TapUpDetails d) {
+          if (_controller?.value.isInitialized != true) {
+            return;
+          }
+          setExposureAndFocusPoint(d, constraints);
+        },
         behavior: HitTestBehavior.translucent,
         child: const SizedBox.expand(),
       ),
