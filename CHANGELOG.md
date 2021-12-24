@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.3
+
+- Fix set exposure point crashes when switching between cameras. (#66)
+
 ## 2.6.2
 
 - Bind circular progress color with theme.
@@ -78,7 +82,7 @@
 ### New Features
 
 - Add `enableSetExposure`, allow users to update the exposure from the point tapped on the screen.
-- Add `enableExposureControlOnPoint`, allow users to control the exposure offset with a offset slide from the exposure point.
+- Add `enableExposureControlOnPoint`, allow users to control the exposure offset with an offset slide from the exposure point.
 - Add `enablePinchToZoom`, allow users to zoom by pinch the screen.
 - Add `enablePullToZoomInRecord`, allow users to zoom by pulling up when recording video.
 - Add `foregroundBuilder`, allow users to build customize widget beyond the camera preview.
