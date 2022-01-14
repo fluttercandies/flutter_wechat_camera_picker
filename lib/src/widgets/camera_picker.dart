@@ -460,13 +460,17 @@ class CameraPickerState extends State<CameraPicker>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    final CameraController? c = _controller;
     // App state changed before we got the chance to initialize.
-    if (_controller == null || !controller.value.isInitialized) {
+    if (c == null || !c.value.isInitialized) {
       return;
     }
     if (state == AppLifecycleState.inactive) {
-      controller.dispose();
-    } else if (state == AppLifecycleState.resumed) {
+      c.dispose();
+    } else if (state == AppLifecycleState.resumed && !c.value.isInitialized) {
+      // Drop initialize when the controller has been already initialized.
+      // This will typically resolve the lifecycle issue on iOS when permissions
+      // are requested for the first time.
       initCameras(currentCamera);
     }
   }
