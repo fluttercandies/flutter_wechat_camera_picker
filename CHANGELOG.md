@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0-dev.1
+
+- Migrate to the latest photo_manager.
+
 ## 2.6.5
 
 - Remove duplicate future requests when saving entity.
