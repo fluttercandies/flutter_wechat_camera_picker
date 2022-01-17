@@ -75,7 +75,8 @@ class CameraPicker extends StatefulWidget {
       Constants.textDelegate = DefaultCameraPickerTextDelegate();
     }
   }
-  
+
+  /// Whether we must lock the orientation of the camera with predefined [CameraDescription]
   final DeviceOrientation? lockCaptureOrientation;
 
   /// The number of clockwise quarter turns the camera view should be rotated.
@@ -576,7 +577,7 @@ class CameraPickerState extends State<CameraPicker>
 
       try {
         await controller.initialize();
-        if(widget.lockCaptureOrientation != null) {
+        if (widget.lockCaptureOrientation != null) {
           await controller.lockCaptureOrientation(widget.lockCaptureOrientation);
         }
         if (shouldPrepareForVideoRecording) {
