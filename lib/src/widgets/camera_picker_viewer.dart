@@ -219,29 +219,25 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       );
       return;
     }
-    Future<AssetEntity?> saveFuture;
-
-    switch (pickerType) {
-      case CameraPickerViewType.image:
-        final Uint8List data = await previewFile.readAsBytes();
-        saveFuture = PhotoManager.editor.saveImage(
-          data,
-          title: path.basename(previewFile.path),
-        );
-        break;
-      case CameraPickerViewType.video:
-        saveFuture = PhotoManager.editor.saveVideo(
-          previewFile,
-          title: path.basename(previewFile.path),
-        );
-        break;
-    }
-
     AssetEntity? entity;
     try {
       final PermissionState _ps = await PhotoManager.requestPermissionExtend();
       if (_ps == PermissionState.authorized || _ps == PermissionState.limited) {
-        entity = await saveFuture;
+        switch (pickerType) {
+          case CameraPickerViewType.image:
+            final Uint8List data = await previewFile.readAsBytes();
+            entity = await PhotoManager.editor.saveImage(
+              data,
+              title: path.basename(previewFile.path),
+            );
+            break;
+          case CameraPickerViewType.video:
+            entity = await PhotoManager.editor.saveVideo(
+              previewFile,
+              title: path.basename(previewFile.path),
+            );
+            break;
+        }
         if (shouldDeletePreviewFile && previewFile.existsSync()) {
           previewFile.delete();
         }
