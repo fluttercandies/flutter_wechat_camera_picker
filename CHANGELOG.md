@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.5
+
+- Remove duplicate future requests when saving entity.
+
 ## 2.6.4
 
 - Drop initialize when the controller has been already initialized. (#70)
