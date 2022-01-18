@@ -49,6 +49,7 @@ class CameraPicker extends StatefulWidget {
     this.resolutionPreset = ResolutionPreset.max,
     this.imageFormatGroup = ImageFormatGroup.unknown,
     this.preferredLensDirection = CameraLensDirection.back,
+    this.lockCaptureOrientation,
     this.cameraQuarterTurns = 0,
     this.foregroundBuilder,
     this.onEntitySaving,
@@ -74,6 +75,11 @@ class CameraPicker extends StatefulWidget {
       Constants.textDelegate = DefaultCameraPickerTextDelegate();
     }
   }
+
+  /// Whether the camera should be locked to the specific orientation
+  /// during captures.
+  /// 摄像机在拍摄时锁定的旋转角度
+  final DeviceOrientation? lockCaptureOrientation;
 
   /// The number of clockwise quarter turns the camera view should be rotated.
   /// 摄像机视图顺时针旋转次数，每次90度
@@ -181,6 +187,7 @@ class CameraPicker extends StatefulWidget {
     ResolutionPreset resolutionPreset = ResolutionPreset.max,
     ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
     CameraLensDirection preferredLensDirection = CameraLensDirection.back,
+    DeviceOrientation? lockCaptureOrientation,
     Widget Function(CameraValue)? foregroundBuilder,
     EntitySaveCallback? onEntitySaving,
     CameraErrorHandler? onError,
@@ -212,6 +219,7 @@ class CameraPicker extends StatefulWidget {
           resolutionPreset: resolutionPreset,
           imageFormatGroup: imageFormatGroup,
           preferredLensDirection: preferredLensDirection,
+          lockCaptureOrientation: lockCaptureOrientation,
           foregroundBuilder: foregroundBuilder,
           onEntitySaving: onEntitySaving,
           onError: onError,
@@ -571,10 +579,13 @@ class CameraPickerState extends State<CameraPicker>
 
       try {
         await controller.initialize();
+        // Call recording preparation first.
         if (shouldPrepareForVideoRecording) {
           await controller.prepareForVideoRecording();
         }
+        // Then call other asynchronous methods.
         Future.wait(<Future<void>>[
+          controller.lockCaptureOrientation(widget.lockCaptureOrientation),
           (() async => _maxAvailableExposureOffset =
               await controller.getMaxExposureOffset())(),
           (() async => _minAvailableExposureOffset =

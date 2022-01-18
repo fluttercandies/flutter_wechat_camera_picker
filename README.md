@@ -78,6 +78,7 @@ Flutter SDK: `>=2.0.0` .
 | cameraQuarterTurns           | `int`                           | The number of clockwise quarter turns the camera view should be rotated.                              | `0`                                    |
 | imageFormatGroup             | `ImageFormatGroup`              | Describes the output of the raw image format.                                                         | `ImageFormatGroup.unknown`             |
 | preferredLensDirection       | `CameraLensDirection`           | Which lens direction is preferred when first using the camera.                                        | `CameraLensDirection.back`             |
+| lockCaptureOrientation       | `DeviceOrientation?`            | Whether the camera should be locked to the specific orientation during captures.                      | null                                   |
 | foregroundBuilder            | `Widget Function(CameraValue)?` | The foreground widget builder which will cover the whole camera preview.                              | null                                   |
 | onEntitySaving               | `EntitySaveCallback?`           | The callback type define for saving entity in the viewer.                                             | null                                   |
 | onError                      | `CameraErrorHandler?`           | The error handler when any error occurred during the picking process.                                 | null                                   |
