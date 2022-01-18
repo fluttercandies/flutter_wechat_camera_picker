@@ -49,11 +49,11 @@ class CameraPicker extends StatefulWidget {
     this.resolutionPreset = ResolutionPreset.max,
     this.imageFormatGroup = ImageFormatGroup.unknown,
     this.preferredLensDirection = CameraLensDirection.back,
+    this.lockCaptureOrientation,
     this.cameraQuarterTurns = 0,
     this.foregroundBuilder,
     this.onEntitySaving,
     this.onError,
-    this.lockCaptureOrientation,
     CameraPickerTextDelegate? textDelegate,
   })  : assert(
           enableRecording == true || onlyEnableRecording != true,
@@ -76,7 +76,9 @@ class CameraPicker extends StatefulWidget {
     }
   }
 
-  /// Whether we must lock the orientation of the camera with predefined [CameraDescription]
+  /// Whether the predefined [CameraDescription] should locked to
+  /// the specific orientation during captures.
+  /// 摄像机在拍摄时锁定的旋转角度
   final DeviceOrientation? lockCaptureOrientation;
 
   /// The number of clockwise quarter turns the camera view should be rotated.
@@ -185,11 +187,11 @@ class CameraPicker extends StatefulWidget {
     ResolutionPreset resolutionPreset = ResolutionPreset.max,
     ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
     CameraLensDirection preferredLensDirection = CameraLensDirection.back,
+    DeviceOrientation? lockCaptureOrientation,
     Widget Function(CameraValue)? foregroundBuilder,
     EntitySaveCallback? onEntitySaving,
     CameraErrorHandler? onError,
-    bool useRootNavigator = true, 
-    DeviceOrientation? lockCaptureOrientation
+    bool useRootNavigator = true,
   }) {
     if (enableRecording != true && onlyEnableRecording == true) {
       throw ArgumentError('Recording mode error.');
@@ -217,10 +219,10 @@ class CameraPicker extends StatefulWidget {
           resolutionPreset: resolutionPreset,
           imageFormatGroup: imageFormatGroup,
           preferredLensDirection: preferredLensDirection,
+          lockCaptureOrientation: lockCaptureOrientation,
           foregroundBuilder: foregroundBuilder,
           onEntitySaving: onEntitySaving,
           onError: onError,
-          lockCaptureOrientation: lockCaptureOrientation,
         ),
         transitionCurve: Curves.easeIn,
         transitionDuration: _kRouteDuration,
@@ -577,13 +579,13 @@ class CameraPickerState extends State<CameraPicker>
 
       try {
         await controller.initialize();
-        if (widget.lockCaptureOrientation != null) {
-          await controller.lockCaptureOrientation(widget.lockCaptureOrientation);
-        }
+        // Call recording preparation first.
         if (shouldPrepareForVideoRecording) {
           await controller.prepareForVideoRecording();
         }
+        // Then call other asynchronous methods.
         Future.wait(<Future<void>>[
+          controller.lockCaptureOrientation(widget.lockCaptureOrientation),
           (() async => _maxAvailableExposureOffset =
               await controller.getMaxExposureOffset())(),
           (() async => _minAvailableExposureOffset =
