@@ -76,7 +76,7 @@ class CameraPicker extends StatefulWidget {
     }
   }
 
-  /// Whether the camera should be locked to the specific orientation=
+  /// Whether the camera should be locked to the specific orientation
   /// during captures.
   /// 摄像机在拍摄时锁定的旋转角度
   final DeviceOrientation? lockCaptureOrientation;
