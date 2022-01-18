@@ -584,8 +584,9 @@ class CameraPickerState extends State<CameraPicker>
           await controller.prepareForVideoRecording();
         }
         // Then call other asynchronous methods.
-        Future.wait(<Future<void>>[
-          controller.lockCaptureOrientation(widget.lockCaptureOrientation),
+        await Future.wait(<Future<void>>[
+          if (widget.lockCaptureOrientation != null)
+            controller.lockCaptureOrientation(widget.lockCaptureOrientation),
           (() async => _maxAvailableExposureOffset =
               await controller.getMaxExposureOffset())(),
           (() async => _minAvailableExposureOffset =
