@@ -2,10 +2,10 @@
 
 ## 3.0.0-dev.2
 
-- Add `lockCaptureOrientation`, allow users to determine lock to the specific orientation during captures. (#68)
+- Add `lockCaptureOrientation`, allowing users to determine lock to the specific orientation during captures. (#68)
 - Tweak asynchronous methods call during initializations.
 - Add full semantics support. (#72)
-- Improve camera initialize by adding lock.
+- Improve camera initializes by adding a lock.
 
 ## 3.0.0-dev.1
 
@@ -13,7 +13,7 @@
 
 ## 2.6.5
 
-- Remove duplicate future requests when saving entity.
+- Remove duplicate future requests when saving an entity.
 
 ## 2.6.4
 
@@ -25,7 +25,7 @@
 
 ## 2.6.2
 
-- Bind circular progress color with theme.
+- Bind circular progress color with the theme.
 
 ## 2.6.1
 
@@ -33,14 +33,14 @@
 
 ## 2.6.0
 
-- Add `preferredLensDirection`, allow users to choose which lens direction is preferred when first using the camera.
-- Add `enableTapRecording`, allow users to determine whether to allow the record can start with single tap.
-- Add `shouldAutoPreviewVideo`, allow users to determine whether the video should be played instantly in the preview.
+- Add `preferredLensDirection`, allowing users to choose which lens direction is preferred when first using the camera.
+- Add `enableTapRecording`, allowing users to determine whether to allow the record can start with a single tap.
+- Add `shouldAutoPreviewVideo`, allowing users to determine whether the video should be played instantly in the preview.
 
 ## 2.5.2
 
 - Request the permission state again when saving.
-- Provide better experiences when video record need to prepare.
+- Provide better experiences when video records need to be prepared.
 
 ## 2.5.1
 
@@ -58,7 +58,7 @@
 
 ## 2.4.1
 
-- Handle save exceptions more graceful.
+- Handle save exceptions more gracefully.
 - Dispose the controller when previewing for better performance.
 
 ## 2.4.0
@@ -81,7 +81,7 @@
 
 ## 2.2.0
 
-- Add `EntitySaveCallback` for custom save method.
+- Add `EntitySaveCallback` for the custom save method.
 
 ## 2.1.2
 
@@ -94,18 +94,18 @@
 ## 2.1.0
 
 - Add `shouldLockPortrait` to fit orientation for the device.
-- Fix exposure offset issue when reset the exposure point after adjust the exposure offset manually.
+- Fix exposure offset issue when resetting the exposure point after adjusting the exposure offset manually.
 
 ## 2.0.0
 
 ### New Features
 
-- Add `enableSetExposure`, allow users to update the exposure from the point tapped on the screen.
-- Add `enableExposureControlOnPoint`, allow users to control the exposure offset with an offset slide from the exposure point.
-- Add `enablePinchToZoom`, allow users to zoom by pinch the screen.
-- Add `enablePullToZoomInRecord`, allow users to zoom by pulling up when recording video.
-- Add `foregroundBuilder`, allow users to build customize widget beyond the camera preview.
-- Add `shouldDeletePreviewFile`, allow users to choose whether the captured file should be deleted.
+- Add `enableSetExposure`, allowing users to update the exposure from the point tapped on the screen.
+- Add `enableExposureControlOnPoint`, allowing users to control the exposure offset with an offset slide from the exposure point.
+- Add `enablePinchToZoom`, allowing users to zoom by pinching the screen.
+- Add `enablePullToZoomInRecord`, allowing users to zoom by pulling up when recording video.
+- Add `foregroundBuilder`, allowing users to build customized widgets beyond the camera preview.
+- Add `shouldDeletePreviewFile`, allowing users to choose whether the captured file should be deleted.
 - Sync `imageFormatGroup` from the `camera` plugin.
 
 ### Breaking Changes
@@ -152,12 +152,12 @@
 
 ## 1.1.0+1
 
-- Link confirm button's text with delegate. Fix #6 .
+- Link confirm button's text with delegate. Fix #6.
 
 ## 1.1.0
 
-- Add `isOnlyAllowRecording` . Resolves #4 .
-- Make camera switching available. Resolves #5 .
+- Add `isOnlyAllowRecording` . Resolves #4.
+- Make camera switching available. Resolves #5.
 
 ## 1.0.0+1
 
@@ -165,5 +165,5 @@
 
 ## 1.0.0
 
-- Support take picture and video.
+- Support taking pictures and videos.
 - Support video recording duration limitation.
