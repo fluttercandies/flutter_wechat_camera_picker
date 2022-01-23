@@ -7,8 +7,10 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:camera/camera.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 
 import '../constants/constants.dart';
@@ -64,15 +66,13 @@ class CameraPicker extends StatefulWidget {
     if (textDelegate != null) {
       Constants.textDelegate = textDelegate;
     } else if (enableRecording && onlyEnableRecording && enableTapRecording) {
-      Constants.textDelegate =
-          DefaultCameraPickerTextDelegateWithTapRecording();
+      Constants.textDelegate = CameraPickerTextDelegateWithTapRecording();
     } else if (enableRecording && onlyEnableRecording) {
-      Constants.textDelegate =
-          DefaultCameraPickerTextDelegateWithOnlyRecording();
+      Constants.textDelegate = CameraPickerTextDelegateWithOnlyRecording();
     } else if (enableRecording) {
-      Constants.textDelegate = DefaultCameraPickerTextDelegateWithRecording();
+      Constants.textDelegate = CameraPickerTextDelegateWithRecording();
     } else {
-      Constants.textDelegate = DefaultCameraPickerTextDelegate();
+      Constants.textDelegate = CameraPickerTextDelegate();
     }
   }
 
@@ -426,6 +426,8 @@ class CameraPickerState extends State<CameraPicker>
   /// 通过常量全局 Key 获取当前选择器的主题
   ThemeData get theme => _theme;
 
+  CameraPickerTextDelegate get _textDelegate => Constants.textDelegate;
+
   @override
   void initState() {
     super.initState();
@@ -699,26 +701,20 @@ class CameraPickerState extends State<CameraPicker>
   /// Use the [details] point to set exposure and focus.
   /// 通过点击点的 [details] 设置曝光和对焦。
   Future<void> setExposureAndFocusPoint(
-    TapUpDetails details,
+    Offset position,
     BoxConstraints constraints,
   ) async {
     _isExposureModeDisplays.value = false;
     // Ignore point update when the new point is less than 8% and higher than
     // 92% of the screen's height.
-    if (details.globalPosition.dy < constraints.maxHeight / 12 ||
-        details.globalPosition.dy > constraints.maxHeight / 12 * 11) {
+    if (position.dy < constraints.maxHeight / 12 ||
+        position.dy > constraints.maxHeight / 12 * 11) {
       return;
     }
     realDebugPrint(
-      'Setting new exposure point ('
-      'x: ${details.globalPosition.dx}, '
-      'y: ${details.globalPosition.dy}'
-      ')',
+      'Setting new exposure point (x: ${position.dx}, y: ${position.dy})',
     );
-    _lastExposurePoint.value = Offset(
-      details.globalPosition.dx,
-      details.globalPosition.dy,
-    );
+    _lastExposurePoint.value = position;
     _restartPointDisplayTimer();
     _currentExposureOffset.value = 0;
     if (_exposureMode.value == ExposureMode.locked) {
@@ -953,9 +949,27 @@ class CameraPickerState extends State<CameraPicker>
     }
   }
 
+  String? get onTapHint {
+    if (enableTapRecording) {
+      if (_controller?.value.isRecordingVideo == true) {
+        return _textDelegate.sActionStopRecordingHint;
+      }
+      return _textDelegate.sActionRecordHint;
+    }
+    if (!onlyEnableRecording) {
+      return _textDelegate.sActionShootHint;
+    }
+  }
+
   GestureLongPressCallback? get onLongPress {
     if (enableRecording && !enableTapRecording) {
       return recordDetection;
+    }
+  }
+
+  String? get onLongPressHint {
+    if (enableRecording && !enableTapRecording) {
+      return _textDelegate.sActionRecordHint;
     }
   }
 
@@ -970,7 +984,7 @@ class CameraPickerState extends State<CameraPicker>
   ///
   /// This displayed at the top of the screen.
   /// 该区域显示在屏幕上方。
-  Widget get settingsAction {
+  Widget settingsAction(BuildContext context) {
     return _initializeWrapper(
       builder: (CameraValue v, __) {
         if (v.isRecordingVideo) {
@@ -980,7 +994,8 @@ class CameraPickerState extends State<CameraPicker>
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Row(
             children: <Widget>[
-              if (cameras.length > 1) switchCamerasButton,
+              if (cameras.length > 1)
+                switchCamerasButton(controller.description.lensDirection),
               const Spacer(),
               switchFlashesButton(v),
             ],
@@ -992,8 +1007,10 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The button to switch between cameras.
   /// 切换相机的按钮
-  Widget get switchCamerasButton {
+  Widget switchCamerasButton(CameraLensDirection value) {
     return IconButton(
+      tooltip: '${_textDelegate.sActionSwitchCameraTooltip}, '
+          '${_textDelegate.sCameraLensDirectionLabel(value)}',
       onPressed: switchCameras,
       icon: Icon(
         Platform.isIOS
@@ -1020,9 +1037,13 @@ class CameraPickerState extends State<CameraPicker>
         icon = Icons.flash_on;
         break;
     }
-    return IconButton(
-      onPressed: switchFlashesMode,
-      icon: Icon(icon, size: 24),
+    return Semantics(
+      label: '${_textDelegate.sActionToggleFlashModeTooltip}, '
+          '${_textDelegate.sFlashModeLabel(value.flashMode)}',
+      child: IconButton(
+        onPressed: switchFlashesMode,
+        icon: Icon(icon, size: 24),
+      ),
     );
   }
 
@@ -1033,11 +1054,9 @@ class CameraPickerState extends State<CameraPicker>
       duration: recordDetectDuration,
       opacity: controller?.value.isRecordingVideo == true ? 0 : 1,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 20.0,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 20.0),
         child: Text(
-          Constants.textDelegate.shootingTips,
+          _textDelegate.shootingTips,
           style: const TextStyle(fontSize: 15.0),
         ),
       ),
@@ -1058,12 +1077,15 @@ class CameraPickerState extends State<CameraPicker>
       height: 118,
       child: Row(
         children: <Widget>[
+          if (controller?.value.isRecordingVideo != true)
+            Expanded(child: backButton(context, constraints))
+          else
+            const Spacer(),
           Expanded(
-            child: controller?.value.isRecordingVideo == true
-                ? const SizedBox.shrink()
-                : Center(child: backButton(context, constraints)),
+            child: Center(
+              child: MergeSemantics(child: shootingButton(constraints)),
+            ),
           ),
-          Expanded(child: Center(child: shootingButton(constraints))),
           const Spacer(),
         ],
       ),
@@ -1073,23 +1095,18 @@ class CameraPickerState extends State<CameraPicker>
   /// The back button near to the [shootingButton].
   /// 靠近拍照键的返回键
   Widget backButton(BuildContext context, BoxConstraints constraints) {
-    return InkWell(
-      borderRadius: maxBorderRadius,
-      onTap: Navigator.of(context).pop,
-      child: Container(
-        margin: const EdgeInsets.all(10.0),
+    return IconButton(
+      onPressed: Navigator.of(context).pop,
+      tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+      icon: Container(
+        alignment: Alignment.center,
         width: 27,
         height: 27,
         decoration: const BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
         ),
-        child: const Center(
-          child: Icon(
-            Icons.keyboard_arrow_down,
-            color: Colors.black,
-          ),
-        ),
+        child: const Icon(Icons.keyboard_arrow_down, color: Colors.black),
       ),
     );
   }
@@ -1099,51 +1116,58 @@ class CameraPickerState extends State<CameraPicker>
   Widget shootingButton(BoxConstraints constraints) {
     const Size outerSize = Size.square(115);
     const Size innerSize = Size.square(82);
-    return Listener(
-      behavior: HitTestBehavior.opaque,
-      onPointerUp: onPointerUp,
-      onPointerMove: onPointerMove(constraints),
-      child: InkWell(
-        borderRadius: maxBorderRadius,
-        onTap: onTap,
-        onLongPress: onLongPress,
-        child: SizedBox.fromSize(
-          size: outerSize,
-          child: Stack(
-            children: <Widget>[
-              Center(
-                child: AnimatedContainer(
-                  duration: kThemeChangeDuration,
-                  width: isShootingButtonAnimate
-                      ? outerSize.width
-                      : innerSize.width,
-                  height: isShootingButtonAnimate
-                      ? outerSize.height
-                      : innerSize.height,
-                  padding: EdgeInsets.all(isShootingButtonAnimate ? 41 : 11),
-                  decoration: BoxDecoration(
-                    color: theme.canvasColor.withOpacity(0.85),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const DecoratedBox(
+    return Semantics(
+      label: _textDelegate.sActionShootingButtonTooltip,
+      onTap: onTap,
+      onTapHint: onTapHint,
+      onLongPress: onLongPress,
+      onLongPressHint: onLongPressHint,
+      child: Listener(
+        behavior: HitTestBehavior.opaque,
+        onPointerUp: onPointerUp,
+        onPointerMove: onPointerMove(constraints),
+        child: GestureDetector(
+          onTap: onTap,
+          onLongPress: onLongPress,
+          child: SizedBox.fromSize(
+            size: outerSize,
+            child: Stack(
+              children: <Widget>[
+                Center(
+                  child: AnimatedContainer(
+                    duration: kThemeChangeDuration,
+                    width: isShootingButtonAnimate
+                        ? outerSize.width
+                        : innerSize.width,
+                    height: isShootingButtonAnimate
+                        ? outerSize.height
+                        : innerSize.height,
+                    padding: EdgeInsets.all(isShootingButtonAnimate ? 41 : 11),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: theme.canvasColor.withOpacity(0.85),
                       shape: BoxShape.circle,
+                    ),
+                    child: const DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              _initializeWrapper(
-                isInitialized: () =>
-                    controller.value.isRecordingVideo && isRecordingRestricted,
-                builder: (_, __) => CircularProgressBar(
-                  duration: maximumRecordingDuration!,
-                  outerRadius: outerSize.width,
-                  ringsColor: theme.indicatorColor,
-                  ringsWidth: 2.0,
+                _initializeWrapper(
+                  isInitialized: () =>
+                      controller.value.isRecordingVideo &&
+                      isRecordingRestricted,
+                  builder: (_, __) => CircularProgressBar(
+                    duration: maximumRecordingDuration!,
+                    outerRadius: outerSize.width,
+                    ringsColor: theme.indicatorColor,
+                    ringsWidth: 2.0,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -1293,22 +1317,24 @@ class CameraPickerState extends State<CameraPicker>
         top: _effectiveTop,
         width: _width,
         height: _pointWidth * 3,
-        child: Row(
-          textDirection:
-              _shouldReverseLayout ? TextDirection.rtl : TextDirection.ltr,
-          children: <Widget>[
-            ExposurePointWidget(
-              key: ValueKey<int>(DateTime.now().millisecondsSinceEpoch),
-              size: _pointWidth,
-              color: theme.iconTheme.color!,
-            ),
-            if (enableExposureControlOnPoint) const SizedBox(width: 2),
-            if (enableExposureControlOnPoint)
-              SizedBox.fromSize(
-                size: Size(_exposureControlWidth, _pointWidth * 3),
-                child: _buildControl(_controllerWidth, _pointWidth * 3),
+        child: ExcludeSemantics(
+          child: Row(
+            textDirection:
+                _shouldReverseLayout ? TextDirection.rtl : TextDirection.ltr,
+            children: <Widget>[
+              ExposurePointWidget(
+                key: ValueKey<int>(DateTime.now().millisecondsSinceEpoch),
+                size: _pointWidth,
+                color: theme.iconTheme.color!,
               ),
-          ],
+              if (enableExposureControlOnPoint) const SizedBox(width: 2),
+              if (enableExposureControlOnPoint)
+                SizedBox.fromSize(
+                  size: Size(_exposureControlWidth, _pointWidth * 3),
+                  child: _buildControl(_controllerWidth, _pointWidth * 3),
+                ),
+            ],
+          ),
         ),
       );
     }
@@ -1330,16 +1356,32 @@ class CameraPickerState extends State<CameraPicker>
     BuildContext context,
     BoxConstraints constraints,
   ) {
+    void _focus(TapUpDetails d) {
+      // Only call exposure point updates when the controller is initialized.
+      if (_controller?.value.isInitialized == true) {
+        Feedback.forTap(context);
+        setExposureAndFocusPoint(d.globalPosition, constraints);
+      }
+    }
+
     return Positioned.fill(
-      child: GestureDetector(
-        onTapUp: (TapUpDetails d) {
-          // Only call exposure point updates when the controller is initialized.
-          if (_controller?.value.isInitialized == true) {
-            setExposureAndFocusPoint(d, constraints);
-          }
-        },
-        behavior: HitTestBehavior.translucent,
-        child: const SizedBox.expand(),
+      child: Semantics(
+        label: _textDelegate.sActionManuallyFocusHint,
+        onTap: () => _focus(
+          TapUpDetails(
+            kind: PointerDeviceKind.touch,
+            globalPosition: Offset(Screens.width / 2, Screens.height / 2),
+          ),
+        ),
+        onTapHint: _textDelegate.sActionManuallyFocusHint,
+        sortKey: const OrdinalSortKey(1),
+        hidden: _controller == null,
+        excludeSemantics: true,
+        child: GestureDetector(
+          onTapUp: _focus,
+          behavior: HitTestBehavior.translucent,
+          child: const SizedBox.expand(),
+        ),
       ),
     );
   }
@@ -1427,10 +1469,18 @@ class CameraPickerState extends State<CameraPicker>
         padding: const EdgeInsets.only(bottom: 20.0),
         child: Column(
           children: <Widget>[
-            settingsAction,
+            Semantics(
+              sortKey: const OrdinalSortKey(0),
+              hidden: _controller == null,
+              child: settingsAction(context),
+            ),
             const Spacer(),
-            tipsTextWidget(_controller),
-            shootingActions(context, _controller, constraints),
+            ExcludeSemantics(child: tipsTextWidget(_controller)),
+            Semantics(
+              sortKey: const OrdinalSortKey(2),
+              hidden: _controller == null,
+              child: shootingActions(context, _controller, constraints),
+            ),
           ],
         ),
       ),
@@ -1452,17 +1502,19 @@ class CameraPickerState extends State<CameraPicker>
                 fit: StackFit.expand,
                 alignment: Alignment.center,
                 children: <Widget>[
-                  _initializeWrapper(
-                    builder: (CameraValue value, __) {
-                      if (value.isInitialized) {
-                        return _cameraBuilder(
-                          context: c,
-                          value: value,
-                          constraints: constraints,
-                        );
-                      }
-                      return const SizedBox.expand();
-                    },
+                  ExcludeSemantics(
+                    child: _initializeWrapper(
+                      builder: (CameraValue value, __) {
+                        if (value.isInitialized) {
+                          return _cameraBuilder(
+                            context: c,
+                            value: value,
+                            constraints: constraints,
+                          );
+                        }
+                        return const SizedBox.expand();
+                      },
+                    ),
                   ),
                   if (enableSetExposure)
                     _exposureDetectorWidget(c, constraints),
