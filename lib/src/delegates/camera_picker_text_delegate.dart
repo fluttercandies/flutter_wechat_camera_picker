@@ -25,6 +25,8 @@ class CameraPickerTextDelegate {
   /// head over to [EnglishCameraPickerTextDelegate] for fields understanding.
   String get sActionManuallyFocusHint => '手动聚焦';
 
+  String get sActionPreviewHint => '预览';
+
   String get sActionRecordHint => '录像';
 
   String get sActionShootHint => '拍照';
@@ -110,6 +112,9 @@ class EnglishCameraPickerTextDelegate extends CameraPickerTextDelegate {
 
   @override
   String get sActionManuallyFocusHint => 'manually focus';
+
+  @override
+  String get sActionPreviewHint => 'preview';
 
   @override
   String get sActionRecordHint => 'record';

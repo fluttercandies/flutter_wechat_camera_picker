@@ -1504,16 +1504,11 @@ class CameraPickerState extends State<CameraPicker>
                 children: <Widget>[
                   ExcludeSemantics(
                     child: _initializeWrapper(
-                      builder: (CameraValue value, __) {
-                        if (value.isInitialized) {
-                          return _cameraBuilder(
-                            context: c,
-                            value: value,
-                            constraints: constraints,
-                          );
-                        }
-                        return const SizedBox.expand();
-                      },
+                      builder: (CameraValue value, __) => _cameraBuilder(
+                        context: c,
+                        value: value,
+                        constraints: constraints,
+                      ),
                     ),
                   ),
                   if (enableSetExposure)
