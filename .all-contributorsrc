@@ -69,6 +69,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "TheVinhLuong",
+      "name": "Luong The Vinh",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20371879?v=4",
+      "profile": "https://github.com/TheVinhLuong",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
