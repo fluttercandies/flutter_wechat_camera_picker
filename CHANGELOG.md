@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.0-dev.2
+
+- Add `lockCaptureOrientation`, allow users to determine lock to the specific orientation during captures. (#68)
+- Tweak asynchronous methods call during initializations.
+- Add full semantics support. (#72)
+- Improve camera initialize by adding lock.
+
 ## 3.0.0-dev.1
 
 - Migrate to the latest photo_manager.
