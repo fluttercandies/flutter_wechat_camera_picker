@@ -307,6 +307,7 @@ class CameraPickerState extends State<CameraPicker>
   /// 当前相机实例的控制器
   CameraController get controller => _controller!;
   CameraController? _controller;
+  bool _shouldLockInitialize = false;
 
   /// Available cameras.
   /// 可用的相机实例
@@ -477,7 +478,7 @@ class CameraPickerState extends State<CameraPicker>
     }
     if (state == AppLifecycleState.inactive) {
       c.dispose();
-    } else if (state == AppLifecycleState.resumed && !c.value.isInitialized) {
+    } else if (state == AppLifecycleState.resumed && !_shouldLockInitialize) {
       // Drop initialize when the controller has been already initialized.
       // This will typically resolve the lifecycle issue on iOS when permissions
       // are requested for the first time.
@@ -513,6 +514,7 @@ class CameraPickerState extends State<CameraPicker>
     final CameraController? _c = _controller;
     // Then unbind the controller from widgets, which requires a build frame.
     safeSetState(() {
+      _shouldLockInitialize = true;
       _maxAvailableZoom = 1;
       _minAvailableZoom = 1;
       _currentZoom = 1;
@@ -541,6 +543,7 @@ class CameraPickerState extends State<CameraPicker>
       // After cameras fetched, judge again with the list is empty or not to
       // ensure there is at least an available camera for use.
       if (cameraDescription == null && (cameras.isEmpty)) {
+        _shouldLockInitialize = false;
         handleErrorWithHandler(
           CameraException(
             'No CameraDescription found.',
@@ -601,7 +604,9 @@ class CameraPickerState extends State<CameraPicker>
       } catch (e) {
         handleErrorWithHandler(e, widget.onError);
       } finally {
-        safeSetState(() {});
+        safeSetState(() {
+          _shouldLockInitialize = false;
+        });
       }
     });
   }
@@ -791,7 +796,10 @@ class CameraPickerState extends State<CameraPicker>
       final XFile _file = await controller.takePicture();
       // Delay disposing the controller to hold the preview.
       Future<void>.delayed(const Duration(milliseconds: 500), () {
-        controller.dispose();
+        _controller?.dispose();
+        safeSetState(() {
+          _controller = null;
+        });
       });
       final AssetEntity? entity = await CameraPickerViewer.pushToViewer(
         context,
