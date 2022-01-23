@@ -8,11 +8,11 @@ import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:path/path.dart' as path;
 import 'package:video_player/video_player.dart';
 
 import '../constants/constants.dart';
-import '../constants/styles.dart';
 import '../internals/enums.dart';
 import '../internals/methods.dart';
 import '../internals/type_defs.dart';
@@ -259,30 +259,62 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
 
   /// The back button for the preview section.
   /// 预览区的返回按钮
-  Widget get previewBackButton {
-    return InkWell(
-      borderRadius: maxBorderRadius,
-      onTap: () {
-        if (previewFile.existsSync()) {
-          previewFile.delete();
-        }
-        Navigator.of(context).pop();
-      },
-      child: Container(
-        margin: const EdgeInsets.all(10.0),
-        width: Screens.width / 15,
-        height: Screens.width / 15,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-        ),
-        child: const Center(
-          child: Icon(
-            Icons.keyboard_return_rounded,
-            color: Colors.black,
-            size: 18.0,
+  Widget previewBackButton(BuildContext context) {
+    return Semantics(
+      sortKey: const OrdinalSortKey(0),
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: IconButton(
+          onPressed: () {
+            if (previewFile.existsSync()) {
+              previewFile.delete();
+            }
+            Navigator.of(context).pop();
+          },
+          padding: EdgeInsets.zero,
+          constraints: BoxConstraints.tight(const Size.square(28)),
+          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+          iconSize: 18,
+          icon: Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: Theme.of(context).iconTheme.color,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.keyboard_return_rounded,
+              color: Theme.of(context).canvasColor,
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget previewWidget(BuildContext context) {
+    final Widget _builder;
+    if (pickerType == CameraPickerViewType.video) {
+      _builder = Stack(
+        children: <Widget>[
+          Center(
+            child: AspectRatio(
+              aspectRatio: videoController.value.aspectRatio,
+              child: VideoPlayer(videoController),
+            ),
+          ),
+          playControlButton,
+        ],
+      );
+    } else {
+      _builder = Image.file(previewFile);
+    }
+    return MergeSemantics(
+      child: Semantics(
+        label: previewXFile.name,
+        image: true,
+        onTapHint: Constants.textDelegate.sActionPreviewHint,
+        sortKey: const OrdinalSortKey(1),
+        child: _builder,
       ),
     );
   }
@@ -345,7 +377,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
 
   /// Actions section for the viewer. Including 'back' and 'confirm' button.
   /// 预览的操作区。包括"返回"和"确定"按钮。
-  Widget get viewerActions {
+  Widget viewerActions(BuildContext context) {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -355,17 +387,23 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                previewBackButton,
-                const Spacer(),
-              ],
+            Semantics(
+              sortKey: const OrdinalSortKey(0),
+              child: Row(
+                children: <Widget>[
+                  previewBackButton(context),
+                  const Spacer(),
+                ],
+              ),
             ),
-            Row(
-              children: <Widget>[
-                const Spacer(),
-                previewConfirmButton,
-              ],
+            Semantics(
+              sortKey: const OrdinalSortKey(2),
+              child: Row(
+                children: <Widget>[
+                  const Spacer(),
+                  previewConfirmButton,
+                ],
+              ),
             ),
           ],
         ),
@@ -390,21 +428,8 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       color: Colors.black,
       child: Stack(
         children: <Widget>[
-          // Place the specific widget according to the view type.
-          if (pickerType == CameraPickerViewType.image)
-            Positioned.fill(child: Image.file(previewFile))
-          else if (pickerType == CameraPickerViewType.video)
-            Positioned.fill(
-              child: Center(
-                child: AspectRatio(
-                  aspectRatio: videoController.value.aspectRatio,
-                  child: VideoPlayer(videoController),
-                ),
-              ),
-            ),
-          // Place the button before the actions to ensure it's not blocking.
-          if (pickerType == CameraPickerViewType.video) playControlButton,
-          viewerActions,
+          Positioned.fill(child: previewWidget(context)),
+          viewerActions(context),
         ],
       ),
     );

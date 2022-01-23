@@ -12,6 +12,5 @@ export 'screens.dart';
 class Constants {
   const Constants._();
 
-  static CameraPickerTextDelegate textDelegate =
-      DefaultCameraPickerTextDelegate();
+  static CameraPickerTextDelegate textDelegate = CameraPickerTextDelegate();
 }
