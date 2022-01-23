@@ -43,7 +43,7 @@ Based on `camera` for camera functions and `photo_manager` for asset implementat
 ## Screenshots 📸
 
 | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yrdqej30u01t017w.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yh3x4j30u01t0wuo.jpg) |
-| ----------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+|-------------------------------------------------------------------------|-------------------------------------------------------------------------|
 | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6z1h7xj30u01t01kx.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6zarvhj30u01t0x5f.jpg) |
 
 ## Preparing for use 🍭
@@ -60,7 +60,7 @@ Flutter SDK: `>=2.0.0` .
 ## Usage 📖
 
 | Name                         | Type                            | Description                                                                                           | Default Value                          |
-| ---------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------- |
+|------------------------------|---------------------------------|-------------------------------------------------------------------------------------------------------|----------------------------------------|
 | enableRecording              | `bool`                          | Whether the picker can record video.                                                                  | `false`                                |
 | onlyEnableRecording          | `bool`                          | Whether the picker can only record video. Only available when `enableRecording` is `true `.           | `false`                                |
 | enableTapRecording           | `bool`                          | Whether allow the record can start with single tap. Only available when `enableRecording` is `true `. | `false`                                |
