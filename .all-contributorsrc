@@ -78,6 +78,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "luomo-pro",
+      "name": "luomo-pro",
+      "avatar_url": "https://avatars.githubusercontent.com/u/41097395?v=4",
+      "profile": "https://github.com/luomo-pro",
+      "contributions": [
+        "a11y",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
