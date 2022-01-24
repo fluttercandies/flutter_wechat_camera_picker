@@ -310,7 +310,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
     }
     return MergeSemantics(
       child: Semantics(
-        label: previewXFile.name,
+        label: Constants.textDelegate.sActionPreviewHint,
         image: true,
         onTapHint: Constants.textDelegate.sActionPreviewHint,
         sortKey: const OrdinalSortKey(1),
