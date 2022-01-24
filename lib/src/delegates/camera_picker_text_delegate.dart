@@ -22,7 +22,7 @@ class CameraPickerTextDelegate {
   /// Semantics fields.
   ///
   /// Fields below are only for semantics usage. For customizable these fields,
-  /// head over to [EnglishCameraPickerTextDelegate] for fields understanding.
+  /// head over to [EnglishCameraPickerTextDelegate] for better understanding.
   String get sActionManuallyFocusHint => '手动聚焦';
 
   String get sActionPreviewHint => '预览';
@@ -35,24 +35,22 @@ class CameraPickerTextDelegate {
 
   String get sActionStopRecordingHint => '停止录像';
 
-  String get sActionSwitchCameraTooltip => '切换摄像头';
-
-  String get sActionToggleFlashModeTooltip => '切换闪光模式';
-
   String sCameraLensDirectionLabel(CameraLensDirection value) {
-    final String _direction;
     switch (value) {
       case CameraLensDirection.front:
-        _direction = '前置';
-        break;
+        return '前置';
       case CameraLensDirection.back:
-        _direction = '后置';
-        break;
+        return '后置';
       case CameraLensDirection.external:
-        _direction = '外置';
-        break;
+        return '外置';
     }
-    return '当前摄像头: $_direction';
+  }
+
+  String? sCameraPreviewLabel(CameraLensDirection? value) {
+    if (value == null) {
+      return null;
+    }
+    return '${sCameraLensDirectionLabel(value)}画面预览';
   }
 
   String sFlashModeLabel(FlashMode mode) {
@@ -71,7 +69,11 @@ class CameraPickerTextDelegate {
         _modeString = '始终闪光';
         break;
     }
-    return '当前闪光模式: $_modeString';
+    return '闪光模式: $_modeString';
+  }
+
+  String sSwitchCameraLensDirectionLabel(CameraLensDirection value) {
+    return '切换至${sCameraLensDirectionLabel(value)}摄像头';
   }
 }
 
@@ -129,18 +131,22 @@ class EnglishCameraPickerTextDelegate extends CameraPickerTextDelegate {
   String get sActionStopRecordingHint => 'stop recording';
 
   @override
-  String get sActionSwitchCameraTooltip => 'switch camera';
+  String sCameraLensDirectionLabel(CameraLensDirection value) => value.name;
 
   @override
-  String get sActionToggleFlashModeTooltip => 'toggle flashlight';
+  String? sCameraPreviewLabel(CameraLensDirection? value) {
+    if (value == null) {
+      return null;
+    }
+    return '${sCameraLensDirectionLabel(value)} camera preview';
+  }
 
   @override
-  String sCameraLensDirectionLabel(CameraLensDirection value) =>
-      'Current camera lens direction: ${value.name}';
+  String sFlashModeLabel(FlashMode mode) => 'Flash mode: ${mode.name}';
 
   @override
-  String sFlashModeLabel(FlashMode mode) =>
-      'Current flashlight mode: ${mode.name}';
+  String sSwitchCameraLensDirectionLabel(CameraLensDirection value) =>
+      'Switch to the ${sCameraLensDirectionLabel(value)} camera';
 }
 
 /// Default text delegate including recording implements with English.

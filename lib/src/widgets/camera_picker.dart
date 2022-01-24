@@ -625,6 +625,15 @@ class CameraPickerState extends State<CameraPicker>
     initCameras(currentCamera);
   }
 
+  /// Obtain the next camera description for semantics.
+  CameraDescription get _nextCameraDescription {
+    final int nextIndex = currentCameraIndex + 1;
+    if (nextIndex == cameras.length) {
+      return cameras[0];
+    }
+    return cameras[nextIndex];
+  }
+
   /// The method to switch between flash modes.
   /// 切换闪光灯模式的方法
   Future<void> switchFlashesMode() async {
@@ -1002,8 +1011,7 @@ class CameraPickerState extends State<CameraPicker>
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Row(
             children: <Widget>[
-              if (cameras.length > 1)
-                switchCamerasButton(controller.description.lensDirection),
+              if (cameras.length > 1) switchCamerasButton,
               const Spacer(),
               switchFlashesButton(v),
             ],
@@ -1015,10 +1023,11 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The button to switch between cameras.
   /// 切换相机的按钮
-  Widget switchCamerasButton(CameraLensDirection value) {
+  Widget get switchCamerasButton {
     return IconButton(
-      tooltip: '${_textDelegate.sActionSwitchCameraTooltip}, '
-          '${_textDelegate.sCameraLensDirectionLabel(value)}',
+      tooltip: _textDelegate.sSwitchCameraLensDirectionLabel(
+        _nextCameraDescription.lensDirection,
+      ),
       onPressed: switchCameras,
       icon: Icon(
         Platform.isIOS
@@ -1045,13 +1054,10 @@ class CameraPickerState extends State<CameraPicker>
         icon = Icons.flash_on;
         break;
     }
-    return Semantics(
-      label: '${_textDelegate.sActionToggleFlashModeTooltip}, '
-          '${_textDelegate.sFlashModeLabel(value.flashMode)}',
-      child: IconButton(
-        onPressed: switchFlashesMode,
-        icon: Icon(icon, size: 24),
-      ),
+    return IconButton(
+      onPressed: switchFlashesMode,
+      tooltip: _textDelegate.sFlashModeLabel(value.flashMode),
+      icon: Icon(icon, size: 24),
     );
   }
 
@@ -1374,7 +1380,10 @@ class CameraPickerState extends State<CameraPicker>
 
     return Positioned.fill(
       child: Semantics(
-        label: _textDelegate.sActionManuallyFocusHint,
+        label: _textDelegate.sCameraPreviewLabel(
+          _controller?.description.lensDirection,
+        ),
+        image: true,
         onTap: () => _focus(
           TapUpDetails(
             kind: PointerDeviceKind.touch,
