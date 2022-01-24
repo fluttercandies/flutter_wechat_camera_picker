@@ -442,11 +442,7 @@ class CameraPickerState extends State<CameraPicker>
       SystemChrome.setEnabledSystemUIOverlays(<SystemUiOverlay>[]);
     }
 
-    Future<void>.delayed(_kRouteDuration, () {
-      if (mounted) {
-        initCameras();
-      }
-    });
+    initCameras();
   }
 
   @override
@@ -584,6 +580,7 @@ class CameraPickerState extends State<CameraPicker>
 
       try {
         await controller.initialize();
+        safeSetState(() {});
         // Call recording preparation first.
         if (shouldPrepareForVideoRecording) {
           await controller.prepareForVideoRecording();
