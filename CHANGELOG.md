@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.0-dev.3
+
+- Improve semantics expressions.
+- Make camera controllers available as soon as possible.
+
 ## 3.0.0-dev.2
 
 - Add `lockCaptureOrientation`, allowing users to determine lock to the specific orientation during captures. (#68)
