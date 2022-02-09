@@ -488,10 +488,13 @@ class CameraPickerState extends State<CameraPicker>
     BoxConstraints constraints,
     CameraController controller,
   ) {
+    final int turns = widget.cameraQuarterTurns;
+    final String orientation = controller.value.deviceOrientation.toString();
     // Fetch the biggest size from the constraints.
     Size size = constraints.biggest;
     // Flip the size when the preview needs to turn with an odd count of quarters.
-    if (widget.cameraQuarterTurns % 2 != 0) {
+    if ((turns.isOdd && orientation.contains('portrait')) ||
+        (turns.isEven && orientation.contains('landscape'))) {
       size = size.flipped;
     }
     // Calculate scale depending on the size and camera ratios.
