@@ -9,7 +9,6 @@
         android:required="true"/>
 
     <application
-        android:name="io.flutter.app.FlutterApplication"
         android:label="wechat_camera_picker_demo"
         android:icon="@mipmap/ic_launcher">
         <activity
