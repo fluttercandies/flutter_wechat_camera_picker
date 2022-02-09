@@ -2,6 +2,7 @@
 /// [Author] Alex (https://github.com/AlexV525)
 /// [Date] 2020/7/13 11:08
 ///
+// ignore_for_file: deprecated_member_use
 import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
@@ -235,7 +236,6 @@ class CameraPicker extends StatefulWidget {
   static ThemeData themeData(Color themeColor) {
     return ThemeData.dark().copyWith(
       primaryColor: Colors.grey[900],
-      primaryColorBrightness: Brightness.dark,
       primaryColorLight: Colors.grey[900],
       primaryColorDark: Colors.grey[900],
       canvasColor: Colors.grey[850],
@@ -438,7 +438,6 @@ class CameraPickerState extends State<CameraPicker>
     /// Hide system status bar automatically when the platform is not Android.
     /// 在非 Android 设备上自动隐藏状态栏
     if (!Platform.isAndroid) {
-      // ignore: deprecated_member_use
       SystemChrome.setEnabledSystemUIOverlays(<SystemUiOverlay>[]);
     }
 
@@ -448,7 +447,6 @@ class CameraPickerState extends State<CameraPicker>
   @override
   void dispose() {
     if (!Platform.isAndroid) {
-      // ignore: deprecated_member_use
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     }
     WidgetsBinding.instance?.removeObserver(this);
@@ -941,12 +939,14 @@ class CameraPickerState extends State<CameraPicker>
     if (enableRecording && !enableTapRecording) {
       return recordDetectionCancel;
     }
+    return null;
   }
 
   PointerMoveEventListener? onPointerMove(BoxConstraints c) {
     if (enablePullToZoomInRecord) {
       return (PointerMoveEvent e) => onShootingButtonMove(e, c);
     }
+    return null;
   }
 
   GestureTapCallback? get onTap {
@@ -964,6 +964,7 @@ class CameraPickerState extends State<CameraPicker>
     if (!onlyEnableRecording) {
       return takePicture;
     }
+    return null;
   }
 
   String? get onTapHint {
@@ -976,18 +977,21 @@ class CameraPickerState extends State<CameraPicker>
     if (!onlyEnableRecording) {
       return _textDelegate.sActionShootHint;
     }
+    return null;
   }
 
   GestureLongPressCallback? get onLongPress {
     if (enableRecording && !enableTapRecording) {
       return recordDetection;
     }
+    return null;
   }
 
   String? get onLongPressHint {
     if (enableRecording && !enableTapRecording) {
       return _textDelegate.sActionRecordHint;
     }
+    return null;
   }
 
   ////////////////////////////////////////////////////////////////////////////
