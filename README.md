@@ -24,6 +24,7 @@ Based on `camera` for camera functions and `photo_manager` for asset implementat
   - [Preparing for use 🍭](#preparing-for-use-)
   - [Usage 📖](#usage-)
     - [Simple usage](#simple-usage)
+    - [With configurations](#with-configurations)
   - [Frequently asked question 💭](#frequently-asked-question-)
     - [Why the orientation behavior is strange on iOS?](#why-the-orientation-behavior-is-strange-on-ios)
   - [Contributors ✨](#contributors-)
@@ -59,6 +60,25 @@ Flutter SDK: `>=2.0.0` .
 
 ## Usage 📖
 
+### Simple usage
+
+```dart
+final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
+```
+
+### With configurations
+
+Use `CameraPickerConfig` for more picking behaviors.
+
+```dart
+final AssetEntity? entity = await CameraPicker.pickFromCamera(
+  context,
+  pickerConfig: const CameraPickerConfig(),
+);
+```
+
+Fields in `CameraPickerConfig`:
+
 | Name                         | Type                            | Description                                                                                           | Default Value                          |
 |------------------------------|---------------------------------|-------------------------------------------------------------------------------------------------------|----------------------------------------|
 | enableRecording              | `bool`                          | Whether the picker can record video.                                                                  | `false`                                |
@@ -82,12 +102,6 @@ Flutter SDK: `>=2.0.0` .
 | foregroundBuilder            | `Widget Function(CameraValue)?` | The foreground widget builder which will cover the whole camera preview.                              | null                                   |
 | onEntitySaving               | `EntitySaveCallback?`           | The callback type define for saving entity in the viewer.                                             | null                                   |
 | onError                      | `CameraErrorHandler?`           | The error handler when any error occurred during the picking process.                                 | null                                   |
-
-### Simple usage
-
-```dart
-final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
-```
 
 ## Frequently asked question 💭
 
