@@ -23,6 +23,7 @@ Language: [English](README.md) | 中文简体
   - [准备工作 🍭](#准备工作-)
   - [使用方法 📖](#使用方法-)
     - [简单的使用方法](#简单的使用方法)
+    - [使用配置](#使用配置)
   - [常见问题 💭](#常见问题-)
     - [iOS 上的预览在旋转时行为诡异](#iOS-上的预览在旋转时行为诡异)
 
@@ -57,6 +58,42 @@ Flutter SDK：`>=2.0.0` 。
 
 ## 使用方法 📖
 
+### 简单的使用方法
+
+```dart
+final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
+```
+
+### 使用配置
+
+你可以使用 `CameraPickerConfig` 来调整选择时的行为。
+
+```dart
+final AssetEntity? entity = await CameraPicker.pickFromCamera(
+  context,
+  pickerConfig: const CameraPickerConfig(),
+);
+```
+
+`CameraPickerConfig` 的成员说明：
+
+### 简单的使用方法
+
+```dart
+final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
+```
+
+你可以使用 `CameraPickerConfig` 来调整选择时的行为。
+
+```dart
+final AssetEntity? entity = await CameraPicker.pickFromCamera(
+  context,
+  pickerConfig: const CameraPickerConfig(),
+);
+```
+
+`CameraPickerConfig` 的成员说明：
+
 | 参数名                          | 类型                              | 描述                                                 | 默认值                                    |
 |------------------------------|---------------------------------|----------------------------------------------------|----------------------------------------|
 | enableRecording              | `bool`                          | 选择器是否可以录像                                          | `false`                                |
@@ -80,12 +117,6 @@ Flutter SDK：`>=2.0.0` 。
 | foregroundBuilder            | `Widget Function(CameraValue)?` | 覆盖在相机预览上方的前景构建                                     | null                                   |
 | onEntitySaving               | `EntitySaveCallback?`           | 在查看器中保存图片时的回调                                      | null                                   |
 | onError                      | `CameraErrorHandler?`           | 拍摄照片过程中的自定义错误处理                                    | null                                   |
-
-### 简单的使用方法
-
-```dart
-final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
-```
 
 ## 常见问题 💭
 
