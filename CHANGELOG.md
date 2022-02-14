@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.0.0-dev.4
+
+- Fix scaling issues with turns and orientations.
+- Fix lint issues on Flutter 2.10.
+- Export `CameraPickerPageRoute`.
+
+Breaking changes:
+- Abstract `CamearPickerConfig`, which moved all arguments from `pickFromCamera` to `pickerConfig`.
+
 ## 3.0.0-dev.3
 
 - Improve semantics expressions.
