@@ -4,36 +4,49 @@
 ///
 import 'package:flutter/material.dart';
 
+/// Build [AssetPickerPageRoute] with the given generic type.
+/// 构建匹配泛型的 [AssetPickerPageRoute]
+typedef CameraPickerPageRouteBuilder<T> = CameraPickerPageRoute<T> Function(
+  Widget picker,
+);
+
 /// Built a slide page transition for the picker.
 /// 为选择器构造一个上下进出的页面过渡动画
-class SlidePageTransitionBuilder<T> extends PageRoute<T> {
-  SlidePageTransitionBuilder({
+class CameraPickerPageRoute<T> extends PageRoute<T> {
+  CameraPickerPageRoute({
     required this.builder,
     this.transitionCurve = Curves.easeIn,
     this.transitionDuration = const Duration(milliseconds: 500),
+    this.barrierColor,
+    this.barrierDismissible = false,
+    this.barrierLabel,
+    this.maintainState = true,
+    this.opaque = true,
+    this.canTransitionFromPredicate,
   });
 
-  final Widget builder;
+  final WidgetBuilder builder;
 
   final Curve transitionCurve;
-
   @override
   final Duration transitionDuration;
 
   @override
-  final bool opaque = true;
+  final Color? barrierColor;
+  @override
+  final bool barrierDismissible;
+  @override
+  final String? barrierLabel;
+  @override
+  final bool opaque;
+  @override
+  final bool maintainState;
+
+  final bool Function(TransitionRoute<dynamic>)? canTransitionFromPredicate;
 
   @override
-  final bool barrierDismissible = false;
-
-  @override
-  final bool maintainState = true;
-
-  @override
-  Color? get barrierColor => null;
-
-  @override
-  String? get barrierLabel => null;
+  bool canTransitionFrom(TransitionRoute<dynamic> previousRoute) =>
+      canTransitionFromPredicate?.call(previousRoute) ?? false;
 
   @override
   Widget buildPage(
@@ -41,7 +54,7 @@ class SlidePageTransitionBuilder<T> extends PageRoute<T> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    return builder;
+    return builder(context);
   }
 
   @override

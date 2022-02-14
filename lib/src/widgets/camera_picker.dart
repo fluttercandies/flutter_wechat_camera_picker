@@ -22,7 +22,7 @@ import '../internals/methods.dart';
 import '../internals/type_defs.dart';
 import '../widgets/circular_progress_bar.dart';
 
-import 'builder/slide_page_transition_builder.dart';
+import 'camera_picker_page_route.dart';
 import 'camera_picker_viewer.dart';
 import 'exposure_point_widget.dart';
 
@@ -193,41 +193,40 @@ class CameraPicker extends StatefulWidget {
     EntitySaveCallback? onEntitySaving,
     CameraErrorHandler? onError,
     bool useRootNavigator = true,
+    CameraPickerPageRouteBuilder<AssetEntity>? pageRouteBuilder,
   }) {
     if (enableRecording != true && onlyEnableRecording == true) {
       throw ArgumentError('Recording mode error.');
     }
+    final Widget picker = CameraPicker(
+      enableRecording: enableRecording,
+      onlyEnableRecording: onlyEnableRecording,
+      enableTapRecording: enableTapRecording,
+      enableAudio: enableAudio,
+      enableSetExposure: enableSetExposure,
+      enableExposureControlOnPoint: enableExposureControlOnPoint,
+      enablePinchToZoom: enablePinchToZoom,
+      enablePullToZoomInRecord: enablePullToZoomInRecord,
+      shouldDeletePreviewFile: shouldDeletePreviewFile,
+      shouldAutoPreviewVideo: shouldAutoPreviewVideo,
+      maximumRecordingDuration: maximumRecordingDuration,
+      theme: theme,
+      cameraQuarterTurns: cameraQuarterTurns,
+      textDelegate: textDelegate,
+      resolutionPreset: resolutionPreset,
+      imageFormatGroup: imageFormatGroup,
+      preferredLensDirection: preferredLensDirection,
+      lockCaptureOrientation: lockCaptureOrientation,
+      foregroundBuilder: foregroundBuilder,
+      onEntitySaving: onEntitySaving,
+      onError: onError,
+    );
     return Navigator.of(
       context,
       rootNavigator: useRootNavigator,
     ).push<AssetEntity>(
-      SlidePageTransitionBuilder<AssetEntity>(
-        builder: CameraPicker(
-          enableRecording: enableRecording,
-          onlyEnableRecording: onlyEnableRecording,
-          enableTapRecording: enableTapRecording,
-          enableAudio: enableAudio,
-          enableSetExposure: enableSetExposure,
-          enableExposureControlOnPoint: enableExposureControlOnPoint,
-          enablePinchToZoom: enablePinchToZoom,
-          enablePullToZoomInRecord: enablePullToZoomInRecord,
-          shouldDeletePreviewFile: shouldDeletePreviewFile,
-          shouldAutoPreviewVideo: shouldAutoPreviewVideo,
-          maximumRecordingDuration: maximumRecordingDuration,
-          theme: theme,
-          cameraQuarterTurns: cameraQuarterTurns,
-          textDelegate: textDelegate,
-          resolutionPreset: resolutionPreset,
-          imageFormatGroup: imageFormatGroup,
-          preferredLensDirection: preferredLensDirection,
-          lockCaptureOrientation: lockCaptureOrientation,
-          foregroundBuilder: foregroundBuilder,
-          onEntitySaving: onEntitySaving,
-          onError: onError,
-        ),
-        transitionCurve: Curves.easeIn,
-        transitionDuration: _kRouteDuration,
-      ),
+      pageRouteBuilder?.call(picker) ??
+          CameraPickerPageRoute<AssetEntity>(builder: (_) => picker),
     );
   }
 
