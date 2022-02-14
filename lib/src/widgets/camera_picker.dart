@@ -14,12 +14,13 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 
+import '../constants/config.dart';
 import '../constants/constants.dart';
 import '../constants/styles.dart';
+import '../delegates/camera_picker_text_delegate.dart';
 import '../internals/enums.dart';
 import '../internals/extensions.dart';
 import '../internals/methods.dart';
-import '../internals/type_defs.dart';
 import '../widgets/circular_progress_bar.dart';
 
 import 'camera_picker_page_route.dart';
@@ -37,190 +38,36 @@ const Duration _kRouteDuration = Duration(milliseconds: 300);
 class CameraPicker extends StatefulWidget {
   CameraPicker({
     Key? key,
-    this.enableRecording = false,
-    this.onlyEnableRecording = false,
-    this.enableTapRecording = false,
-    this.enableAudio = true,
-    this.enableSetExposure = true,
-    this.enableExposureControlOnPoint = true,
-    this.enablePinchToZoom = true,
-    this.enablePullToZoomInRecord = true,
-    this.shouldDeletePreviewFile = false,
-    this.shouldAutoPreviewVideo = false,
-    this.maximumRecordingDuration = const Duration(seconds: 15),
-    this.theme,
-    this.resolutionPreset = ResolutionPreset.max,
-    this.imageFormatGroup = ImageFormatGroup.unknown,
-    this.preferredLensDirection = CameraLensDirection.back,
-    this.lockCaptureOrientation,
-    this.cameraQuarterTurns = 0,
-    this.foregroundBuilder,
-    this.onEntitySaving,
-    this.onError,
-    CameraPickerTextDelegate? textDelegate,
-  })  : assert(
-          enableRecording == true || onlyEnableRecording != true,
-          'Recording mode error.',
-        ),
-        super(key: key) {
+    this.pickerConfig = const CameraPickerConfig(),
+  }) : super(key: key) {
     // Set text delegate accordingly.
-    if (textDelegate != null) {
-      Constants.textDelegate = textDelegate;
-    } else if (enableRecording && onlyEnableRecording && enableTapRecording) {
+    if (pickerConfig.textDelegate != null) {
+      Constants.textDelegate = pickerConfig.textDelegate!;
+    } else if (pickerConfig.enableRecording &&
+        pickerConfig.onlyEnableRecording &&
+        pickerConfig.enableTapRecording) {
       Constants.textDelegate = CameraPickerTextDelegateWithTapRecording();
-    } else if (enableRecording && onlyEnableRecording) {
+    } else if (pickerConfig.enableRecording &&
+        pickerConfig.onlyEnableRecording) {
       Constants.textDelegate = CameraPickerTextDelegateWithOnlyRecording();
-    } else if (enableRecording) {
+    } else if (pickerConfig.enableRecording) {
       Constants.textDelegate = CameraPickerTextDelegateWithRecording();
     } else {
       Constants.textDelegate = CameraPickerTextDelegate();
     }
   }
 
-  /// Whether the camera should be locked to the specific orientation
-  /// during captures.
-  /// 摄像机在拍摄时锁定的旋转角度
-  final DeviceOrientation? lockCaptureOrientation;
-
-  /// The number of clockwise quarter turns the camera view should be rotated.
-  /// 摄像机视图顺时针旋转次数，每次90度
-  final int cameraQuarterTurns;
-
-  /// Whether the picker can record video.
-  /// 选择器是否可以录像
-  final bool enableRecording;
-
-  /// Whether the picker can record video.
-  /// 选择器是否可以录像
-  final bool onlyEnableRecording;
-
-  /// Whether allow the record can start with single tap.
-  /// 选择器是否可以单击录像
-  ///
-  /// It only works when [onlyEnableRecording] is true.
-  /// 仅在 [onlyEnableRecording] 为 true 时生效。
-  final bool enableTapRecording;
-
-  /// Whether the picker should record audio.
-  /// 选择器录像时是否需要录制声音
-  final bool enableAudio;
-
-  /// Whether users can set the exposure point by tapping.
-  /// 用户是否可以在界面上通过点击设定曝光点
-  final bool enableSetExposure;
-
-  /// Whether users can adjust exposure according to the set point.
-  /// 用户是否可以根据已经设置的曝光点调节曝光度
-  final bool enableExposureControlOnPoint;
-
-  /// Whether users can zoom the camera by pinch.
-  /// 用户是否可以在界面上双指缩放相机对焦
-  final bool enablePinchToZoom;
-
-  /// Whether users can zoom by pulling up when recording video.
-  /// 用户是否可以在录制视频时上拉缩放
-  final bool enablePullToZoomInRecord;
-
-  /// {@template wechat_camera_picker.shouldDeletePreviewFile}
-  /// Whether the preview file will be delete when pop.
-  /// 返回页面时是否删除预览文件
-  /// {@endtemplate}
-  final bool shouldDeletePreviewFile;
-
-  /// {@template wechat_camera_picker.shouldAutoPreviewVideo}
-  /// Whether the video should be played instantly in the preview.
-  /// 在预览时是否直接播放视频
-  /// {@endtemplate}
-  final bool shouldAutoPreviewVideo;
-
-  /// The maximum duration of the video recording process.
-  /// 录制视频最长时长
-  ///
-  /// Defaults to 15 seconds, allow `null` for unrestricted video recording.
-  /// 默认为 15 秒，可以使用 `null` 来设置无限制的视频录制
-  final Duration? maximumRecordingDuration;
-
-  /// Theme data for the picker.
-  /// 选择器的主题
-  final ThemeData? theme;
-
-  /// Present resolution for the camera.
-  /// 相机的分辨率预设
-  final ResolutionPreset resolutionPreset;
-
-  /// The [ImageFormatGroup] describes the output of the raw image format.
-  /// 输出图像的格式描述
-  final ImageFormatGroup imageFormatGroup;
-
-  /// Which lens direction is preferred when first using the camera,
-  /// typically with the front or the back direction.
-  /// 首次使用相机时首选的镜头方向，通常是前置或后置。
-  final CameraLensDirection preferredLensDirection;
-
-  /// The foreground widget builder which will cover the whole camera preview.
-  /// 覆盖在相机预览上方的前景构建
-  final Widget Function(CameraValue)? foregroundBuilder;
-
-  /// {@macro wechat_camera_picker.EntitySaveCallback}
-  final EntitySaveCallback? onEntitySaving;
-
-  /// {@macro wechat_camera_picker.CameraErrorHandler}
-  final CameraErrorHandler? onError;
+  final CameraPickerConfig pickerConfig;
 
   /// Static method to create [AssetEntity] through camera.
   /// 通过相机创建 [AssetEntity] 的静态方法
   static Future<AssetEntity?> pickFromCamera(
     BuildContext context, {
-    bool enableRecording = false,
-    bool onlyEnableRecording = false,
-    bool enableTapRecording = false,
-    bool enableAudio = true,
-    bool enableSetExposure = true,
-    bool enableExposureControlOnPoint = true,
-    bool enablePinchToZoom = true,
-    bool enablePullToZoomInRecord = true,
-    bool shouldDeletePreviewFile = false,
-    bool shouldAutoPreviewVideo = false,
-    Duration maximumRecordingDuration = const Duration(seconds: 15),
-    ThemeData? theme,
-    int cameraQuarterTurns = 0,
-    CameraPickerTextDelegate? textDelegate,
-    ResolutionPreset resolutionPreset = ResolutionPreset.max,
-    ImageFormatGroup imageFormatGroup = ImageFormatGroup.unknown,
-    CameraLensDirection preferredLensDirection = CameraLensDirection.back,
-    DeviceOrientation? lockCaptureOrientation,
-    Widget Function(CameraValue)? foregroundBuilder,
-    EntitySaveCallback? onEntitySaving,
-    CameraErrorHandler? onError,
+    CameraPickerConfig pickerConfig = const CameraPickerConfig(),
     bool useRootNavigator = true,
     CameraPickerPageRouteBuilder<AssetEntity>? pageRouteBuilder,
   }) {
-    if (enableRecording != true && onlyEnableRecording == true) {
-      throw ArgumentError('Recording mode error.');
-    }
-    final Widget picker = CameraPicker(
-      enableRecording: enableRecording,
-      onlyEnableRecording: onlyEnableRecording,
-      enableTapRecording: enableTapRecording,
-      enableAudio: enableAudio,
-      enableSetExposure: enableSetExposure,
-      enableExposureControlOnPoint: enableExposureControlOnPoint,
-      enablePinchToZoom: enablePinchToZoom,
-      enablePullToZoomInRecord: enablePullToZoomInRecord,
-      shouldDeletePreviewFile: shouldDeletePreviewFile,
-      shouldAutoPreviewVideo: shouldAutoPreviewVideo,
-      maximumRecordingDuration: maximumRecordingDuration,
-      theme: theme,
-      cameraQuarterTurns: cameraQuarterTurns,
-      textDelegate: textDelegate,
-      resolutionPreset: resolutionPreset,
-      imageFormatGroup: imageFormatGroup,
-      preferredLensDirection: preferredLensDirection,
-      lockCaptureOrientation: lockCaptureOrientation,
-      foregroundBuilder: foregroundBuilder,
-      onEntitySaving: onEntitySaving,
-      onError: onError,
-    );
+    final Widget picker = CameraPicker(pickerConfig: pickerConfig);
     return Navigator.of(
       context,
       rootNavigator: useRootNavigator,
@@ -377,37 +224,38 @@ class CameraPickerState extends State<CameraPicker>
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////// Global Getters //////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
+  CameraPickerConfig get config => widget.pickerConfig;
 
-  bool get enableRecording => widget.enableRecording;
+  bool get enableRecording => config.enableRecording;
 
-  bool get onlyEnableRecording => enableRecording && widget.onlyEnableRecording;
+  bool get onlyEnableRecording => enableRecording && config.onlyEnableRecording;
 
   bool get enableTapRecording =>
-      onlyEnableRecording && widget.enableTapRecording;
+      onlyEnableRecording && config.enableTapRecording;
 
   /// No audio integration required when it's only for camera.
   /// 在仅允许拍照时不需要启用音频
-  bool get enableAudio => enableRecording && widget.enableAudio;
+  bool get enableAudio => enableRecording && config.enableAudio;
 
   /// Whether the picker needs to prepare for video recording on iOS.
   /// 是否需要为 iOS 的录制视频执行准备操作
   bool get shouldPrepareForVideoRecording =>
       enableRecording && enableAudio && Platform.isIOS;
 
-  bool get enableSetExposure => widget.enableSetExposure;
+  bool get enableSetExposure => config.enableSetExposure;
 
-  bool get enableExposureControlOnPoint => widget.enableExposureControlOnPoint;
+  bool get enableExposureControlOnPoint => config.enableExposureControlOnPoint;
 
-  bool get enablePinchToZoom => widget.enablePinchToZoom;
+  bool get enablePinchToZoom => config.enablePinchToZoom;
 
   bool get enablePullToZoomInRecord =>
-      enableRecording && widget.enablePullToZoomInRecord;
+      enableRecording && config.enablePullToZoomInRecord;
 
-  bool get shouldDeletePreviewFile => widget.shouldDeletePreviewFile;
+  bool get shouldDeletePreviewFile => config.shouldDeletePreviewFile;
 
-  bool get shouldAutoPreviewVideo => widget.shouldAutoPreviewVideo;
+  bool get shouldAutoPreviewVideo => config.shouldAutoPreviewVideo;
 
-  Duration? get maximumRecordingDuration => widget.maximumRecordingDuration;
+  Duration? get maximumRecordingDuration => config.maximumRecordingDuration;
 
   /// Whether the recording restricted to a specific duration.
   /// 录像是否有限制的时长
@@ -420,7 +268,7 @@ class CameraPickerState extends State<CameraPicker>
   /// If there's no theme provided from the user, use [CameraPicker.themeData] .
   /// 如果用户未提供主题，
   late final ThemeData _theme =
-      widget.theme ?? CameraPicker.themeData(C.themeColor);
+      config.theme ?? CameraPicker.themeData(C.themeColor);
 
   /// Get [ThemeData] of the [CameraPicker] through [Constants.pickerKey].
   /// 通过常量全局 Key 获取当前选择器的主题
@@ -485,7 +333,7 @@ class CameraPickerState extends State<CameraPicker>
     BoxConstraints constraints,
     CameraController controller,
   ) {
-    final int turns = widget.cameraQuarterTurns;
+    final int turns = config.cameraQuarterTurns;
     final String orientation = controller.value.deviceOrientation.toString();
     // Fetch the biggest size from the constraints.
     Size size = constraints.biggest;
@@ -545,13 +393,13 @@ class CameraPickerState extends State<CameraPicker>
             'No CameraDescription found.',
             'No cameras are available in the controller.',
           ),
-          widget.onError,
+          config.onError,
         );
       }
 
       final int preferredIndex = cameras.indexWhere(
         (CameraDescription e) =>
-            e.lensDirection == widget.preferredLensDirection,
+            e.lensDirection == config.preferredLensDirection,
       );
       final int index;
       if (preferredIndex != -1 && _c == null) {
@@ -563,9 +411,9 @@ class CameraPickerState extends State<CameraPicker>
       // Initialize the controller with the given resolution preset.
       _controller = CameraController(
         cameraDescription ?? cameras[index],
-        widget.resolutionPreset,
+        config.resolutionPreset,
         enableAudio: enableAudio,
-        imageFormatGroup: widget.imageFormatGroup,
+        imageFormatGroup: config.imageFormatGroup,
       )..addListener(() {
           if (controller.value.hasError) {
             handleErrorWithHandler(
@@ -573,7 +421,7 @@ class CameraPickerState extends State<CameraPicker>
                 'CameraController exception',
                 controller.value.errorDescription,
               ),
-              widget.onError,
+              config.onError,
             );
           }
         });
@@ -587,8 +435,8 @@ class CameraPickerState extends State<CameraPicker>
         }
         // Then call other asynchronous methods.
         await Future.wait(<Future<void>>[
-          if (widget.lockCaptureOrientation != null)
-            controller.lockCaptureOrientation(widget.lockCaptureOrientation),
+          if (config.lockCaptureOrientation != null)
+            controller.lockCaptureOrientation(config.lockCaptureOrientation),
           (() async => _maxAvailableExposureOffset =
               await controller.getMaxExposureOffset())(),
           (() async => _minAvailableExposureOffset =
@@ -599,7 +447,7 @@ class CameraPickerState extends State<CameraPicker>
               _minAvailableZoom = await controller.getMinZoomLevel())(),
         ]);
       } catch (e) {
-        handleErrorWithHandler(e, widget.onError);
+        handleErrorWithHandler(e, config.onError);
       } finally {
         safeSetState(() {
           _shouldLockInitialize = false;
@@ -792,7 +640,7 @@ class CameraPickerState extends State<CameraPicker>
     if (!controller.value.isInitialized) {
       handleErrorWithHandler(
         StateError('Camera has not initialized.'),
-        widget.onError,
+        config.onError,
       );
     }
     if (controller.value.isTakingPicture) {
@@ -815,7 +663,7 @@ class CameraPickerState extends State<CameraPicker>
         theme: theme,
         shouldDeletePreviewFile: shouldDeletePreviewFile,
         shouldAutoPreviewVideo: shouldAutoPreviewVideo,
-        onEntitySaving: widget.onEntitySaving,
+        onEntitySaving: config.onEntitySaving,
       );
       if (entity != null) {
         Navigator.of(context).pop(entity);
@@ -825,7 +673,7 @@ class CameraPickerState extends State<CameraPicker>
       safeSetState(() {});
     } catch (e) {
       realDebugPrint('Error when preview the captured file: $e');
-      handleErrorWithHandler(e, widget.onError);
+      handleErrorWithHandler(e, config.onError);
     }
   }
 
@@ -885,7 +733,7 @@ class CameraPickerState extends State<CameraPicker>
             stopRecordingVideo();
           });
         }
-        handleErrorWithHandler(e, widget.onError);
+        handleErrorWithHandler(e, config.onError);
       });
     }
   }
@@ -918,7 +766,7 @@ class CameraPickerState extends State<CameraPicker>
         realDebugPrint('Try to initialize a new CameraController...');
         initCameras();
         _handleError();
-        handleErrorWithHandler(e, widget.onError);
+        handleErrorWithHandler(e, config.onError);
       }).whenComplete(() {
         isShootingButtonAnimate = false;
         safeSetState(() {});
@@ -1433,7 +1281,7 @@ class CameraPickerState extends State<CameraPicker>
     }
 
     _preview = RotatedBox(
-      quarterTurns: -widget.cameraQuarterTurns,
+      quarterTurns: -config.cameraQuarterTurns,
       child: Transform.scale(
         scale: _effectiveCameraScale(constraints, controller),
         child: Center(child: _preview),
@@ -1476,8 +1324,8 @@ class CameraPickerState extends State<CameraPicker>
               constraints: constraints,
             ),
           ),
-          if (widget.foregroundBuilder != null)
-            Positioned.fill(child: widget.foregroundBuilder!(value)),
+          if (config.foregroundBuilder != null)
+            Positioned.fill(child: config.foregroundBuilder!(value)),
         ],
       ),
     );
@@ -1516,7 +1364,7 @@ class CameraPickerState extends State<CameraPicker>
         child: Material(
           color: Colors.black,
           child: RotatedBox(
-            quarterTurns: widget.cameraQuarterTurns,
+            quarterTurns: config.cameraQuarterTurns,
             child: LayoutBuilder(
               builder: (BuildContext c, BoxConstraints constraints) => Stack(
                 fit: StackFit.expand,
