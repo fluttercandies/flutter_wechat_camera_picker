@@ -28,7 +28,7 @@ import 'camera_picker_viewer.dart';
 import 'exposure_point_widget.dart';
 
 const Color _lockedColor = Colors.amber;
-const Duration _kRouteDuration = Duration(milliseconds: 300);
+const Duration _kDuration = Duration(milliseconds: 300);
 
 /// Create a camera picker integrate with [CameraDescription].
 /// 通过 [CameraDescription] 整合的拍照选择
@@ -1052,7 +1052,7 @@ class CameraPickerState extends State<CameraPicker>
       return ValueListenableBuilder<bool>(
         valueListenable: _isExposureModeDisplays,
         builder: (_, bool value, Widget? child) => AnimatedOpacity(
-          duration: _kRouteDuration,
+          duration: _kDuration,
           opacity: value ? 1 : 0,
           child: child,
         ),
@@ -1131,7 +1131,7 @@ class CameraPickerState extends State<CameraPicker>
               ValueListenableBuilder<bool>(
                 valueListenable: _isExposureModeDisplays,
                 builder: (_, bool value, Widget? child) => AnimatedOpacity(
-                  duration: _kRouteDuration,
+                  duration: _kDuration,
                   opacity: value ? 1 : 0,
                   child: child,
                 ),

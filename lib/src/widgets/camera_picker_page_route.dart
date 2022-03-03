@@ -16,7 +16,7 @@ class CameraPickerPageRoute<T> extends PageRoute<T> {
   CameraPickerPageRoute({
     required this.builder,
     this.transitionCurve = Curves.easeIn,
-    this.transitionDuration = const Duration(milliseconds: 500),
+    this.transitionDuration = const Duration(milliseconds: 300),
     this.barrierColor,
     this.barrierDismissible = false,
     this.barrierLabel,
