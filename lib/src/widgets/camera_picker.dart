@@ -1274,14 +1274,13 @@ class CameraPickerState extends State<CameraPicker>
       ),
     );
 
-    // Flip the preview if the user is using a front camera to match the result.
-    if (currentCamera.lensDirection == CameraLensDirection.front) {
-      _preview = Transform(
-        transform: Matrix4.rotationY(math.pi),
-        alignment: Alignment.center,
-        child: _preview,
-      );
-    }
+    // Make a transformed widget if it's defined.
+    final Widget? _transformedWidget = config.previewTransformBuilder?.call(
+      context,
+      controller,
+      _preview,
+    );
+    _preview = _transformedWidget ?? _preview;
 
     _preview = RotatedBox(
       quarterTurns: -config.cameraQuarterTurns,
@@ -1328,7 +1327,7 @@ class CameraPickerState extends State<CameraPicker>
             ),
           ),
           if (config.foregroundBuilder != null)
-            Positioned.fill(child: config.foregroundBuilder!(value)),
+            Positioned.fill(child: config.foregroundBuilder!(context, value)),
         ],
       ),
     );
