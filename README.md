@@ -79,29 +79,30 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 
 Fields in `CameraPickerConfig`:
 
-| Name                         | Type                            | Description                                                                                           | Default Value                          |
-|------------------------------|---------------------------------|-------------------------------------------------------------------------------------------------------|----------------------------------------|
-| enableRecording              | `bool`                          | Whether the picker can record video.                                                                  | `false`                                |
-| onlyEnableRecording          | `bool`                          | Whether the picker can only record video. Only available when `enableRecording` is `true `.           | `false`                                |
-| enableTapRecording           | `bool`                          | Whether allow the record can start with single tap. Only available when `enableRecording` is `true `. | `false`                                |
-| enableAudio                  | `bool`                          | Whether Whether the picker should record audio. Only available with recording.                        | `true`                                 |
-| enableSetExposure            | `bool`                          | Whether users can set the exposure point by tapping.                                                  | `true`                                 |
-| enableExposureControlOnPoint | `bool`                          | Whether users can adjust exposure according to the set point.                                         | `true`                                 |
-| enablePinchToZoom            | `bool`                          | Whether users can zoom the camera by pinch.                                                           | `true`                                 |
-| enablePullToZoomInRecord     | `bool`                          | Whether users can zoom by pulling up when recording video.                                            | `true`                                 |
-| shouldDeletePreviewFile      | `bool`                          | Whether the preview file will be delete when pop.                                                     | `false`                                |
-| shouldAutoPreviewVideo       | `bool`                          | Whether the video should be played instantly in the preview.                                          | `false`                                |
-| maximumRecordingDuration     | `Duration`                      | The maximum duration of the video recording process.                                                  | `const Duration(seconds: 15)`          |
-| theme                        | `ThemeData?`                    | Theme data for the picker.                                                                            | `CameraPicker.themeData(C.themeColor)` |
-| textDelegate                 | `CameraPickerTextDelegate?`     | Text delegate that controls text in widgets.                                                          | `DefaultCameraPickerTextDelegate`      |
-| resolutionPreset             | `ResolutionPreset`              | Present resolution for the camera.                                                                    | `ResolutionPreset.max`                 |
-| cameraQuarterTurns           | `int`                           | The number of clockwise quarter turns the camera view should be rotated.                              | `0`                                    |
-| imageFormatGroup             | `ImageFormatGroup`              | Describes the output of the raw image format.                                                         | `ImageFormatGroup.unknown`             |
-| preferredLensDirection       | `CameraLensDirection`           | Which lens direction is preferred when first using the camera.                                        | `CameraLensDirection.back`             |
-| lockCaptureOrientation       | `DeviceOrientation?`            | Whether the camera should be locked to the specific orientation during captures.                      | null                                   |
-| foregroundBuilder            | `Widget Function(CameraValue)?` | The foreground widget builder which will cover the whole camera preview.                              | null                                   |
-| onEntitySaving               | `EntitySaveCallback?`           | The callback type define for saving entity in the viewer.                                             | null                                   |
-| onError                      | `CameraErrorHandler?`           | The error handler when any error occurred during the picking process.                                 | null                                   |
+| Name                         | Type                        | Description                                                                                           | Default Value                          |
+|------------------------------|-----------------------------|-------------------------------------------------------------------------------------------------------|----------------------------------------|
+| enableRecording              | `bool`                      | Whether the picker can record video.                                                                  | `false`                                |
+| onlyEnableRecording          | `bool`                      | Whether the picker can only record video. Only available when `enableRecording` is `true `.           | `false`                                |
+| enableTapRecording           | `bool`                      | Whether allow the record can start with single tap. Only available when `enableRecording` is `true `. | `false`                                |
+| enableAudio                  | `bool`                      | Whether Whether the picker should record audio. Only available with recording.                        | `true`                                 |
+| enableSetExposure            | `bool`                      | Whether users can set the exposure point by tapping.                                                  | `true`                                 |
+| enableExposureControlOnPoint | `bool`                      | Whether users can adjust exposure according to the set point.                                         | `true`                                 |
+| enablePinchToZoom            | `bool`                      | Whether users can zoom the camera by pinch.                                                           | `true`                                 |
+| enablePullToZoomInRecord     | `bool`                      | Whether users can zoom by pulling up when recording video.                                            | `true`                                 |
+| shouldDeletePreviewFile      | `bool`                      | Whether the preview file will be delete when pop.                                                     | `false`                                |
+| shouldAutoPreviewVideo       | `bool`                      | Whether the video should be played instantly in the preview.                                          | `false`                                |
+| maximumRecordingDuration     | `Duration`                  | The maximum duration of the video recording process.                                                  | `const Duration(seconds: 15)`          |
+| theme                        | `ThemeData?`                | Theme data for the picker.                                                                            | `CameraPicker.themeData(C.themeColor)` |
+| textDelegate                 | `CameraPickerTextDelegate?` | Text delegate that controls text in widgets.                                                          | `DefaultCameraPickerTextDelegate`      |
+| resolutionPreset             | `ResolutionPreset`          | Present resolution for the camera.                                                                    | `ResolutionPreset.max`                 |
+| cameraQuarterTurns           | `int`                       | The number of clockwise quarter turns the camera view should be rotated.                              | `0`                                    |
+| imageFormatGroup             | `ImageFormatGroup`          | Describes the output of the raw image format.                                                         | `ImageFormatGroup.unknown`             |
+| preferredLensDirection       | `CameraLensDirection`       | Which lens direction is preferred when first using the camera.                                        | `CameraLensDirection.back`             |
+| lockCaptureOrientation       | `DeviceOrientation?`        | Whether the camera should be locked to the specific orientation during captures.                      | null                                   |
+| foregroundBuilder            | `ForegroundBuilder?`        | The foreground widget builder which will cover the whole camera preview.                              | null                                   |
+| previewTransformBuilder      | `PreviewTransformBuilder?`  | The widget builder which will transform the camera preview.                                           | null                                   |
+| onEntitySaving               | `EntitySaveCallback?`       | The callback type define for saving entity in the viewer.                                             | null                                   |
+| onError                      | `CameraErrorHandler?`       | The error handler when any error occurred during the picking process.                                 | null                                   |
 
 ## Frequently asked question 💭
 

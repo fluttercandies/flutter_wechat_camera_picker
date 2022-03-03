@@ -34,6 +34,7 @@ class CameraPickerConfig {
     this.preferredLensDirection = CameraLensDirection.back,
     this.lockCaptureOrientation,
     this.foregroundBuilder,
+    this.previewTransformBuilder,
     this.onEntitySaving,
     this.onError,
   }) : assert(
@@ -120,9 +121,11 @@ class CameraPickerConfig {
   /// 首次使用相机时首选的镜头方向，通常是前置或后置。
   final CameraLensDirection preferredLensDirection;
 
-  /// The foreground widget builder which will cover the whole camera preview.
-  /// 覆盖在相机预览上方的前景构建
-  final Widget Function(CameraValue)? foregroundBuilder;
+  /// {@macro wechat_camera_picker.ForegroundBuilder}
+  final ForegroundBuilder? foregroundBuilder;
+
+  /// {@macro wechat_camera_picker.PreviewTransformBuilder}
+  final PreviewTransformBuilder? previewTransformBuilder;
 
   /// Whether the camera should be locked to the specific orientation
   /// during captures.

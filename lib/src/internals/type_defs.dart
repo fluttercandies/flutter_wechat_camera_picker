@@ -2,10 +2,11 @@
 /// [Author] Alex (https://github.com/AlexV525)
 /// [Date] 2021/9/30 17:04
 ///
-import 'dart:async';
-import 'dart:io';
+import 'dart:async' show FutureOr;
+import 'dart:io' show File;
 
-import 'package:flutter/widgets.dart';
+import 'package:camera/camera.dart' show CameraController, CameraValue;
+import 'package:flutter/widgets.dart' show BuildContext, Widget;
 
 import '../internals/enums.dart';
 
@@ -37,4 +38,23 @@ typedef EntitySaveCallback = FutureOr<dynamic> Function({
 typedef CameraErrorHandler = void Function(
   Object error,
   StackTrace? stackTrace,
+);
+
+/// {@template wechat_camera_picker.ForegroundBuilder}
+/// Build the foreground/overlay widget with the given [cameraValue].
+/// 根据给定的 [cameraValue] 构建自定义的前景 widget
+/// {@endtemplate}
+typedef ForegroundBuilder = Widget Function(
+  BuildContext context,
+  CameraValue cameraValue,
+);
+
+/// {@template wechat_camera_picker.PreviewTransformBuilder}
+/// Build the transformed widget with the given [controller].
+/// 根据给定的 [controller] 构建自定义的变换 widget
+/// {@endtemplate}
+typedef PreviewTransformBuilder = Widget? Function(
+  BuildContext context,
+  CameraController controller,
+  Widget child,
 );
