@@ -52,9 +52,11 @@ class _MyHomePageState extends State<MyHomePage> {
         if (mounted) {
           setState(() {});
         }
-        data = await _entity.thumbDataWithSize(
-          (size.width * scale).toInt(),
-          (size.height * scale).toInt(),
+        data = await _entity.thumbnailDataWithSize(
+          ThumbnailSize(
+            (size.width * scale).toInt(),
+            (size.height * scale).toInt(),
+          ),
         );
         if (mounted) {
           setState(() {});

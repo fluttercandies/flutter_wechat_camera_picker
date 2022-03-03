@@ -14,5 +14,5 @@ dependencies:
   camera: ^0.9.4+6
   path: ^1.8.0
   path_provider: ^2.0.8
-  photo_manager: ^2.0.0-dev.7
+  photo_manager: ^2.0.0-dev.14
   video_player: ^2.2.14
