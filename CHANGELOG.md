@@ -1,29 +1,24 @@
 # Changelog
 
-## 3.0.0-dev.4
+## 3.0.0
+
+### New features
+
+- Add full semantics support. (#72)
+- Add `lockCaptureOrientation`, allowing users to determine lock to the specific orientation during captures. (#68)
+- Export `CameraPickerPageRoute`.
+- Abstract `CamearPickerConfig`, which moved all arguments from `pickFromCamera` to `pickerConfig`.
+
+### Improvements
+
+- Improve camera initializes by adding a lock.
+- Tweak asynchronous methods call during initializations.
+- Make camera controllers available as soon as possible.
+
+### Fixes
 
 - Fix scaling issues with turns and orientations.
 - Fix lint issues on Flutter 2.10.
-- Export `CameraPickerPageRoute`.
-
-Breaking changes:
-- Abstract `CamearPickerConfig`, which moved all arguments from `pickFromCamera` to `pickerConfig`.
-
-## 3.0.0-dev.3
-
-- Improve semantics expressions.
-- Make camera controllers available as soon as possible.
-
-## 3.0.0-dev.2
-
-- Add `lockCaptureOrientation`, allowing users to determine lock to the specific orientation during captures. (#68)
-- Tweak asynchronous methods call during initializations.
-- Add full semantics support. (#72)
-- Improve camera initializes by adding a lock.
-
-## 3.0.0-dev.1
-
-- Migrate to the latest photo_manager.
 
 ## 2.6.5
 
