@@ -27,7 +27,7 @@ apply plugin: 'kotlin-kapt'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion flutter.compileSdkVersion
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -38,19 +38,31 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.fluttercandies.wechat_camera_picker_demo"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion flutter.compileSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
 
+    signingConfigs {
+        forAll {
+            storeFile file("${rootDir.absolutePath}/key.jks")
+            storePassword 'picker'
+            keyAlias 'picker'
+            keyPassword 'picker'
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig signingConfigs.forAll
+        }
+        profile {
+            signingConfig signingConfigs.forAll
+        }
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.forAll
         }
     }
 }
