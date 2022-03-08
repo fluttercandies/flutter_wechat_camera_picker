@@ -297,7 +297,6 @@ class CameraPickerState extends State<CameraPicker>
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     }
     WidgetsBinding.instance?.removeObserver(this);
-    controller.dispose();
     _controller?.dispose();
     _currentExposureOffset.dispose();
     _lastExposurePoint.dispose();
