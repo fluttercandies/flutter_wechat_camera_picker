@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.1
+
+### Fixes
+
+- Remove redundant dispose with the controller.
+
 ## 3.0.0
 
 ### New features
