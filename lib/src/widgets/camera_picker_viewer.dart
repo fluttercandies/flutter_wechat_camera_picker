@@ -4,7 +4,6 @@
 ///
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -225,9 +224,9 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       if (_ps == PermissionState.authorized || _ps == PermissionState.limited) {
         switch (pickerType) {
           case CameraPickerViewType.image:
-            final Uint8List data = await previewFile.readAsBytes();
-            entity = await PhotoManager.editor.saveImage(
-              data,
+            final String filePath = previewFile.path;
+            entity = await PhotoManager.editor.saveImageWithPath(
+              filePath,
               title: path.basename(previewFile.path),
             );
             break;
