@@ -16,9 +16,9 @@ import 'package:flutter/services.dart';
 
 import '../constants/config.dart';
 import '../constants/constants.dart';
+import '../constants/enums.dart';
 import '../constants/styles.dart';
 import '../delegates/camera_picker_text_delegate.dart';
-import '../internals/enums.dart';
 import '../internals/extensions.dart';
 import '../internals/methods.dart';
 import '../widgets/circular_progress_bar.dart';

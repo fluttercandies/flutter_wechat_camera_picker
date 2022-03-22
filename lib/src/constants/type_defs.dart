@@ -8,7 +8,7 @@ import 'dart:io' show File;
 import 'package:camera/camera.dart' show CameraController, CameraValue;
 import 'package:flutter/widgets.dart' show BuildContext, Widget;
 
-import '../internals/enums.dart';
+import 'enums.dart';
 
 /// {@template wechat_camera_picker.EntitySaveCallback}
 /// The callback type define for saving entity in the viewer.

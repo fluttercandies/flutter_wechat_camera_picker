@@ -7,7 +7,7 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 
 import 'extensions.dart';
-import 'type_defs.dart';
+import '../constants/type_defs.dart';
 
 /// Log only in debug mode.
 /// 只在调试模式打印

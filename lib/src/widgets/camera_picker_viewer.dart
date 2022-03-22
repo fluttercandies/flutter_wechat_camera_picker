@@ -12,9 +12,9 @@ import 'package:path/path.dart' as path;
 import 'package:video_player/video_player.dart';
 
 import '../constants/constants.dart';
-import '../internals/enums.dart';
+import '../constants/enums.dart';
+import '../constants/type_defs.dart';
 import '../internals/methods.dart';
-import '../internals/type_defs.dart';
 
 import 'camera_picker.dart';
 
