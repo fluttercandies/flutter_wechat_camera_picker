@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.2
+
+### Improvements
+
+- Export enums and typedefs.
+
 ## 3.0.1
 
 ### Fixes
