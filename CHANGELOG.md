@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.4
+
+### Fixes
+
+- Unify the method to push to the viewer. (#86)
+
 ## 3.0.3
 
 ### Fixes
