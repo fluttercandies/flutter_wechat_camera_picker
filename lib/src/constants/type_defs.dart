@@ -25,11 +25,11 @@ import 'enums.dart';
 ///  * 不要使用 `Navigator.of(context).pop/maybePop` 返回 `null` 或 `AssetEntity`
 ///    以外类型的内容，否则会抛出类型转换异常。
 /// {@endtemplate}
-typedef EntitySaveCallback = FutureOr<dynamic> Function({
+typedef EntitySaveCallback = FutureOr<dynamic> Function(
   BuildContext context,
   CameraPickerViewType viewType,
   File file,
-});
+);
 
 /// {@template wechat_camera_picker.CameraErrorHandler}
 /// The error handler when any error occurred during the picking process.

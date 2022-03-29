@@ -211,11 +211,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
   /// because the parent picker will ignore it.
   Future<void> createAssetEntityAndPop() async {
     if (widget.onEntitySaving != null) {
-      await widget.onEntitySaving!(
-        context: context,
-        viewType: pickerType,
-        file: previewFile,
-      );
+      await widget.onEntitySaving!(context, pickerType, previewFile);
       return;
     }
     AssetEntity? entity;
