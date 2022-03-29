@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.3
+
+### Fixes
+
+- Correct arguments of `EntitySaveCallback`. (#85)
+
 ## 3.0.2
 
 ### Improvements
