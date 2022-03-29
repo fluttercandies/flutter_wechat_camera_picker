@@ -654,15 +654,9 @@ class CameraPickerState extends State<CameraPicker>
           _controller = null;
         });
       });
-      final AssetEntity? entity = await CameraPickerViewer.pushToViewer(
-        context,
-        pickerState: this,
-        pickerType: CameraPickerViewType.image,
-        previewXFile: _file,
-        theme: theme,
-        shouldDeletePreviewFile: shouldDeletePreviewFile,
-        shouldAutoPreviewVideo: shouldAutoPreviewVideo,
-        onEntitySaving: config.onEntitySaving,
+      final AssetEntity? entity = await _pushToViewer(
+        file: _file,
+        viewType: CameraPickerViewType.image,
       );
       if (entity != null) {
         Navigator.of(context).pop(entity);
@@ -748,14 +742,9 @@ class CameraPickerState extends State<CameraPicker>
 
     if (controller.value.isRecordingVideo) {
       controller.stopVideoRecording().then((XFile file) async {
-        final AssetEntity? entity = await CameraPickerViewer.pushToViewer(
-          context,
-          pickerState: this,
-          pickerType: CameraPickerViewType.video,
-          previewXFile: file,
-          theme: theme,
-          shouldDeletePreviewFile: shouldDeletePreviewFile,
-          shouldAutoPreviewVideo: shouldAutoPreviewVideo,
+        final AssetEntity? entity = await _pushToViewer(
+          file: file,
+          viewType: CameraPickerViewType.video,
         );
         if (entity != null) {
           Navigator.of(context).pop(entity);
@@ -773,6 +762,23 @@ class CameraPickerState extends State<CameraPicker>
       return;
     }
     _handleError();
+  }
+
+  Future<AssetEntity?> _pushToViewer({
+    required XFile file,
+    required CameraPickerViewType viewType,
+  }) {
+    return CameraPickerViewer.pushToViewer(
+      context,
+      pickerState: this,
+      pickerType: viewType,
+      previewXFile: file,
+      theme: theme,
+      shouldDeletePreviewFile: shouldDeletePreviewFile,
+      shouldAutoPreviewVideo: shouldAutoPreviewVideo,
+      onEntitySaving: config.onEntitySaving,
+      onError: config.onError,
+    );
   }
 
   ////////////////////////////////////////////////////////////////////////////
