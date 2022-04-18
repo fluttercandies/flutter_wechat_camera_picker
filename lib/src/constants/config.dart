@@ -6,7 +6,9 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../constants/enums.dart';
 import '../delegates/camera_picker_text_delegate.dart';
+import '../widgets/camera_picker.dart';
 import 'type_defs.dart';
 
 /// {@template wechat_camera_picker.CameraPickerConfig}
@@ -37,6 +39,7 @@ class CameraPickerConfig {
     this.previewTransformBuilder,
     this.onEntitySaving,
     this.onError,
+    this.onStopRecordingVideo,
   }) : assert(
           enableRecording == true || onlyEnableRecording != true,
           'Recording mode error.',
@@ -137,4 +140,8 @@ class CameraPickerConfig {
 
   /// {@macro wechat_camera_picker.CameraErrorHandler}
   final CameraErrorHandler? onError;
+
+  /// Call when recording stops
+  /// 当录制结束时回调
+  final StopVideoRecordingCallback? onStopRecordingVideo;
 }

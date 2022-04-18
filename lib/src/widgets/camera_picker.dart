@@ -742,12 +742,16 @@ class CameraPickerState extends State<CameraPicker>
 
     if (controller.value.isRecordingVideo) {
       controller.stopVideoRecording().then((XFile file) async {
-        final AssetEntity? entity = await _pushToViewer(
-          file: file,
-          viewType: CameraPickerViewType.video,
-        );
-        if (entity != null) {
-          Navigator.of(context).pop(entity);
+        if (widget.pickerConfig.onStopRecordingVideo != null) {
+          widget.pickerConfig.onStopRecordingVideo!(file);
+        } else {
+          final AssetEntity? entity = await _pushToViewer(
+            file: file,
+            viewType: CameraPickerViewType.video,
+          );
+          if (entity != null) {
+            Navigator.of(context).pop(entity);
+          }
         }
       }).catchError((Object e) {
         realDebugPrint('Error when stop recording video: $e');

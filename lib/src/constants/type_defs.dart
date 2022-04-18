@@ -5,7 +5,7 @@
 import 'dart:async' show FutureOr;
 import 'dart:io' show File;
 
-import 'package:camera/camera.dart' show CameraController, CameraValue;
+import 'package:camera/camera.dart' show CameraController, CameraValue, XFile;
 import 'package:flutter/widgets.dart' show BuildContext, Widget;
 
 import 'enums.dart';
@@ -58,3 +58,5 @@ typedef PreviewTransformBuilder = Widget? Function(
   CameraController controller,
   Widget child,
 );
+
+typedef StopVideoRecordingCallback = void Function(XFile);

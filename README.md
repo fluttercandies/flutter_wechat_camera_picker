@@ -103,6 +103,7 @@ Fields in `CameraPickerConfig`:
 | previewTransformBuilder      | `PreviewTransformBuilder?`  | The widget builder which will transform the camera preview.                                           | null                                   |
 | onEntitySaving               | `EntitySaveCallback?`       | The callback type define for saving entity in the viewer.                                             | null                                   |
 | onError                      | `CameraErrorHandler?`       | The error handler when any error occurred during the picking process.                                 | null                                   |
+| onStopRecordingVideo                      | `XFile?`       | The callback type define for customizing the behaviour after video recording stops. Once provided, the default video viewer page will not be pushed after on video stop recording.                                  | null                                   |
 
 ## Frequently asked question 💭
 
