@@ -63,6 +63,9 @@ typedef PreviewTransformBuilder = Widget? Function(
 /// The callback type definition when the XFile is captured by the camera.
 /// 拍摄文件生成后的回调
 ///
+/// Return `true` if it has handled arguments.
+/// 如果在回调中已经进行了处理，请返回 `true`。
+///
 /// ### Notice about the implementation
 ///  * After the callback is implemented, the default viewer page 
 ///    will not be pushed anymore.
@@ -70,4 +73,4 @@ typedef PreviewTransformBuilder = Widget? Function(
 /// ### 在实现时需要注意
 ///  * 实现该方法后，默认的的预览页面不会再出现。
 /// {@endtemplate}
-typedef XFileCapturedCallback = void Function(XFile, CameraPickerViewType);
+typedef XFileCapturedCallback = bool Function(XFile, CameraPickerViewType);
