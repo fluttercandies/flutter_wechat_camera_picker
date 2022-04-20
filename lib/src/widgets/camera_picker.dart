@@ -1284,7 +1284,9 @@ class CameraPickerState extends State<CameraPicker>
         onScaleUpdate: enablePinchToZoom ? _handleScaleUpdate : null,
         // Enabled cameras switching by default if we have multiple cameras.
         onDoubleTap: cameras.length > 1 ? switchCameras : null,
-        child: CameraPreview(controller),
+        child: _controller != null
+            ? CameraPreview(controller)
+            : const SizedBox.shrink(),
       ),
     );
 
