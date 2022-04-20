@@ -5,7 +5,7 @@
 import 'dart:async' show FutureOr;
 import 'dart:io' show File;
 
-import 'package:camera/camera.dart' show CameraController, CameraValue;
+import 'package:camera/camera.dart' show CameraController, CameraValue, XFile;
 import 'package:flutter/widgets.dart' show BuildContext, Widget;
 
 import 'enums.dart';
@@ -58,3 +58,16 @@ typedef PreviewTransformBuilder = Widget? Function(
   CameraController controller,
   Widget child,
 );
+
+/// {@template wechat_camera_picker.XFileCapturedCallback}
+/// The callback type definition when the XFile is captured by the camera.
+/// 拍摄文件生成后的回调
+///
+/// ### Notice about the implementation
+///  * After the callback is implemented, the default viewer page 
+///    will not be pushed anymore.
+///
+/// ### 在实现时需要注意
+///  * 实现该方法后，默认的的预览页面不会再出现。
+/// {@endtemplate}
+typedef XFileCapturedCallback = void Function(XFile, CameraPickerViewType);

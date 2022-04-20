@@ -654,6 +654,10 @@ class CameraPickerState extends State<CameraPicker>
           _controller = null;
         });
       });
+      if (config.onXFileCaptured != null) {
+        config.onXFileCaptured!(_file, CameraPickerViewType.image);
+        return;
+      }
       final AssetEntity? entity = await _pushToViewer(
         file: _file,
         viewType: CameraPickerViewType.image,
@@ -741,7 +745,12 @@ class CameraPickerState extends State<CameraPicker>
     }
 
     if (controller.value.isRecordingVideo) {
-      controller.stopVideoRecording().then((XFile file) async {
+      try {
+        final XFile file = await controller.stopVideoRecording();
+        if (config.onXFileCaptured != null) {
+          config.onXFileCaptured!(file, CameraPickerViewType.video);
+          return;
+        }
         final AssetEntity? entity = await _pushToViewer(
           file: file,
           viewType: CameraPickerViewType.video,
@@ -749,16 +758,16 @@ class CameraPickerState extends State<CameraPicker>
         if (entity != null) {
           Navigator.of(context).pop(entity);
         }
-      }).catchError((Object e) {
+      } catch (e) {
         realDebugPrint('Error when stop recording video: $e');
         realDebugPrint('Try to initialize a new CameraController...');
         initCameras();
         _handleError();
         handleErrorWithHandler(e, config.onError);
-      }).whenComplete(() {
+      } finally {
         isShootingButtonAnimate = false;
         safeSetState(() {});
-      });
+      }
       return;
     }
     _handleError();
@@ -1275,7 +1284,9 @@ class CameraPickerState extends State<CameraPicker>
         onScaleUpdate: enablePinchToZoom ? _handleScaleUpdate : null,
         // Enabled cameras switching by default if we have multiple cameras.
         onDoubleTap: cameras.length > 1 ? switchCameras : null,
-        child: CameraPreview(controller),
+        child: _controller != null
+            ? CameraPreview(controller)
+            : const SizedBox.shrink(),
       ),
     );
 

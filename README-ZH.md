@@ -118,6 +118,7 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 | previewTransformBuilder      | `PreviewTransformBuilder?`  | 对相机预览做变换的构建                                        | null                                   |
 | onEntitySaving               | `EntitySaveCallback?`       | 在查看器中保存图片时的回调                                      | null                                   |
 | onError                      | `CameraErrorHandler?`       | 拍摄照片过程中的自定义错误处理                                    | null                                   |
+| onXFileCaptured              | `XFileCapturedCallback?`    | 拍摄文件生成后的回调                                         | null                                   |
 
 ## 常见问题 💭
 

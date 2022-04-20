@@ -103,6 +103,7 @@ Fields in `CameraPickerConfig`:
 | previewTransformBuilder      | `PreviewTransformBuilder?`  | The widget builder which will transform the camera preview.                                           | null                                   |
 | onEntitySaving               | `EntitySaveCallback?`       | The callback type define for saving entity in the viewer.                                             | null                                   |
 | onError                      | `CameraErrorHandler?`       | The error handler when any error occurred during the picking process.                                 | null                                   |
+| onXFileCaptured              | `XFileCapturedCallback?`    | The callback type definition when the XFile is captured by the camera.                                | null                                   |
 
 ## Frequently asked question 💭
 
