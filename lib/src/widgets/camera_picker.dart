@@ -656,18 +656,18 @@ class CameraPickerState extends State<CameraPicker>
       });
       if (config.onXFileCaptured != null) {
         config.onXFileCaptured!(_file, CameraPickerViewType.image);
-      } else {
-        final AssetEntity? entity = await _pushToViewer(
-          file: _file,
-          viewType: CameraPickerViewType.image,
-        );
-        if (entity != null) {
-          Navigator.of(context).pop(entity);
-          return;
-        }
-        initCameras(currentCamera);
-        safeSetState(() {});
+        return;
       }
+      final AssetEntity? entity = await _pushToViewer(
+        file: _file,
+        viewType: CameraPickerViewType.image,
+      );
+      if (entity != null) {
+        Navigator.of(context).pop(entity);
+        return;
+      }
+      initCameras(currentCamera);
+      safeSetState(() {});
     } catch (e) {
       realDebugPrint('Error when preview the captured file: $e');
       handleErrorWithHandler(e, config.onError);
@@ -745,31 +745,29 @@ class CameraPickerState extends State<CameraPicker>
     }
 
     if (controller.value.isRecordingVideo) {
-      controller.stopVideoRecording().then((XFile file) async {
+      try {
+        final XFile file = await controller.stopVideoRecording();
         if (config.onXFileCaptured != null) {
-          config.onXFileCaptured!(
-            file,
-            CameraPickerViewType.video,
-          );
-        } else {
-          final AssetEntity? entity = await _pushToViewer(
-            file: file,
-            viewType: CameraPickerViewType.video,
-          );
-          if (entity != null) {
-            Navigator.of(context).pop(entity);
-          }
+          config.onXFileCaptured!(file, CameraPickerViewType.video);
+          return;
         }
-      }).catchError((Object e) {
+        final AssetEntity? entity = await _pushToViewer(
+          file: file,
+          viewType: CameraPickerViewType.video,
+        );
+        if (entity != null) {
+          Navigator.of(context).pop(entity);
+        }
+      } catch (e) {
         realDebugPrint('Error when stop recording video: $e');
         realDebugPrint('Try to initialize a new CameraController...');
         initCameras();
         _handleError();
         handleErrorWithHandler(e, config.onError);
-      }).whenComplete(() {
+      } finally {
         isShootingButtonAnimate = false;
         safeSetState(() {});
-      });
+      }
       return;
     }
     _handleError();
