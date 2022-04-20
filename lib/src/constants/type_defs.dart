@@ -71,6 +71,6 @@ typedef PreviewTransformBuilder = Widget? Function(
 ///    the default viewer page will not be presented anymore.
 ///
 /// ### 在实现时需要注意
-///  * 实现该方法后且返回 `true` 后，默认的预览页面不会再出现。
+///  * 实现了该方法且返回 `true` 后，默认的预览页面不会再出现。
 /// {@endtemplate}
 typedef XFileCapturedCallback = bool Function(XFile, CameraPickerViewType);
