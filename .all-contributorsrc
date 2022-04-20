@@ -88,6 +88,15 @@
         "a11y",
         "bug"
       ]
+    },
+    {
+      "login": "ZhuBoao",
+      "name": "LeonardoZhu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17305573?v=4",
+      "profile": "https://github.com/ZhuBoao",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
