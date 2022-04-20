@@ -647,16 +647,16 @@ class CameraPickerState extends State<CameraPicker>
     }
     try {
       final XFile _file = await controller.takePicture();
+      // Delay disposing the controller to hold the preview.
+      Future<void>.delayed(const Duration(milliseconds: 500), () {
+        _controller?.dispose();
+        safeSetState(() {
+          _controller = null;
+        });
+      });
       if (config.onXFileCaptured != null) {
         config.onXFileCaptured!(_file, CameraPickerViewType.image);
       } else {
-        // Delay disposing the controller to hold the preview.
-        Future<void>.delayed(const Duration(milliseconds: 500), () {
-          _controller?.dispose();
-          safeSetState(() {
-            _controller = null;
-          });
-        });
         final AssetEntity? entity = await _pushToViewer(
           file: _file,
           viewType: CameraPickerViewType.image,
@@ -748,7 +748,9 @@ class CameraPickerState extends State<CameraPicker>
       controller.stopVideoRecording().then((XFile file) async {
         if (config.onXFileCaptured != null) {
           config.onXFileCaptured!(
-              file, CameraPickerViewType.video);
+            file,
+            CameraPickerViewType.video,
+          );
         } else {
           final AssetEntity? entity = await _pushToViewer(
             file: file,

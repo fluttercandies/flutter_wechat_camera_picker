@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../delegates/camera_picker_text_delegate.dart';
-import '../widgets/camera_picker.dart';
 import 'type_defs.dart';
 
 /// {@template wechat_camera_picker.CameraPickerConfig}
