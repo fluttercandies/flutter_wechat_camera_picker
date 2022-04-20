@@ -67,10 +67,10 @@ typedef PreviewTransformBuilder = Widget? Function(
 /// 如果在回调中已经进行了处理，请返回 `true`。
 ///
 /// ### Notice about the implementation
-///  * After the callback is implemented, the default viewer page 
-///    will not be pushed anymore.
+///  * After the callback is implemented and returned `true`,
+///    the default viewer page will not be presented anymore.
 ///
 /// ### 在实现时需要注意
-///  * 实现该方法后，默认的的预览页面不会再出现。
+///  * 实现该方法后且返回 `true` 后，默认的预览页面不会再出现。
 /// {@endtemplate}
 typedef XFileCapturedCallback = bool Function(XFile, CameraPickerViewType);
