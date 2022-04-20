@@ -59,4 +59,15 @@ typedef PreviewTransformBuilder = Widget? Function(
   Widget child,
 );
 
-typedef StopVideoRecordingCallback = void Function(XFile);
+/// {@template wechat_camera_picker.PreviewTransformBuilder}
+/// The callback type define for capturing xfile in the camera.
+/// 拍摄照片/视频时的回调
+///
+/// ### Notice about the implementation
+///  * After the callback is implemented, the default viewer page 
+///    will not be pushed anymore.
+///
+/// ### 在实现时需要注意
+///  * 实现该方法后，默认的的预览页面不会再出现；
+/// {@endtemplate}
+typedef XFileCapturedCallback = void Function(XFile, CameraPickerViewType);

@@ -647,23 +647,27 @@ class CameraPickerState extends State<CameraPicker>
     }
     try {
       final XFile _file = await controller.takePicture();
-      // Delay disposing the controller to hold the preview.
-      Future<void>.delayed(const Duration(milliseconds: 500), () {
-        _controller?.dispose();
-        safeSetState(() {
-          _controller = null;
+      if (config.onXFileCaptured != null) {
+        config.onXFileCaptured!(_file, CameraPickerViewType.image);
+      } else {
+        // Delay disposing the controller to hold the preview.
+        Future<void>.delayed(const Duration(milliseconds: 500), () {
+          _controller?.dispose();
+          safeSetState(() {
+            _controller = null;
+          });
         });
-      });
-      final AssetEntity? entity = await _pushToViewer(
-        file: _file,
-        viewType: CameraPickerViewType.image,
-      );
-      if (entity != null) {
-        Navigator.of(context).pop(entity);
-        return;
+        final AssetEntity? entity = await _pushToViewer(
+          file: _file,
+          viewType: CameraPickerViewType.image,
+        );
+        if (entity != null) {
+          Navigator.of(context).pop(entity);
+          return;
+        }
+        initCameras(currentCamera);
+        safeSetState(() {});
       }
-      initCameras(currentCamera);
-      safeSetState(() {});
     } catch (e) {
       realDebugPrint('Error when preview the captured file: $e');
       handleErrorWithHandler(e, config.onError);
@@ -742,8 +746,9 @@ class CameraPickerState extends State<CameraPicker>
 
     if (controller.value.isRecordingVideo) {
       controller.stopVideoRecording().then((XFile file) async {
-        if (widget.pickerConfig.onStopRecordingVideo != null) {
-          widget.pickerConfig.onStopRecordingVideo!(file);
+        if (config.onXFileCaptured != null) {
+          config.onXFileCaptured!(
+              file, CameraPickerViewType.video);
         } else {
           final AssetEntity? entity = await _pushToViewer(
             file: file,
