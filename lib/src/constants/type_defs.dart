@@ -68,6 +68,6 @@ typedef PreviewTransformBuilder = Widget? Function(
 ///    will not be pushed anymore.
 ///
 /// ### 在实现时需要注意
-///  * 实现该方法后，默认的的预览页面不会再出现；
+///  * 实现该方法后，默认的的预览页面不会再出现。
 /// {@endtemplate}
 typedef XFileCapturedCallback = void Function(XFile, CameraPickerViewType);
