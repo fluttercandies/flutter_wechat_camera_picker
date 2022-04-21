@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.0
+
+### New features
+
+- Introduce `onXFileCaptured`. (#87)
+
 ## 3.0.4
 
 ### Fixes
