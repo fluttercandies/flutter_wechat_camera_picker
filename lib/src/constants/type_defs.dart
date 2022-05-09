@@ -41,8 +41,8 @@ typedef CameraErrorHandler = void Function(
 );
 
 /// {@template wechat_camera_picker.ForegroundBuilder}
-/// Build the foreground/overlay widget with the given [cameraValue].
-/// 根据给定的 [cameraValue] 构建自定义的前景 widget
+/// Build the foreground/overlay widget with the given [CameraValue].
+/// 根据给定的 [CameraValue] 构建自定义的前景 widget
 /// {@endtemplate}
 typedef ForegroundBuilder = Widget Function(
   BuildContext context,
@@ -50,8 +50,8 @@ typedef ForegroundBuilder = Widget Function(
 );
 
 /// {@template wechat_camera_picker.PreviewTransformBuilder}
-/// Build the transformed widget with the given [controller].
-/// 根据给定的 [controller] 构建自定义的变换 widget
+/// Build the transformed widget with the given [CameraController].
+/// 根据给定的 [CameraController] 构建自定义的变换 widget
 /// {@endtemplate}
 typedef PreviewTransformBuilder = Widget? Function(
   BuildContext context,

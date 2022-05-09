@@ -4,8 +4,8 @@
 
 import 'package:flutter/material.dart';
 
-/// Build [AssetPickerPageRoute] with the given generic type.
-/// 构建匹配泛型的 [AssetPickerPageRoute]
+/// Build [CameraPickerPageRoute] with the given generic type.
+/// 构建匹配泛型的 [CameraPickerPageRoute]
 typedef CameraPickerPageRouteBuilder<T> = CameraPickerPageRoute<T> Function(
   Widget picker,
 );

@@ -270,7 +270,7 @@ class CameraPickerState extends State<CameraPicker>
   late final ThemeData _theme =
       config.theme ?? CameraPicker.themeData(C.themeColor);
 
-  /// Get [ThemeData] of the [CameraPicker] through [Constants.pickerKey].
+  /// Get [ThemeData] of the [CameraPicker] through the key.
   /// 通过常量全局 Key 获取当前选择器的主题
   ThemeData get theme => _theme;
 
