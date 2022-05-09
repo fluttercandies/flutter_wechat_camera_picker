@@ -1,3 +1,7 @@
+<!-- Copyright 2019 The FlutterCandies author. All rights reserved.
+Use of this source code is governed by an Apache license
+that can be found in the LICENSE file. -->
+
 # wechat_camera_picker_demo
 
 A new Flutter project.

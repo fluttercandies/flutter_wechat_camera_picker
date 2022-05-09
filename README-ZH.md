@@ -1,3 +1,7 @@
+<!-- Copyright 2019 The FlutterCandies author. All rights reserved.
+Use of this source code is governed by an Apache license
+that can be found in the LICENSE file. -->
+
 # Flutter WeChat Camera Picker
 
 [![pub package](https://img.shields.io/pub/v/wechat_camera_picker?logo=dart&label=%E7%A8%B3%E5%AE%9A%E7%89%88&style=flat-square)](https://pub.flutter-io.cn/packages/wechat_camera_picker)

@@ -1,7 +1,7 @@
-///
-/// [Author] Alex (https://github.com/AlexV525)
-/// [Date] 2021/9/30 17:04
-///
+// Copyright 2019 The FlutterCandies author. All rights reserved.
+// Use of this source code is governed by an Apache license that can be found
+// in the LICENSE file.
+
 import 'dart:async' show FutureOr;
 import 'dart:io' show File;
 
