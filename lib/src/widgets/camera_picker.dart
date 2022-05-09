@@ -10,7 +10,6 @@ import 'dart:math' as math;
 import 'package:camera/camera.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 
@@ -279,7 +278,7 @@ class CameraPickerState extends State<CameraPicker>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     // TODO(Alex): Currently hide status bar will cause the viewport shaking on Android.
     /// Hide system status bar automatically when the platform is not Android.
@@ -296,7 +295,7 @@ class CameraPickerState extends State<CameraPicker>
     if (!Platform.isAndroid) {
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     }
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     _controller?.dispose();
     _currentExposureOffset.dispose();
     _lastExposurePoint.dispose();
@@ -373,7 +372,7 @@ class CameraPickerState extends State<CameraPicker>
     });
     // **IMPORTANT**: Push methods into a post frame callback, which ensures the
     // controller has already unbind from widgets.
-    SchedulerBinding.instance?.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Dispose at last to avoid disposed usage with assertions.
       await _c?.dispose();
 

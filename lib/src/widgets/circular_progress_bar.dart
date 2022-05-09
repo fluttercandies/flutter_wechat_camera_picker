@@ -5,7 +5,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 import '../constants/styles.dart';
 
@@ -41,7 +40,7 @@ class _CircleProgressState extends State<CircularProgressBar>
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance?.addPostFrameCallback((Duration _) {
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
       progressController.forward();
     });
   }
