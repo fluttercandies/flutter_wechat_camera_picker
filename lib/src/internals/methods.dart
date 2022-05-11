@@ -7,7 +7,6 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 
 import '../constants/type_defs.dart';
-import 'extensions.dart';
 
 /// Log only in debug mode.
 /// 只在调试模式打印
@@ -17,10 +16,14 @@ void realDebugPrint(dynamic message) {
   }
 }
 
-void handleErrorWithHandler(Object error, CameraErrorHandler? handler) {
+void handleErrorWithHandler(
+  Object e,
+  CameraErrorHandler? handler, {
+  StackTrace? s,
+}) {
   if (handler != null) {
-    handler(error, error.nullableStackTrace);
+    handler(e, s);
     return;
   }
-  throw error;
+  throw e;
 }

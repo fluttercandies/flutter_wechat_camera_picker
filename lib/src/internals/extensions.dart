@@ -17,12 +17,3 @@ extension SafeSetStateExtension on State {
     }
   }
 }
-
-extension NullableObjectExtension on Object? {
-  StackTrace? get nullableStackTrace {
-    if (this is Error?) {
-      return (this as Error?)?.stackTrace;
-    }
-    return null;
-  }
-}

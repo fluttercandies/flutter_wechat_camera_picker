@@ -444,8 +444,8 @@ class CameraPickerState extends State<CameraPicker>
           (() async =>
               _minAvailableZoom = await controller.getMinZoomLevel())(),
         ]);
-      } catch (e) {
-        handleErrorWithHandler(e, config.onError);
+      } catch (e, s) {
+        handleErrorWithHandler(e, config.onError, s: s);
       } finally {
         safeSetState(() {
           _shouldLockInitialize = false;
@@ -1041,7 +1041,7 @@ class CameraPickerState extends State<CameraPicker>
                 ),
                 _initializeWrapper(
                   isInitialized: () =>
-                      controller.value.isRecordingVideo &&
+                      _controller?.value.isRecordingVideo == true &&
                       isRecordingRestricted,
                   builder: (_, __) => CircularProgressBar(
                     duration: maximumRecordingDuration!,
