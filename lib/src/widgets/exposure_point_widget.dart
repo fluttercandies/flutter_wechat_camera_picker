@@ -8,10 +8,10 @@ import 'builder/tween_animation_builder_2.dart';
 
 class ExposurePointWidget extends StatelessWidget {
   const ExposurePointWidget({
-    Key? key,
+    super.key,
     required this.size,
     required this.color,
-  }) : super(key: key);
+  });
 
   final double size;
   final Color color;
@@ -58,48 +58,48 @@ class ExposurePointPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final Size _dividedSize = size / 3;
-    final double _lineLength = _dividedSize.width - radius;
-    final Paint _paint = Paint()
+    final Size dividedSize = size / 3;
+    final double lineLength = dividedSize.width - radius;
+    final Paint paint = Paint()
       ..style = PaintingStyle.stroke
       ..color = color
       ..strokeWidth = strokeWidth;
 
     final Path path = Path()
       // 先移动到左上组弧的顺时针起始位
-      ..moveTo(0, _dividedSize.height)
+      ..moveTo(0, dividedSize.height)
       // 左上组弧
-      ..relativeLineTo(0, -_lineLength)
+      ..relativeLineTo(0, -lineLength)
       ..relativeArcToPoint(Offset(radius, -radius), radius: _circularRadius)
-      ..relativeLineTo(_lineLength, 0)
+      ..relativeLineTo(lineLength, 0)
       // 移动至右上组弧起始位
-      ..relativeMoveTo(_dividedSize.width, 0)
+      ..relativeMoveTo(dividedSize.width, 0)
       // 右上组弧
-      ..relativeLineTo(_lineLength, 0)
+      ..relativeLineTo(lineLength, 0)
       ..relativeArcToPoint(Offset(radius, radius), radius: _circularRadius)
-      ..relativeLineTo(0, _lineLength)
+      ..relativeLineTo(0, lineLength)
       // 移动至右下组弧起始位
-      ..relativeMoveTo(0, _dividedSize.height)
+      ..relativeMoveTo(0, dividedSize.height)
       // 右下组弧
-      ..relativeLineTo(0, _lineLength)
+      ..relativeLineTo(0, lineLength)
       ..relativeArcToPoint(Offset(-radius, radius), radius: _circularRadius)
-      ..relativeLineTo(-_lineLength, 0)
+      ..relativeLineTo(-lineLength, 0)
       // 移动至左下组弧起始位
-      ..relativeMoveTo(-_dividedSize.width, 0)
+      ..relativeMoveTo(-dividedSize.width, 0)
       // 左下组弧
-      ..relativeLineTo(-_lineLength, 0)
+      ..relativeLineTo(-lineLength, 0)
       ..relativeArcToPoint(Offset(-radius, -radius), radius: _circularRadius)
-      ..relativeLineTo(0, -_lineLength)
+      ..relativeLineTo(0, -lineLength)
       // 移动至左上组弧起始位
-      ..relativeMoveTo(0, -_dividedSize.height)
+      ..relativeMoveTo(0, -dividedSize.height)
       ..close();
     canvas
-      ..drawPath(path, _paint)
+      ..drawPath(path, paint)
       // 中心圆
       ..drawCircle(
         Offset(size.width / 2, size.height / 2),
-        _dividedSize.width / 2,
-        _paint,
+        dividedSize.width / 2,
+        paint,
       );
   }
 

@@ -36,9 +36,9 @@ const Duration _kDuration = Duration(milliseconds: 300);
 /// 该选择器可以通过拍照创建 [AssetEntity]。
 class CameraPicker extends StatefulWidget {
   CameraPicker({
-    Key? key,
+    super.key,
     this.pickerConfig = const CameraPickerConfig(),
-  }) : super(key: key) {
+  }) {
     // Set text delegate accordingly.
     if (pickerConfig.textDelegate != null) {
       Constants.textDelegate = pickerConfig.textDelegate!;
@@ -105,7 +105,7 @@ class CameraPicker extends StatefulWidget {
       buttonTheme: ButtonThemeData(buttonColor: themeColor),
       colorScheme: ColorScheme(
         primary: Colors.grey[900]!,
-        primaryVariant: Colors.grey[900]!,
+        primaryVariant: Colors.grey[900],
         secondary: themeColor,
         secondaryVariant: themeColor,
         background: Colors.grey[900]!,
@@ -353,7 +353,7 @@ class CameraPickerState extends State<CameraPicker>
   /// 初始化相机实例
   void initCameras([CameraDescription? cameraDescription]) {
     // Save the current controller to a local variable.
-    final CameraController? _c = _controller;
+    final CameraController? c = _controller;
     // Then unbind the controller from widgets, which requires a build frame.
     safeSetState(() {
       _shouldLockInitialize = true;
@@ -374,7 +374,7 @@ class CameraPickerState extends State<CameraPicker>
     // controller has already unbind from widgets.
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Dispose at last to avoid disposed usage with assertions.
-      await _c?.dispose();
+      await c?.dispose();
 
       // When the [cameraDescription] is null, which means this is the first
       // time initializing cameras, so available cameras should be fetched.
@@ -400,7 +400,7 @@ class CameraPickerState extends State<CameraPicker>
             e.lensDirection == config.preferredLensDirection,
       );
       final int index;
-      if (preferredIndex != -1 && _c == null) {
+      if (preferredIndex != -1 && c == null) {
         index = preferredIndex;
         currentCameraIndex = preferredIndex;
       } else {
@@ -495,13 +495,14 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   Future<void> zoom(double scale) async {
-    final double _zoom = (_baseZoom * scale)
-        .clamp(_minAvailableZoom, _maxAvailableZoom)
-        .toDouble();
-    if (_zoom == _currentZoom) {
+    final double zoom = (_baseZoom * scale).clamp(
+      _minAvailableZoom,
+      _maxAvailableZoom,
+    );
+    if (zoom == _currentZoom) {
       return;
     }
-    _currentZoom = _zoom;
+    _currentZoom = zoom;
 
     await controller.setZoomLevel(_currentZoom);
   }
@@ -584,7 +585,7 @@ class CameraPickerState extends State<CameraPicker>
         1 / constraints.maxHeight,
       ),
     );
-    if (controller.value.focusPointSupported == true) {
+    if (controller.value.focusPointSupported) {
       controller.setFocusPoint(
         _lastExposurePoint.value!.scale(
           1 / constraints.maxWidth,
@@ -618,13 +619,13 @@ class CameraPickerState extends State<CameraPicker>
     _lastShootingButtonPressedPosition ??= event.position;
     if (controller.value.isRecordingVideo) {
       // First calculate relative offset.
-      final Offset _offset =
+      final Offset offset =
           event.position - _lastShootingButtonPressedPosition!;
       // Then turn negative,
       // multiply double with 10 * 1.5 - 1 = 14,
       // plus 1 to ensure always scale.
-      final double _scale = _offset.dy / constraints.maxHeight * -14 + 1;
-      zoom(_scale);
+      final double scale = offset.dy / constraints.maxHeight * -14 + 1;
+      zoom(scale);
     }
   }
 
@@ -657,7 +658,7 @@ class CameraPickerState extends State<CameraPicker>
         file,
         CameraPickerViewType.image,
       );
-      if (isCapturedFileHandled == true) {
+      if (isCapturedFileHandled ?? false) {
         return;
       }
       final AssetEntity? entity = await _pushToViewer(
@@ -753,7 +754,7 @@ class CameraPickerState extends State<CameraPicker>
           file,
           CameraPickerViewType.video,
         );
-        if (isCapturedFileHandled == true) {
+        if (isCapturedFileHandled ?? false) {
           return;
         }
         final AssetEntity? entity = await _pushToViewer(
@@ -817,7 +818,7 @@ class CameraPickerState extends State<CameraPicker>
 
   GestureTapCallback? get onTap {
     if (enableTapRecording) {
-      if (_controller?.value.isRecordingVideo == true) {
+      if (_controller?.value.isRecordingVideo ?? false) {
         return stopRecordingVideo;
       }
       return () {
@@ -835,7 +836,7 @@ class CameraPickerState extends State<CameraPicker>
 
   String? get onTapHint {
     if (enableTapRecording) {
-      if (_controller?.value.isRecordingVideo == true) {
+      if (_controller?.value.isRecordingVideo ?? false) {
         return _textDelegate.sActionStopRecordingHint;
       }
       return _textDelegate.sActionRecordHint;
@@ -936,7 +937,7 @@ class CameraPickerState extends State<CameraPicker>
   Widget tipsTextWidget(CameraController? controller) {
     return AnimatedOpacity(
       duration: recordDetectDuration,
-      opacity: controller?.value.isRecordingVideo == true ? 0 : 1,
+      opacity: controller?.value.isRecordingVideo ?? false ? 0 : 1,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20.0),
         child: Text(
@@ -1041,7 +1042,7 @@ class CameraPickerState extends State<CameraPicker>
                 ),
                 _initializeWrapper(
                   isInitialized: () =>
-                      _controller?.value.isRecordingVideo == true &&
+                      (_controller?.value.isRecordingVideo ?? false) &&
                       isRecordingRestricted,
                   builder: (_, __) => CircularProgressBar(
                     duration: maximumRecordingDuration!,
@@ -1082,20 +1083,20 @@ class CameraPickerState extends State<CameraPicker>
     return ValueListenableBuilder<double>(
       valueListenable: _currentExposureOffset,
       builder: (_, double exposure, __) {
-        final double _effectiveTop = (size + gap) +
+        final double effectiveTop = (size + gap) +
             (_minAvailableExposureOffset.abs() - exposure) *
                 (height - size * 3) /
                 (_maxAvailableExposureOffset - _minAvailableExposureOffset);
-        final double _effectiveBottom = height - _effectiveTop - size;
+        final double effectiveBottom = height - effectiveTop - size;
         return Stack(
           clipBehavior: Clip.none,
           children: <Widget>[
             Positioned.fill(
-              top: _effectiveTop + gap,
+              top: effectiveTop + gap,
               child: _line(),
             ),
             Positioned.fill(
-              bottom: _effectiveBottom + gap,
+              bottom: effectiveBottom + gap,
               child: _line(),
             ),
             Positioned(
@@ -1140,7 +1141,7 @@ class CameraPickerState extends State<CameraPicker>
   /// 用户手动设置的曝光点的区域显示
   Widget _focusingAreaWidget(BoxConstraints constraints) {
     Widget _buildControl(double size, double height) {
-      const double _verticalGap = 3;
+      const double verticalGap = 3;
       return ValueListenableBuilder<ExposureMode>(
         valueListenable: _exposureMode,
         builder: (_, ExposureMode mode, __) {
@@ -1166,11 +1167,11 @@ class CameraPickerState extends State<CameraPicker>
                   ),
                 ),
               ),
-              const SizedBox(height: _verticalGap),
+              const SizedBox(height: verticalGap),
               Expanded(
-                child: _exposureSlider(mode, size, height, _verticalGap),
+                child: _exposureSlider(mode, size, height, verticalGap),
               ),
-              const SizedBox(height: _verticalGap),
+              const SizedBox(height: verticalGap),
               SizedBox.fromSize(size: Size.square(size)),
             ],
           );
@@ -1179,43 +1180,43 @@ class CameraPickerState extends State<CameraPicker>
     }
 
     Widget _buildFromPoint(Offset point) {
-      const double _controllerWidth = 20;
-      final double _pointWidth = constraints.maxWidth / 5;
-      final double _exposureControlWidth =
-          enableExposureControlOnPoint ? _controllerWidth : 0;
-      final double _width = _pointWidth + _exposureControlWidth + 2;
+      const double controllerWidth = 20;
+      final double pointWidth = constraints.maxWidth / 5;
+      final double exposureControlWidth =
+          enableExposureControlOnPoint ? controllerWidth : 0;
+      final double width = pointWidth + exposureControlWidth + 2;
 
-      final bool _shouldReverseLayout = point.dx > constraints.maxWidth / 4 * 3;
+      final bool shouldReverseLayout = point.dx > constraints.maxWidth / 4 * 3;
 
-      final double _effectiveLeft = math.min(
-        constraints.maxWidth - _width,
-        math.max(0, point.dx - _width / 2),
+      final double effectiveLeft = math.min(
+        constraints.maxWidth - width,
+        math.max(0, point.dx - width / 2),
       );
-      final double _effectiveTop = math.min(
-        constraints.maxHeight - _pointWidth * 3,
-        math.max(0, point.dy - _pointWidth * 3 / 2),
+      final double effectiveTop = math.min(
+        constraints.maxHeight - pointWidth * 3,
+        math.max(0, point.dy - pointWidth * 3 / 2),
       );
 
       return Positioned(
-        left: _effectiveLeft,
-        top: _effectiveTop,
-        width: _width,
-        height: _pointWidth * 3,
+        left: effectiveLeft,
+        top: effectiveTop,
+        width: width,
+        height: pointWidth * 3,
         child: ExcludeSemantics(
           child: Row(
             textDirection:
-                _shouldReverseLayout ? TextDirection.rtl : TextDirection.ltr,
+                shouldReverseLayout ? TextDirection.rtl : TextDirection.ltr,
             children: <Widget>[
               ExposurePointWidget(
                 key: ValueKey<int>(DateTime.now().millisecondsSinceEpoch),
-                size: _pointWidth,
+                size: pointWidth,
                 color: theme.iconTheme.color!,
               ),
               if (enableExposureControlOnPoint) const SizedBox(width: 2),
               if (enableExposureControlOnPoint)
                 SizedBox.fromSize(
-                  size: Size(_exposureControlWidth, _pointWidth * 3),
-                  child: _buildControl(_controllerWidth, _pointWidth * 3),
+                  size: Size(exposureControlWidth, pointWidth * 3),
+                  child: _buildControl(controllerWidth, pointWidth * 3),
                 ),
             ],
           ),
@@ -1242,7 +1243,7 @@ class CameraPickerState extends State<CameraPicker>
   ) {
     void _focus(TapUpDetails d) {
       // Only call exposure point updates when the controller is initialized.
-      if (_controller?.value.isInitialized == true) {
+      if (_controller?.value.isInitialized ?? false) {
         Feedback.forTap(context);
         setExposureAndFocusPoint(d.globalPosition, constraints);
       }
@@ -1281,7 +1282,7 @@ class CameraPickerState extends State<CameraPicker>
     required DeviceOrientation orientation,
     required BoxConstraints constraints,
   }) {
-    Widget _preview = Listener(
+    Widget preview = Listener(
       onPointerDown: (_) => _pointers++,
       onPointerUp: (_) => _pointers--,
       child: GestureDetector(
@@ -1296,21 +1297,21 @@ class CameraPickerState extends State<CameraPicker>
     );
 
     // Make a transformed widget if it's defined.
-    final Widget? _transformedWidget = config.previewTransformBuilder?.call(
+    final Widget? transformedWidget = config.previewTransformBuilder?.call(
       context,
       controller,
-      _preview,
+      preview,
     );
-    _preview = _transformedWidget ?? _preview;
+    preview = transformedWidget ?? preview;
 
-    _preview = RotatedBox(
+    preview = RotatedBox(
       quarterTurns: -config.cameraQuarterTurns,
       child: Transform.scale(
         scale: _effectiveCameraScale(constraints, controller),
-        child: Center(child: _preview),
+        child: Center(child: preview),
       ),
     );
-    return _preview;
+    return preview;
   }
 
   Widget _initializeWrapper({

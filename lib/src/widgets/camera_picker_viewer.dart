@@ -20,7 +20,7 @@ import 'camera_picker.dart';
 
 class CameraPickerViewer extends StatefulWidget {
   const CameraPickerViewer({
-    Key? key,
+    super.key,
     required this.pickerState,
     required this.pickerType,
     required this.previewXFile,
@@ -29,7 +29,7 @@ class CameraPickerViewer extends StatefulWidget {
     this.shouldAutoPreviewVideo = false,
     this.onEntitySaving,
     this.onError,
-  }) : super(key: key);
+  });
 
   /// State of the picker.
   /// 选择器的状态实例
@@ -97,7 +97,7 @@ class CameraPickerViewer extends StatefulWidget {
   }
 
   @override
-  _CameraPickerViewerState createState() => _CameraPickerViewerState();
+  State<CameraPickerViewer> createState() => _CameraPickerViewerState();
 }
 
 class _CameraPickerViewerState extends State<CameraPickerViewer> {
@@ -216,8 +216,8 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
     }
     AssetEntity? entity;
     try {
-      final PermissionState _ps = await PhotoManager.requestPermissionExtend();
-      if (_ps == PermissionState.authorized || _ps == PermissionState.limited) {
+      final PermissionState ps = await PhotoManager.requestPermissionExtend();
+      if (ps == PermissionState.authorized || ps == PermissionState.limited) {
         switch (pickerType) {
           case CameraPickerViewType.image:
             final String filePath = previewFile.path;
@@ -287,9 +287,9 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
   }
 
   Widget previewWidget(BuildContext context) {
-    final Widget _builder;
+    final Widget builder;
     if (pickerType == CameraPickerViewType.video) {
-      _builder = Stack(
+      builder = Stack(
         children: <Widget>[
           Center(
             child: AspectRatio(
@@ -301,7 +301,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
         ],
       );
     } else {
-      _builder = Image.file(previewFile);
+      builder = Image.file(previewFile);
     }
     return MergeSemantics(
       child: Semantics(
@@ -309,7 +309,7 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
         image: true,
         onTapHint: Constants.textDelegate.sActionPreviewHint,
         sortKey: const OrdinalSortKey(1),
-        child: _builder,
+        child: builder,
       ),
     );
   }
@@ -325,6 +325,8 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(3.0),
       ),
+      onPressed: createAssetEntityAndPop,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       child: Text(
         Constants.textDelegate.confirm,
         style: TextStyle(
@@ -333,8 +335,6 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
           fontWeight: FontWeight.normal,
         ),
       ),
-      onPressed: createAssetEntityAndPop,
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
   }
 
