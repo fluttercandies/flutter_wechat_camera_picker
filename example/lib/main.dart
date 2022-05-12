@@ -10,14 +10,15 @@ import 'package:flutter/services.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
   );
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,10 +34,10 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  const MyHomePage({super.key});
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -47,16 +48,16 @@ class _MyHomePageState extends State<MyHomePage> {
     final Size size = MediaQuery.of(context).size;
     final double scale = MediaQuery.of(context).devicePixelRatio;
     try {
-      final AssetEntity? _entity = await CameraPicker.pickFromCamera(
+      final AssetEntity? result = await CameraPicker.pickFromCamera(
         context,
         pickerConfig: const CameraPickerConfig(enableRecording: true),
       );
-      if (_entity != null && entity != _entity) {
-        entity = _entity;
+      if (result != null && result != entity) {
+        entity = result;
         if (mounted) {
           setState(() {});
         }
-        data = await _entity.thumbnailDataWithSize(
+        data = await result.thumbnailDataWithSize(
           ThumbnailSize(
             (size.width * scale).toInt(),
             (size.height * scale).toInt(),

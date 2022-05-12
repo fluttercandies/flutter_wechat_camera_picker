@@ -5,19 +5,18 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 import '../constants/styles.dart';
 
 class CircularProgressBar extends StatefulWidget {
   const CircularProgressBar({
-    Key? key,
+    super.key,
     required this.outerRadius,
     required this.ringsWidth,
     this.ringsColor = C.themeColor,
     this.progress = 0.0,
     this.duration = const Duration(seconds: 15),
-  }) : super(key: key);
+  });
 
   final double outerRadius;
   final double ringsWidth;
@@ -26,7 +25,7 @@ class CircularProgressBar extends StatefulWidget {
   final Duration duration;
 
   @override
-  _CircleProgressState createState() => _CircleProgressState();
+  State<CircularProgressBar> createState() => _CircleProgressState();
 }
 
 class _CircleProgressState extends State<CircularProgressBar>
@@ -41,7 +40,7 @@ class _CircleProgressState extends State<CircularProgressBar>
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance?.addPostFrameCallback((Duration _) {
+    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
       progressController.forward();
     });
   }

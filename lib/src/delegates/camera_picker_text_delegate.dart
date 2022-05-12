@@ -54,22 +54,22 @@ class CameraPickerTextDelegate {
   }
 
   String sFlashModeLabel(FlashMode mode) {
-    final String _modeString;
+    final String modeString;
     switch (mode) {
       case FlashMode.off:
-        _modeString = '关闭';
+        modeString = '关闭';
         break;
       case FlashMode.auto:
-        _modeString = '自动';
+        modeString = '自动';
         break;
       case FlashMode.always:
-        _modeString = '拍照时闪光';
+        modeString = '拍照时闪光';
         break;
       case FlashMode.torch:
-        _modeString = '始终闪光';
+        modeString = '始终闪光';
         break;
     }
-    return '闪光模式: $_modeString';
+    return '闪光模式: $modeString';
   }
 
   String sSwitchCameraLensDirectionLabel(CameraLensDirection value) {
