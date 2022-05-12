@@ -4,9 +4,9 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
-## 3.2.0-dev.1
+## 3.2.0
 
-Migrate to Flutter 2.13, and drop supports for older Flutter versions.
+Migrate to Flutter 3, drop supports for previous Flutter versions.
 
 ## 3.1.0
 
