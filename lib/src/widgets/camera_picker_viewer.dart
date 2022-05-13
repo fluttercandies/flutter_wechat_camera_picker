@@ -20,7 +20,7 @@ import 'camera_picker.dart';
 
 class CameraPickerViewer extends StatefulWidget {
   const CameraPickerViewer({
-    super.key,
+    Key? key,
     required this.pickerState,
     required this.pickerType,
     required this.previewXFile,
@@ -29,7 +29,7 @@ class CameraPickerViewer extends StatefulWidget {
     this.shouldAutoPreviewVideo = false,
     this.onEntitySaving,
     this.onError,
-  });
+  }) : super(key: key);
 
   /// State of the picker.
   /// 选择器的状态实例
