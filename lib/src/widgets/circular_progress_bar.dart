@@ -4,19 +4,20 @@
 
 import 'dart:math' as math;
 
+import 'package:bindings_compatible/bindings_compatible.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/styles.dart';
 
 class CircularProgressBar extends StatefulWidget {
   const CircularProgressBar({
-    super.key,
+    Key? key,
     required this.outerRadius,
     required this.ringsWidth,
     this.ringsColor = C.themeColor,
     this.progress = 0.0,
     this.duration = const Duration(seconds: 15),
-  });
+  }) : super(key: key);
 
   final double outerRadius;
   final double ringsWidth;
@@ -40,7 +41,7 @@ class _CircleProgressState extends State<CircularProgressBar>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((Duration _) {
+    useWidgetsBinding().addPostFrameCallback((Duration _) {
       progressController.forward();
     });
   }

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class TweenAnimationBuilder2<A, B> extends StatelessWidget {
   const TweenAnimationBuilder2({
-    super.key,
+    Key? key,
     required this.firstTween,
     required this.secondTween,
     required this.builder,
@@ -14,7 +14,7 @@ class TweenAnimationBuilder2<A, B> extends StatelessWidget {
     this.secondTweenDuration = kThemeAnimationDuration,
     this.firstTweenCurve = Curves.linear,
     this.secondTweenCurve = Curves.linear,
-  });
+  }) : super(key: key);
 
   final Tween<A> firstTween;
   final Tween<B> secondTween;
