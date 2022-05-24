@@ -412,16 +412,6 @@ class CameraPickerState extends State<CameraPicker>
 
       try {
         await newController.initialize();
-        if (newController.value.hasError) {
-          handleErrorWithHandler(
-            CameraException(
-              'CameraController exception',
-              controller.value.errorDescription,
-            ),
-            config.onError,
-          );
-          return;
-        }
         // Call recording preparation first.
         if (shouldPrepareForVideoRecording) {
           await newController.prepareForVideoRecording();
