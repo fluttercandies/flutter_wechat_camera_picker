@@ -153,7 +153,6 @@ class CameraPickerState extends State<CameraPicker>
   /// 当前相机实例的控制器
   CameraController get controller => _controller!;
   CameraController? _controller;
-  bool _shouldLockInitialize = false;
 
   /// Available cameras.
   /// 可用的相机实例
@@ -318,10 +317,7 @@ class CameraPickerState extends State<CameraPicker>
     }
     if (state == AppLifecycleState.inactive) {
       c.dispose();
-    } else if (state == AppLifecycleState.resumed && !_shouldLockInitialize) {
-      // Drop initialize when the controller has been already initialized.
-      // This will typically resolve the lifecycle issue on iOS when permissions
-      // are requested for the first time.
+    } else if (state == AppLifecycleState.resumed) {
       initCameras(currentCamera);
     }
   }
@@ -352,17 +348,20 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Initialize cameras instances.
   /// 初始化相机实例
-  void initCameras([CameraDescription? cameraDescription]) {
+  Future<void> initCameras([CameraDescription? cameraDescription]) async {
     // Save the current controller to a local variable.
     final CameraController? c = _controller;
-    // Then unbind the controller from widgets, which requires a build frame.
+    // Dispose at last to avoid disposed usage with assertions.
+    if (c != null) {
+      _controller = null;
+      await c.dispose();
+    }
+    // Then request a new frame to unbind the controller from elements.
     safeSetState(() {
-      _shouldLockInitialize = true;
       _maxAvailableZoom = 1;
       _minAvailableZoom = 1;
       _currentZoom = 1;
       _baseZoom = 1;
-      _controller = null;
       // Meanwhile, cancel the existed exposure point and mode display.
       _exposureModeDisplayTimer?.cancel();
       _exposurePointDisplayTimer?.cancel();
@@ -374,9 +373,6 @@ class CameraPickerState extends State<CameraPicker>
     // **IMPORTANT**: Push methods into a post frame callback, which ensures the
     // controller has already unbind from widgets.
     useWidgetsBinding().addPostFrameCallback((_) async {
-      // Dispose at last to avoid disposed usage with assertions.
-      await c?.dispose();
-
       // When the [cameraDescription] is null, which means this is the first
       // time initializing cameras, so available cameras should be fetched.
       if (cameraDescription == null) {
@@ -386,7 +382,6 @@ class CameraPickerState extends State<CameraPicker>
       // After cameras fetched, judge again with the list is empty or not to
       // ensure there is at least an available camera for use.
       if (cameraDescription == null && (cameras.isEmpty)) {
-        _shouldLockInitialize = false;
         handleErrorWithHandler(
           CameraException(
             'No CameraDescription found.',
@@ -408,49 +403,37 @@ class CameraPickerState extends State<CameraPicker>
         index = currentCameraIndex;
       }
       // Initialize the controller with the given resolution preset.
-      _controller = CameraController(
+      final CameraController newController = CameraController(
         cameraDescription ?? cameras[index],
         config.resolutionPreset,
         enableAudio: enableAudio,
         imageFormatGroup: config.imageFormatGroup,
-      )..addListener(() {
-          if (controller.value.hasError) {
-            handleErrorWithHandler(
-              CameraException(
-                'CameraController exception',
-                controller.value.errorDescription,
-              ),
-              config.onError,
-            );
-          }
-        });
+      );
 
       try {
-        await controller.initialize();
-        safeSetState(() {});
+        await newController.initialize();
         // Call recording preparation first.
         if (shouldPrepareForVideoRecording) {
-          await controller.prepareForVideoRecording();
+          await newController.prepareForVideoRecording();
         }
         // Then call other asynchronous methods.
         await Future.wait(<Future<void>>[
           if (config.lockCaptureOrientation != null)
-            controller.lockCaptureOrientation(config.lockCaptureOrientation),
+            newController.lockCaptureOrientation(config.lockCaptureOrientation),
           (() async => _maxAvailableExposureOffset =
-              await controller.getMaxExposureOffset())(),
+              await newController.getMaxExposureOffset())(),
           (() async => _minAvailableExposureOffset =
-              await controller.getMinExposureOffset())(),
+              await newController.getMinExposureOffset())(),
           (() async =>
-              _maxAvailableZoom = await controller.getMaxZoomLevel())(),
+              _maxAvailableZoom = await newController.getMaxZoomLevel())(),
           (() async =>
-              _minAvailableZoom = await controller.getMinZoomLevel())(),
+              _minAvailableZoom = await newController.getMinZoomLevel())(),
         ]);
+        _controller = newController;
       } catch (e, s) {
         handleErrorWithHandler(e, config.onError, s: s);
       } finally {
-        safeSetState(() {
-          _shouldLockInitialize = false;
-        });
+        safeSetState(() {});
       }
     });
   }
