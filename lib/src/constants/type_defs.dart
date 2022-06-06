@@ -43,10 +43,13 @@ typedef CameraErrorHandler = void Function(
 /// {@template wechat_camera_picker.ForegroundBuilder}
 /// Build the foreground/overlay widget with the given [CameraValue].
 /// 根据给定的 [CameraValue] 构建自定义的前景 widget
+///
+/// The [cameraValue] will be null until the [CameraController] initialized.
+/// 在 [CameraController] 完成初始化前，[cameraValue] 将为空。
 /// {@endtemplate}
 typedef ForegroundBuilder = Widget Function(
   BuildContext context,
-  CameraValue cameraValue,
+  CameraValue? cameraValue,
 );
 
 /// {@template wechat_camera_picker.PreviewTransformBuilder}
