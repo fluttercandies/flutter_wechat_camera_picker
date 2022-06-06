@@ -946,7 +946,7 @@ class CameraPickerState extends State<CameraPicker>
       duration: recordDetectDuration,
       opacity: controller?.value.isRecordingVideo ?? false ? 0 : 1,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.all(20),
         child: Text(tips, style: const TextStyle(fontSize: 15)),
       ),
     );
