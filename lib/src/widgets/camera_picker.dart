@@ -18,7 +18,6 @@ import '../constants/config.dart';
 import '../constants/constants.dart';
 import '../constants/enums.dart';
 import '../constants/styles.dart';
-import '../constants/type_defs.dart';
 import '../delegates/camera_picker_text_delegate.dart';
 import '../internals/extensions.dart';
 import '../internals/methods.dart';
@@ -1388,17 +1387,6 @@ class CameraPickerState extends State<CameraPicker>
     );
   }
 
-  Widget _foregroundBuilder(BuildContext context) {
-    final ForegroundBuilder builder = config.foregroundBuilder!;
-    if (_controller == null) {
-      return builder(context, null);
-    }
-    return ValueListenableBuilder<CameraValue>(
-      valueListenable: _controller!,
-      builder: (BuildContext c, CameraValue v, __) => builder(c, v),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -1430,7 +1418,9 @@ class CameraPickerState extends State<CameraPicker>
                   ),
                   _contentBuilder(constraints),
                   if (config.foregroundBuilder != null)
-                    Positioned.fill(child: _foregroundBuilder(context)),
+                    Positioned.fill(
+                      child: config.foregroundBuilder!(context, _controller),
+                    ),
                 ],
               ),
             ),
