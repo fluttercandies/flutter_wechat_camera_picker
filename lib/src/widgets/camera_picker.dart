@@ -40,22 +40,10 @@ class CameraPicker extends StatefulWidget {
   CameraPicker({
     Key? key,
     this.pickerConfig = const CameraPickerConfig(),
+    Locale? locale,
   }) : super(key: key) {
-    // Set text delegate accordingly.
-    if (pickerConfig.textDelegate != null) {
-      Constants.textDelegate = pickerConfig.textDelegate!;
-    } else if (pickerConfig.enableRecording &&
-        pickerConfig.onlyEnableRecording &&
-        pickerConfig.enableTapRecording) {
-      Constants.textDelegate = CameraPickerTextDelegateWithTapRecording();
-    } else if (pickerConfig.enableRecording &&
-        pickerConfig.onlyEnableRecording) {
-      Constants.textDelegate = CameraPickerTextDelegateWithOnlyRecording();
-    } else if (pickerConfig.enableRecording) {
-      Constants.textDelegate = CameraPickerTextDelegateWithRecording();
-    } else {
-      Constants.textDelegate = CameraPickerTextDelegate();
-    }
+    Constants.textDelegate =
+        pickerConfig.textDelegate ?? cameraPickerTextDelegateFromLocale(locale);
   }
 
   final CameraPickerConfig pickerConfig;
@@ -67,8 +55,12 @@ class CameraPicker extends StatefulWidget {
     CameraPickerConfig pickerConfig = const CameraPickerConfig(),
     bool useRootNavigator = true,
     CameraPickerPageRouteBuilder<AssetEntity>? pageRouteBuilder,
+    Locale? locale,
   }) {
-    final Widget picker = CameraPicker(pickerConfig: pickerConfig);
+    final Widget picker = CameraPicker(
+      pickerConfig: pickerConfig,
+      locale: locale ?? Localizations.maybeLocaleOf(context),
+    );
     return Navigator.of(
       context,
       rootNavigator: useRootNavigator,
@@ -880,7 +872,7 @@ class CameraPickerState extends State<CameraPicker>
           return const SizedBox.shrink();
         }
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: <Widget>[
               if (cameras.length > 1) switchCamerasButton,
@@ -936,15 +928,26 @@ class CameraPickerState extends State<CameraPicker>
   /// Text widget for shooting tips.
   /// 拍摄的提示文字
   Widget tipsTextWidget(CameraController? controller) {
+    final String tips;
+    if (config.enableRecording) {
+      if (config.onlyEnableRecording) {
+        if (config.enableTapRecording) {
+          tips = _textDelegate.shootingTapRecordingTips;
+        } else {
+          tips = _textDelegate.shootingOnlyRecordingTips;
+        }
+      } else {
+        tips = _textDelegate.shootingWithRecordingTips;
+      }
+    } else {
+      tips = _textDelegate.shootingTips;
+    }
     return AnimatedOpacity(
       duration: recordDetectDuration,
       opacity: controller?.value.isRecordingVideo ?? false ? 0 : 1,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20.0),
-        child: Text(
-          _textDelegate.shootingTips,
-          style: const TextStyle(fontSize: 15.0),
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Text(tips, style: const TextStyle(fontSize: 15)),
       ),
     );
   }
@@ -1049,7 +1052,7 @@ class CameraPickerState extends State<CameraPicker>
                     duration: maximumRecordingDuration!,
                     outerRadius: outerSize.width,
                     ringsColor: theme.indicatorColor,
-                    ringsWidth: 2.0,
+                    ringsWidth: 2,
                   ),
                 ),
               ],
@@ -1351,7 +1354,7 @@ class CameraPickerState extends State<CameraPicker>
   Widget _contentBuilder(BoxConstraints constraints) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 20.0),
+        padding: const EdgeInsets.only(bottom: 20),
         child: Column(
           children: <Widget>[
             Semantics(
