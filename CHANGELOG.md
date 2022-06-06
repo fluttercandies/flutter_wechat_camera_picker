@@ -4,13 +4,16 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
-## 3.2.1
+## 3.3.0
 
-### Improvements
+### Breaking Changes
 
 - Allow the foreground builder to be used all the time (#97) .
   The signature of the `ForegroundBuilder` has changed
   but can be easily migrated.
+
+### Improvements
+
 - Allow text delegates to be obtained by `Locale`. (#99)
 
 ## 3.2.0+1
