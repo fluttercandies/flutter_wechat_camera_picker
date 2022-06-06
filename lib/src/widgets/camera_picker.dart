@@ -418,18 +418,26 @@ class CameraPickerState extends State<CameraPicker>
           await newController.prepareForVideoRecording();
         }
         // Then call other asynchronous methods.
-        await Future.wait(<Future<void>>[
-          if (config.lockCaptureOrientation != null)
-            newController.lockCaptureOrientation(config.lockCaptureOrientation),
-          (() async => _maxAvailableExposureOffset =
-              await newController.getMaxExposureOffset())(),
-          (() async => _minAvailableExposureOffset =
-              await newController.getMinExposureOffset())(),
-          (() async =>
-              _maxAvailableZoom = await newController.getMaxZoomLevel())(),
-          (() async =>
-              _minAvailableZoom = await newController.getMinZoomLevel())(),
-        ]);
+        await Future.wait(
+          <Future<void>>[
+            if (config.lockCaptureOrientation != null)
+              newController
+                  .lockCaptureOrientation(config.lockCaptureOrientation),
+            newController
+                .getMinExposureOffset()
+                .then((double value) => _maxAvailableExposureOffset = value),
+            newController
+                .getMaxExposureOffset()
+                .then((double value) => _minAvailableExposureOffset = value),
+            newController
+                .getMaxZoomLevel()
+                .then((double value) => _maxAvailableZoom = value),
+            newController
+                .getMinZoomLevel()
+                .then((double value) => _minAvailableZoom = value),
+          ],
+          eagerError: true,
+        );
         _controller = newController;
       } catch (e, s) {
         handleErrorWithHandler(e, config.onError, s: s);
@@ -700,26 +708,34 @@ class CameraPickerState extends State<CameraPicker>
   /// Set record file path and start recording.
   /// 设置拍摄文件路径并开始录制视频
   Future<void> startRecordingVideo() async {
-    if (!controller.value.isRecordingVideo) {
-      controller.startVideoRecording().then((dynamic _) {
-        safeSetState(() {});
-        if (isRecordingRestricted) {
-          _recordCountdownTimer = Timer(maximumRecordingDuration!, () {
-            stopRecordingVideo();
-          });
-        }
-      }).catchError((Object e) {
-        realDebugPrint('Error when start recording video: $e');
-        if (controller.value.isRecordingVideo) {
-          controller.stopVideoRecording().catchError((Object e) {
-            realDebugPrint(
-              'Error when stop recording video after an error start: $e',
-            );
-            stopRecordingVideo();
-          });
-        }
-        handleErrorWithHandler(e, config.onError);
-      });
+    if (controller.value.isRecordingVideo) {
+      return;
+    }
+    try {
+      await controller.startVideoRecording();
+      if (isRecordingRestricted) {
+        _recordCountdownTimer = Timer(maximumRecordingDuration!, () {
+          stopRecordingVideo();
+        });
+      }
+    } catch (e, s) {
+      realDebugPrint('Error when start recording video: $e');
+      if (!controller.value.isRecordingVideo) {
+        handleErrorWithHandler(e, config.onError, s: s);
+        return;
+      }
+      try {
+        await controller.stopVideoRecording();
+      } catch (e, s) {
+        realDebugPrint(
+          'Error when stop recording video after an error start: $e',
+        );
+        _recordCountdownTimer?.cancel();
+        isShootingButtonAnimate = false;
+        handleErrorWithHandler(e, config.onError, s: s);
+      }
+    } finally {
+      safeSetState(() {});
     }
   }
 
@@ -732,36 +748,36 @@ class CameraPickerState extends State<CameraPicker>
       safeSetState(() {});
     }
 
-    if (controller.value.isRecordingVideo) {
-      try {
-        final XFile file = await controller.stopVideoRecording();
-        final bool? isCapturedFileHandled = config.onXFileCaptured?.call(
-          file,
-          CameraPickerViewType.video,
-        );
-        if (isCapturedFileHandled ?? false) {
-          return;
-        }
-        final AssetEntity? entity = await _pushToViewer(
-          file: file,
-          viewType: CameraPickerViewType.video,
-        );
-        if (entity != null) {
-          Navigator.of(context).pop(entity);
-        }
-      } catch (e) {
-        realDebugPrint('Error when stop recording video: $e');
-        realDebugPrint('Try to initialize a new CameraController...');
-        initCameras();
-        _handleError();
-        handleErrorWithHandler(e, config.onError);
-      } finally {
-        isShootingButtonAnimate = false;
-        safeSetState(() {});
-      }
+    if (!controller.value.isRecordingVideo) {
+      _handleError();
       return;
     }
-    _handleError();
+    try {
+      final XFile file = await controller.stopVideoRecording();
+      final bool? isCapturedFileHandled = config.onXFileCaptured?.call(
+        file,
+        CameraPickerViewType.video,
+      );
+      if (isCapturedFileHandled ?? false) {
+        return;
+      }
+      final AssetEntity? entity = await _pushToViewer(
+        file: file,
+        viewType: CameraPickerViewType.video,
+      );
+      if (entity != null) {
+        Navigator.of(context).pop(entity);
+      }
+    } catch (e, s) {
+      realDebugPrint('Error when stop recording video: $e');
+      realDebugPrint('Try to initialize a new CameraController...');
+      initCameras();
+      _handleError();
+      handleErrorWithHandler(e, config.onError, s: s);
+    } finally {
+      isShootingButtonAnimate = false;
+      safeSetState(() {});
+    }
   }
 
   Future<AssetEntity?> _pushToViewer({
