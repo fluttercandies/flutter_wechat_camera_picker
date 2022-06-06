@@ -404,12 +404,23 @@ class CameraPickerState extends State<CameraPicker>
       );
 
       try {
+        final Stopwatch stopwatch = Stopwatch()..start();
         await newController.initialize();
+        stopwatch.stop();
+        realDebugPrint("${stopwatch.elapsed} for controller's initialization.");
         // Call recording preparation first.
         if (shouldPrepareForVideoRecording) {
+          stopwatch
+            ..reset()
+            ..start();
           await newController.prepareForVideoRecording();
+          stopwatch.stop();
+          realDebugPrint("${stopwatch.elapsed} for recording's preparation.");
         }
         // Then call other asynchronous methods.
+        stopwatch
+          ..reset()
+          ..start();
         await Future.wait(
           <Future<void>>[
             if (config.lockCaptureOrientation != null)
@@ -430,6 +441,8 @@ class CameraPickerState extends State<CameraPicker>
           ],
           eagerError: true,
         );
+        stopwatch.stop();
+        realDebugPrint("${stopwatch.elapsed} for config's update.");
         _controller = newController;
       } catch (e, s) {
         handleErrorWithHandler(e, config.onError, s: s);
