@@ -4,6 +4,14 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.2.1
+
+### Improvements
+
+- Allow the foreground builder to be used all the time (#97) .
+  The signature of the `ForegroundBuilder` has changed
+  but can be easily migrated.
+
 ## 3.2.0+1
 
 ### New features
