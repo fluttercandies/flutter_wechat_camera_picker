@@ -3,17 +3,55 @@
 // in the LICENSE file.
 
 import 'package:camera/camera.dart' show CameraLensDirection, FlashMode;
+import 'package:flutter/rendering.dart';
 
-/// Text delegate that controls text in widgets, implemented with Chinese.
-/// 控制部件中的文字实现，中文。
+/// All text delegates.
+const List<CameraPickerTextDelegate> cameraPickerTextDelegates =
+    <CameraPickerTextDelegate>[
+  CameraPickerTextDelegate(),
+  EnglishCameraPickerTextDelegate(),
+];
+
+/// Obtain the text delegate from the given locale.
+CameraPickerTextDelegate cameraPickerTextDelegateFromLocale(Locale? locale) {
+  if (locale == null) {
+    return const CameraPickerTextDelegate();
+  }
+  final String languageCode = locale.languageCode.toLowerCase();
+  for (final CameraPickerTextDelegate delegate in cameraPickerTextDelegates) {
+    if (delegate.languageCode == languageCode) {
+      return delegate;
+    }
+  }
+  return const CameraPickerTextDelegate();
+}
+
+/// Text delegate implemented with Chinese.
+/// 中文文字实现
 class CameraPickerTextDelegate {
+  const CameraPickerTextDelegate();
+
+  String get languageCode => 'zh';
+
   /// Confirm string for the confirm button.
   /// 确认按钮的字段
   String get confirm => '确认';
 
-  /// Tips string above the shooting button before shooting.
+  /// Tips above the shooting button before shooting.
   /// 拍摄前确认按钮上方的提示文字
   String get shootingTips => '轻触拍照';
+
+  /// Tips with recording above the shooting button before shooting.
+  /// 拍摄前确认按钮上方的提示文字（带录像）
+  String get shootingWithRecordingTips => '轻触拍照，长按摄像';
+
+  /// Tips with only recording above the shooting button before shooting.
+  /// 拍摄前确认按钮上方的提示文字（仅录像）
+  String get shootingOnlyRecordingTips => '长按摄像';
+
+  /// Tips with tap recording above the shooting button before shooting.
+  /// 拍摄前确认按钮上方的提示文字（点击录像）
+  String get shootingTapRecordingTips => '轻触摄像';
 
   /// Load failed string for item.
   /// 资源加载失败时的字段
@@ -77,37 +115,28 @@ class CameraPickerTextDelegate {
   }
 }
 
-/// Default text delegate including recording implements with Chinese.
-/// 中文文字实现（包括摄像）
-class CameraPickerTextDelegateWithRecording extends CameraPickerTextDelegate {
-  @override
-  String get shootingTips => '轻触拍照，长按摄像';
-}
-
-/// Default text delegate including only recording implements with Chinese.
-/// 中文文字实现（仅摄像）
-class CameraPickerTextDelegateWithOnlyRecording
-    extends CameraPickerTextDelegate {
-  @override
-  String get shootingTips => '长按摄像';
-}
-
-/// Default text delegate including tap recording implements with Chinese.
-/// 中文文字实现（仅轻触摄像）
-class CameraPickerTextDelegateWithTapRecording
-    extends CameraPickerTextDelegate {
-  @override
-  String get shootingTips => '轻触摄像';
-}
-
-/// Default text delegate implements with English.
-/// 英文文字实现
+/// Text delegate implements with English.
 class EnglishCameraPickerTextDelegate extends CameraPickerTextDelegate {
+  const EnglishCameraPickerTextDelegate();
+
+  @override
+  String get languageCode => 'en';
+
   @override
   String get confirm => 'Confirm';
 
   @override
   String get shootingTips => 'Tap to take photo.';
+
+  @override
+  String get shootingWithRecordingTips =>
+      'Tap to take photo. Long press to record video.';
+
+  @override
+  String get shootingOnlyRecordingTips => 'Long press to record video.';
+
+  @override
+  String get shootingTapRecordingTips => 'Tap to record video.';
 
   @override
   String get loadFailed => 'Load failed';
@@ -147,28 +176,4 @@ class EnglishCameraPickerTextDelegate extends CameraPickerTextDelegate {
   @override
   String sSwitchCameraLensDirectionLabel(CameraLensDirection value) =>
       'Switch to the ${sCameraLensDirectionLabel(value)} camera';
-}
-
-/// Default text delegate including recording implements with English.
-/// 英文文字实现（包括摄像）
-class EnglishCameraPickerTextDelegateWithRecording
-    extends EnglishCameraPickerTextDelegate {
-  @override
-  String get shootingTips => 'Tap to take photo. Long press to record video.';
-}
-
-/// Default text delegate including only recording implements with English.
-/// 英文文字实现（仅摄像）
-class EnglishCameraPickerTextDelegateWithOnlyRecording
-    extends EnglishCameraPickerTextDelegate {
-  @override
-  String get shootingTips => 'Long press to record video.';
-}
-
-/// Default text delegate including tap recording implements with English.
-/// 英文文字实现（仅轻触摄像）
-class EnglishCameraPickerTextDelegateWithTapRecording
-    extends EnglishCameraPickerTextDelegate {
-  @override
-  String get shootingTips => 'Tap to record video.';
 }

@@ -11,6 +11,7 @@ that can be found in the LICENSE file. -->
 - Allow the foreground builder to be used all the time (#97) .
   The signature of the `ForegroundBuilder` has changed
   but can be easily migrated.
+- Allow text delegates to be obtained by `Locale`. (#99)
 
 ## 3.2.0+1
 

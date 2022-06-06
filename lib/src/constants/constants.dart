@@ -9,5 +9,6 @@ export 'package:photo_manager/photo_manager.dart';
 class Constants {
   const Constants._();
 
-  static CameraPickerTextDelegate textDelegate = CameraPickerTextDelegate();
+  static CameraPickerTextDelegate textDelegate =
+      const CameraPickerTextDelegate();
 }
