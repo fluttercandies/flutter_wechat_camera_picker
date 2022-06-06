@@ -9,6 +9,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'extensions/color_extension.dart';
+
+/// Common picking methods are defined in [pickMethods].
+/// 常见的选择器调用方式定义在 [pickMethods]。
+import 'models/picker_method.dart';
+
 import 'pages/splash_page.dart';
 
 const Color themeColor = Color(0xff00bc56);
