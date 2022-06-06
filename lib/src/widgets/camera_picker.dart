@@ -1391,14 +1391,14 @@ class CameraPickerState extends State<CameraPicker>
                       ),
                     ),
                   ),
-                  if (config.foregroundBuilder != null)
-                    Positioned.fill(child: _foregroundBuilder(context)),
                   if (enableSetExposure)
                     _exposureDetectorWidget(c, constraints),
                   _initializeWrapper(
                     builder: (_, __) => _focusingAreaWidget(constraints),
                   ),
                   _contentBuilder(constraints),
+                  if (config.foregroundBuilder != null)
+                    Positioned.fill(child: _foregroundBuilder(context)),
                 ],
               ),
             ),
