@@ -14,6 +14,29 @@ import 'enums.dart';
 /// The callback type define for saving entity in the viewer.
 /// 在查看器中保存图片时的回调
 ///
+/// ```dart
+/// Future<void> _onEntitySaving() async {
+///   File? _fileToBeHandle;
+///   await CameraPicker.pickFromCamera(
+///     context,
+///     pickerConfig: CameraPickerConfig(
+///       onEntitySaving: (
+///         BuildContext context,
+///         CameraPickerViewType viewType,
+///         File file,
+///       ) {
+///         // Pass the file out of the saving method's scope.
+///         _fileToBeHandle = file;
+///         // Pop twice without any result to exit the picker.
+///         Navigator.of(context)..pop()..pop();
+///       },
+///     ),
+///   );
+///   // Continue your custom flow here.
+///   print(_fileToBeHandle?.path);
+/// }
+/// ```
+///
 /// ### Notice about the implementation
 ///  * After the callback is implemented, the default saving method
 ///    won't called anymore.
@@ -68,6 +91,25 @@ typedef PreviewTransformBuilder = Widget? Function(
 ///
 /// Return `true` if it has handled arguments.
 /// 如果在回调中已经进行了处理，请返回 `true`。
+///
+/// ```dart
+/// Future<void> _onXFileCaptured() async {
+///   XFile? _fileToBeHandle;
+///   await CameraPicker.pickFromCamera(
+///     context,
+///     pickerConfig: CameraPickerConfig(
+///       onXFileCaptured: (XFile file, CameraPickerViewType viewType) {
+///         // Pass the file out of the saving method's scope.
+///         _fileToBeHandle = file;
+///         // Pop twice without any result to exit the picker.
+///         Navigator.of(context).pop();
+///       },
+///     ),
+///   );
+///   // Continue your custom flow here.
+///   print(_fileToBeHandle?.path);
+/// }
+/// ```
 ///
 /// ### Notice about the implementation
 ///  * After the callback is implemented and returned `true`,
