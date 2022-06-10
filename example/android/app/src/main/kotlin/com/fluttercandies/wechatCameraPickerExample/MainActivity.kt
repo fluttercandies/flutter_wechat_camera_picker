@@ -1,4 +1,4 @@
-package com.fluttercandies.wechat_camera_picker_demo
+package com.fluttercandies.wechatCameraPickerExample
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -38,9 +38,9 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.fluttercandies.wechat_camera_picker_demo"
+        applicationId "com.fluttercandies.wechatCameraPickerExample"
         minSdkVersion 21
-        targetSdkVersion flutter.compileSdkVersion
+        targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
