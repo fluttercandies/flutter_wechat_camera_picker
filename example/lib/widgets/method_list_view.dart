@@ -78,20 +78,17 @@ class _MethodListViewState extends State<MethodListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-      ).copyWith(bottom: 10.0),
-      child: Scrollbar(
+    return Scrollbar(
+      controller: _controller,
+      thumbVisibility: true,
+      radius: const Radius.circular(999),
+      child: ListView.builder(
         controller: _controller,
-        thumbVisibility: true,
-        radius: const Radius.circular(999),
-        child: ListView.builder(
-          controller: _controller,
-          padding: const EdgeInsets.symmetric(vertical: 10.0),
-          itemCount: widget.pickMethods.length,
-          itemBuilder: methodItemBuilder,
+        padding: const EdgeInsets.symmetric(horizontal: 10).add(
+          const EdgeInsets.only(top: 10, bottom: 20),
         ),
+        itemCount: widget.pickMethods.length,
+        itemBuilder: methodItemBuilder,
       ),
     );
   }
