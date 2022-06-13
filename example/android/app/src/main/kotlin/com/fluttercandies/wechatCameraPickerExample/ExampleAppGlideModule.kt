@@ -1,4 +1,4 @@
-package com.fluttercandies.wechat_camera_picker_demo
+package com.fluttercandies.wechatCameraPickerExample
 
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule

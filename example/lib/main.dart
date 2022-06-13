@@ -2,17 +2,28 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wechat_camera_picker/wechat_camera_picker.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'extensions/color_extension.dart';
+
+/// Common picking methods are defined in [pickMethods].
+/// 常见的选择器调用方式定义在 [pickMethods]。
+import 'models/picker_method.dart';
+
+import 'pages/splash_page.dart';
+
+const Color themeColor = Color(0xff00bc56);
+
+String? packageVersion;
 
 void main() {
   runApp(const MyApp());
   SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
+    SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent),
   );
 }
 
@@ -25,68 +36,22 @@ class MyApp extends StatelessWidget {
       title: 'WeChat Camera Picker Demo',
       theme: ThemeData(
         brightness: MediaQueryData.fromWindow(ui.window).platformBrightness,
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  AssetEntity? entity;
-  Uint8List? data;
-
-  Future<void> pick(BuildContext context) async {
-    final Size size = MediaQuery.of(context).size;
-    final double scale = MediaQuery.of(context).devicePixelRatio;
-    final AssetEntity? result = await CameraPicker.pickFromCamera(
-      context,
-      pickerConfig: const CameraPickerConfig(enableRecording: true),
-    );
-    if (result != null && result != entity) {
-      entity = result;
-      if (mounted) {
-        setState(() {});
-      }
-      data = await result.thumbnailDataWithSize(
-        ThumbnailSize(
-          (size.width * scale).toInt(),
-          (size.height * scale).toInt(),
+        primarySwatch: themeColor.swatch,
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: themeColor,
         ),
-      );
-      if (mounted) {
-        setState(() {});
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('WeChat Camera Picker Demo')),
-      body: Stack(
-        children: <Widget>[
-          if (entity != null && data != null)
-            Positioned.fill(child: Image.memory(data!, fit: BoxFit.contain))
-          else if (entity != null && data == null)
-            const Center(child: CircularProgressIndicator())
-          else
-            const Center(child: Text('Click the button to start picking.')),
-        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => pick(context),
-        tooltip: 'Increment',
-        child: const Icon(Icons.camera_enhance),
-      ),
+      home: const SplashPage(),
+      localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+        GlobalWidgetsLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const <Locale>[
+        Locale('en'), // English
+        Locale('zh'), // Chinese
+      ],
+      locale: const Locale('en'),
     );
   }
 }
