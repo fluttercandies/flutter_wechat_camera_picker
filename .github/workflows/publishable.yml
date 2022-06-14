@@ -1,6 +1,12 @@
 name: Publishable
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   dry_run:
@@ -8,16 +14,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
+      - uses: actions/checkout@v3
+      - name: Dart and Flutter Package Publisher
+        uses: k-paxian/dart-package-publisher@master
         with:
-          java-version: '11.x'
-      - uses: subosito/flutter-action@v1
-        with:
-          channel: 'stable'
-      - run: dart --version
-      - run: flutter --version
-      - run: flutter pub get
-      - run: flutter pub publish --dry-run
+          credentialJson: ${{ secrets.CREDENTIAL_JSON }}
+          flutter: true
+          dryRunOnly: true
