@@ -492,6 +492,12 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   Future<void> zoom(double scale) async {
+    if (_maxAvailableZoom == _minAvailableZoom) {
+      return;
+    }
+    if (_recordDetectTimer?.isActive ?? false) {
+      return;
+    }
     final double zoom = (_baseZoom * scale).clamp(
       _minAvailableZoom,
       _maxAvailableZoom,
@@ -500,8 +506,11 @@ class CameraPickerState extends State<CameraPicker>
       return;
     }
     _currentZoom = zoom;
-
-    await controller.setZoomLevel(_currentZoom);
+    try {
+      await controller.setZoomLevel(_currentZoom);
+    } catch (e, s) {
+      handleErrorWithHandler(e, config.onError, s: s);
+    }
   }
 
   /// Handle when the scale gesture start.
