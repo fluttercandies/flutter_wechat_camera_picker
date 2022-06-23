@@ -6,6 +6,10 @@ that can be found in the LICENSE file. -->
 
 ## 3.3.1
 
+### New features
+
+- Add `enableScaledPreview`. (#108)
+
 ### Improvements
 
 - Prevent unnecessary zoom updates. (#107)
@@ -32,7 +36,7 @@ that can be found in the LICENSE file. -->
 
 ### New features
 
-- Introduce `onXFileCaptured`. (#87)
+- Add `onXFileCaptured`. (#87)
 
 ## 3.0.4
 
