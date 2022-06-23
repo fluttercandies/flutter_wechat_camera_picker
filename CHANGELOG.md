@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.3.1
+
+### Improvements
+
+- Prevent unnecessary zoom updates. (#107)
+
 ## 3.3.0
 
 ### Breaking Changes
