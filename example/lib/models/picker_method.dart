@@ -116,7 +116,17 @@ List<PickMethod> get pickMethods {
       ),
     ),
     PickMethod(
-      icon: '🔎',
+      icon: '🔍',
+      name: 'Prevent scaling for camera preview',
+      description: 'Camera preview will not be scaled to cover '
+          'the whole screen of the device, only fit with the raw size.',
+      method: (BuildContext context) => CameraPicker.pickFromCamera(
+        context,
+        pickerConfig: const CameraPickerConfig(enableScaledPreview: false),
+      ),
+    ),
+    PickMethod(
+      icon: '🌀',
       name: 'Lower resolutions',
       description: 'Use a lower resolution preset might be helpful '
           'in some specific scenarios.',

@@ -1327,12 +1327,12 @@ class CameraPickerState extends State<CameraPicker>
       controller,
       preview,
     );
-    preview = transformedWidget ?? preview;
+    preview = Center(child: transformedWidget ?? preview);
     // Scale the preview if the config is enabled.
     if (config.enableScaledPreview) {
       preview = Transform.scale(
         scale: _effectiveCameraScale(constraints, controller),
-        child: Center(child: preview),
+        child: preview,
       );
     }
     // Rotated the preview if the turns is valid.
