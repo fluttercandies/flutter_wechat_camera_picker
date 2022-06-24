@@ -4,7 +4,7 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
-## 3.3.1
+## 3.4.0
 
 ### New features
 
@@ -12,6 +12,7 @@ that can be found in the LICENSE file. -->
 
 ### Improvements
 
+- Improve tapping exposure updates. (#109)
 - Prevent unnecessary zoom updates. (#107)
 
 ## 3.3.0
