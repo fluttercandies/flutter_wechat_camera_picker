@@ -225,24 +225,12 @@ class CameraPickerState extends State<CameraPicker>
   bool get shouldPrepareForVideoRecording =>
       enableRecording && enableAudio && Platform.isIOS;
 
-  bool get enableSetExposure => config.enableSetExposure;
-
-  bool get enableExposureControlOnPoint => config.enableExposureControlOnPoint;
-
-  bool get enablePinchToZoom => config.enablePinchToZoom;
-
   bool get enablePullToZoomInRecord =>
       enableRecording && config.enablePullToZoomInRecord;
 
-  bool get shouldDeletePreviewFile => config.shouldDeletePreviewFile;
-
-  bool get shouldAutoPreviewVideo => config.shouldAutoPreviewVideo;
-
-  Duration? get maximumRecordingDuration => config.maximumRecordingDuration;
-
   /// Whether the recording restricted to a specific duration.
   /// 录像是否有限制的时长
-  bool get isRecordingRestricted => maximumRecordingDuration != null;
+  bool get isRecordingRestricted => config.maximumRecordingDuration != null;
 
   /// A getter to the current [CameraDescription].
   /// 获取当前相机实例
@@ -526,7 +514,6 @@ class CameraPickerState extends State<CameraPicker>
     if (_pointers != 2) {
       return;
     }
-
     zoom(details.scale);
   }
 
@@ -753,7 +740,7 @@ class CameraPickerState extends State<CameraPicker>
     try {
       await controller.startVideoRecording();
       if (isRecordingRestricted) {
-        _recordCountdownTimer = Timer(maximumRecordingDuration!, () {
+        _recordCountdownTimer = Timer(config.maximumRecordingDuration!, () {
           stopRecordingVideo();
         });
       }
@@ -829,8 +816,8 @@ class CameraPickerState extends State<CameraPicker>
       pickerType: viewType,
       previewXFile: file,
       theme: theme,
-      shouldDeletePreviewFile: shouldDeletePreviewFile,
-      shouldAutoPreviewVideo: shouldAutoPreviewVideo,
+      shouldDeletePreviewFile: config.shouldDeletePreviewFile,
+      shouldAutoPreviewVideo: config.shouldAutoPreviewVideo,
       onEntitySaving: config.onEntitySaving,
       onError: config.onError,
     );
@@ -1096,7 +1083,7 @@ class CameraPickerState extends State<CameraPicker>
                       (_controller?.value.isRecordingVideo ?? false) &&
                       isRecordingRestricted,
                   builder: (_, __) => CircularProgressBar(
-                    duration: maximumRecordingDuration!,
+                    duration: config.maximumRecordingDuration!,
                     outerRadius: outerSize.width,
                     ringsColor: theme.indicatorColor,
                     ringsWidth: 2,
@@ -1233,11 +1220,9 @@ class CameraPickerState extends State<CameraPicker>
       const double controllerWidth = 20;
       final double pointWidth = constraints.maxWidth / 5;
       final double exposureControlWidth =
-          enableExposureControlOnPoint ? controllerWidth : 0;
+          config.enableExposureControlOnPoint ? controllerWidth : 0;
       final double width = pointWidth + exposureControlWidth + 2;
-
       final bool shouldReverseLayout = point.dx > constraints.maxWidth / 4 * 3;
-
       final double effectiveLeft = math.min(
         constraints.maxWidth - width,
         math.max(0, point.dx - width / 2),
@@ -1246,7 +1231,6 @@ class CameraPickerState extends State<CameraPicker>
         constraints.maxHeight - pointWidth * 3,
         math.max(0, point.dy - pointWidth * 3 / 2),
       );
-
       return Positioned(
         left: effectiveLeft,
         top: effectiveTop,
@@ -1262,8 +1246,8 @@ class CameraPickerState extends State<CameraPicker>
                 size: pointWidth,
                 color: theme.iconTheme.color!,
               ),
-              if (enableExposureControlOnPoint) const SizedBox(width: 2),
-              if (enableExposureControlOnPoint)
+              if (config.enableExposureControlOnPoint) const SizedBox(width: 2),
+              if (config.enableExposureControlOnPoint)
                 SizedBox.fromSize(
                   size: Size(exposureControlWidth, pointWidth * 3),
                   child: _buildControl(controllerWidth, pointWidth * 3),
@@ -1336,8 +1320,8 @@ class CameraPickerState extends State<CameraPicker>
       onPointerDown: (_) => _pointers++,
       onPointerUp: (_) => _pointers--,
       child: GestureDetector(
-        onScaleStart: enablePinchToZoom ? _handleScaleStart : null,
-        onScaleUpdate: enablePinchToZoom ? _handleScaleUpdate : null,
+        onScaleStart: config.enablePinchToZoom ? _handleScaleStart : null,
+        onScaleUpdate: config.enablePinchToZoom ? _handleScaleUpdate : null,
         // Enabled cameras switching by default if we have multiple cameras.
         onDoubleTap: cameras.length > 1 ? switchCameras : null,
         child: _controller != null
@@ -1444,14 +1428,14 @@ class CameraPickerState extends State<CameraPicker>
                 children: <Widget>[
                   ExcludeSemantics(
                     child: _initializeWrapper(
-                      builder: (CameraValue value, __) => _cameraBuilder(
+                      builder: (CameraValue value, Widget? w) => _cameraBuilder(
                         context: c,
                         value: value,
                         constraints: constraints,
                       ),
                     ),
                   ),
-                  if (enableSetExposure)
+                  if (config.enableSetExposure)
                     _exposureDetectorWidget(c, constraints),
                   _initializeWrapper(
                     builder: (CameraValue cameraValue, Widget? w) {
