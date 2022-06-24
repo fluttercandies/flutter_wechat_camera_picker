@@ -604,11 +604,6 @@ class CameraPickerState extends State<CameraPicker>
   /// Update the exposure offset using the exposure controller.
   /// 使用曝光控制器更新曝光值
   Future<void> updateExposureOffset(double value) async {
-    if (value == _currentExposureOffset.value ||
-        value < _minAvailableExposureOffset ||
-        value > _maxAvailableExposureOffset) {
-      return;
-    }
     // Normalize the new exposure value if exposures have steps.
     if (_exposureStep > 0) {
       final double inv = 1.0 / _exposureStep;
@@ -619,6 +614,11 @@ class CameraPickerState extends State<CameraPicker>
         roundedOffset = (value * inv).ceilToDouble() / inv;
       }
       value = roundedOffset;
+    }
+    if (value == _currentExposureOffset.value ||
+        value < _minAvailableExposureOffset ||
+        value > _maxAvailableExposureOffset) {
+      return;
     }
     _currentExposureOffset.value = value;
     try {
