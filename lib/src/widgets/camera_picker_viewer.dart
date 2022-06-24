@@ -167,10 +167,10 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
       if (shouldAutoPreviewVideo) {
         videoController.play();
       }
-    } catch (e) {
+    } catch (e, s) {
       hasErrorWhenInitializing = true;
       realDebugPrint('Error when initializing video controller: $e');
-      handleErrorWithHandler(e, widget.onError);
+      handleErrorWithHandler(e, widget.onError, s: s);
     } finally {
       if (mounted) {
         setState(() {});
@@ -193,16 +193,20 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
   /// the end, then click the button will make the video replay.
   /// 一般来说按钮只切换播放暂停。当视频播放结束时，点击按钮将从头开始播放。
   Future<void> playButtonCallback() async {
-    if (isPlaying.value) {
-      videoController.pause();
-    } else {
-      if (videoController.value.duration == videoController.value.position) {
-        videoController
-          ..seekTo(Duration.zero)
-          ..play();
+    try {
+      if (isPlaying.value) {
+        videoController.pause();
       } else {
-        videoController.play();
+        if (videoController.value.duration == videoController.value.position) {
+          videoController
+            ..seekTo(Duration.zero)
+            ..play();
+        } else {
+          videoController.play();
+        }
       }
+    } catch (e, s) {
+      handleErrorWithHandler(e, widget.onError, s: s);
     }
   }
 
@@ -244,11 +248,13 @@ class _CameraPickerViewerState extends State<CameraPickerViewer> {
         ),
         widget.onError,
       );
-    } catch (e) {
+    } catch (e, s) {
       realDebugPrint('Saving entity failed: $e');
-      handleErrorWithHandler(e, widget.onError);
+      handleErrorWithHandler(e, widget.onError, s: s);
     } finally {
-      Navigator.of(context).pop(entity);
+      if (mounted) {
+        Navigator.of(context).pop(entity);
+      }
     }
   }
 
