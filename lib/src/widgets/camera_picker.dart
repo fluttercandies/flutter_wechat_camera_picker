@@ -9,6 +9,7 @@ import 'dart:math' as math;
 
 import 'package:bindings_compatible/bindings_compatible.dart';
 import 'package:camera/camera.dart';
+import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
@@ -154,13 +155,9 @@ class CameraPickerState extends State<CameraPicker>
   /// 当前曝光值
   final ValueNotifier<double> _currentExposureOffset = ValueNotifier<double>(0);
 
-  /// The maximum available value for exposure.
-  /// 最大可用曝光值
   double _maxAvailableExposureOffset = 0;
-
-  /// The minimum available value for exposure.
-  /// 最小可用曝光值
   double _minAvailableExposureOffset = 0;
+  double _exposureStep = 0;
 
   /// The maximum available value for zooming.
   /// 最大可用缩放值
@@ -426,6 +423,9 @@ class CameraPickerState extends State<CameraPicker>
               newController
                   .lockCaptureOrientation(config.lockCaptureOrientation),
             newController
+                .getExposureOffsetStepSize()
+                .then((double value) => _exposureStep = value),
+            newController
                 .getMinExposureOffset()
                 .then((double value) => _maxAvailableExposureOffset = value),
             newController
@@ -603,12 +603,33 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Update the exposure offset using the exposure controller.
   /// 使用曝光控制器更新曝光值
-  void updateExposureOffset(double value) {
-    if (value == _currentExposureOffset.value) {
+  Future<void> updateExposureOffset(double value) async {
+    if (value == _currentExposureOffset.value ||
+        value < _minAvailableExposureOffset ||
+        value > _maxAvailableExposureOffset) {
       return;
     }
+    // Normalize the new exposure value if exposures have steps.
+    if (_exposureStep > 0) {
+      final double inv = 1.0 / _exposureStep;
+      double roundedOffset = (value * inv).roundToDouble() / inv;
+      if (roundedOffset > _maxAvailableExposureOffset) {
+        roundedOffset = (value * inv).floorToDouble() / inv;
+      } else if (roundedOffset < _minAvailableExposureOffset) {
+        roundedOffset = (value * inv).ceilToDouble() / inv;
+      }
+      value = roundedOffset;
+    }
     _currentExposureOffset.value = value;
-    controller.setExposureOffset(value);
+    try {
+      // Use [CameraPlatform] explicitly to reduce channel calls.
+      await CameraPlatform.instance.setExposureOffset(
+        controller.cameraId,
+        value,
+      );
+    } catch (e, s) {
+      handleErrorWithHandler(e, config.onError, s: s);
+    }
     if (!_isExposureModeDisplays.value) {
       _isExposureModeDisplays.value = true;
     }
