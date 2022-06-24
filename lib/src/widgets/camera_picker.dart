@@ -134,11 +134,6 @@ class CameraPickerState extends State<CameraPicker>
   /// 在开始录像前，最后一次在拍照按钮按下的位置
   Offset? _lastShootingButtonPressedPosition;
 
-  /// Current exposure mode.
-  /// 当前曝光模式
-  final ValueNotifier<ExposureMode> _exposureMode =
-      ValueNotifier<ExposureMode>(ExposureMode.auto);
-
   final ValueNotifier<bool> _isExposureModeDisplays =
       ValueNotifier<bool>(false);
 
@@ -288,7 +283,6 @@ class CameraPickerState extends State<CameraPicker>
     _controller?.dispose();
     _currentExposureOffset.dispose();
     _lastExposurePoint.dispose();
-    _exposureMode.dispose();
     _isExposureModeDisplays.dispose();
     _exposurePointDisplayTimer?.cancel();
     _exposureModeDisplayTimer?.cancel();
@@ -477,17 +471,23 @@ class CameraPickerState extends State<CameraPicker>
   /// The method to switch between flash modes.
   /// 切换闪光灯模式的方法
   Future<void> switchFlashesMode() async {
+    final FlashMode newFlashMode;
     switch (controller.value.flashMode) {
       case FlashMode.off:
-        await controller.setFlashMode(FlashMode.auto);
+        newFlashMode = FlashMode.auto;
         break;
       case FlashMode.auto:
-        await controller.setFlashMode(FlashMode.always);
+        newFlashMode = FlashMode.always;
         break;
       case FlashMode.always:
       case FlashMode.torch:
-        await controller.setFlashMode(FlashMode.off);
+        newFlashMode = FlashMode.off;
         break;
+    }
+    try {
+      await controller.setFlashMode(newFlashMode);
+    } catch (e, s) {
+      handleErrorWithHandler(e, config.onError, s: s);
     }
   }
 
@@ -546,19 +546,25 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Use the specific [mode] to update the exposure mode.
   /// 设置曝光模式
-  void switchExposureMode() {
-    if (_exposureMode.value == ExposureMode.auto) {
-      _exposureMode.value = ExposureMode.locked;
+  Future<void> switchExposureMode() async {
+    final ExposureMode mode = controller.value.exposureMode;
+    final ExposureMode newMode;
+    if (mode == ExposureMode.auto) {
+      newMode = ExposureMode.locked;
     } else {
-      _exposureMode.value = ExposureMode.auto;
+      newMode = ExposureMode.auto;
     }
     _exposurePointDisplayTimer?.cancel();
-    if (_exposureMode.value == ExposureMode.auto) {
+    if (newMode == ExposureMode.auto) {
       _exposurePointDisplayTimer = Timer(const Duration(seconds: 5), () {
         _lastExposurePoint.value = null;
       });
     }
-    controller.setExposureMode(_exposureMode.value);
+    try {
+      await controller.setExposureMode(newMode);
+    } catch (e, s) {
+      handleErrorWithHandler(e, config.onError, s: s);
+    }
     _restartModeDisplayTimer();
   }
 
@@ -581,23 +587,22 @@ class CameraPickerState extends State<CameraPicker>
     _lastExposurePoint.value = position;
     _restartPointDisplayTimer();
     _currentExposureOffset.value = 0;
-    if (_exposureMode.value == ExposureMode.locked) {
-      await controller.setExposureMode(ExposureMode.auto);
-      _exposureMode.value = ExposureMode.auto;
-    }
-    controller.setExposurePoint(
-      _lastExposurePoint.value!.scale(
+    try {
+      if (controller.value.exposureMode == ExposureMode.locked) {
+        await controller.setExposureMode(ExposureMode.auto);
+      }
+      final Offset newPoint = _lastExposurePoint.value!.scale(
         1 / constraints.maxWidth,
         1 / constraints.maxHeight,
-      ),
-    );
-    if (controller.value.focusPointSupported) {
-      controller.setFocusPoint(
-        _lastExposurePoint.value!.scale(
-          1 / constraints.maxWidth,
-          1 / constraints.maxHeight,
-        ),
       );
+      if (controller.value.exposurePointSupported) {
+        controller.setExposurePoint(newPoint);
+      }
+      if (controller.value.focusPointSupported) {
+        controller.setFocusPoint(newPoint);
+      }
+    } catch (e, s) {
+      handleErrorWithHandler(e, config.onError, s: s);
     }
   }
 
@@ -1185,43 +1190,42 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The area widget for the last exposure point that user manually set.
   /// 用户手动设置的曝光点的区域显示
-  Widget _focusingAreaWidget(BoxConstraints constraints) {
+  Widget _focusingAreaWidget(
+    CameraValue cameraValue,
+    BoxConstraints constraints,
+  ) {
     Widget _buildControl(double size, double height) {
       const double verticalGap = 3;
-      return ValueListenableBuilder<ExposureMode>(
-        valueListenable: _exposureMode,
-        builder: (_, ExposureMode mode, __) {
-          final bool isLocked = mode == ExposureMode.locked;
-          return Column(
-            children: <Widget>[
-              ValueListenableBuilder<bool>(
-                valueListenable: _isExposureModeDisplays,
-                builder: (_, bool value, Widget? child) => AnimatedOpacity(
-                  duration: _kDuration,
-                  opacity: value ? 1 : 0,
-                  child: child,
-                ),
-                child: GestureDetector(
-                  onTap: switchExposureMode,
-                  child: SizedBox.fromSize(
-                    size: Size.square(size),
-                    child: Icon(
-                      isLocked ? Icons.lock_rounded : Icons.lock_open_rounded,
-                      size: size,
-                      color: isLocked ? _lockedColor : null,
-                    ),
-                  ),
+      final ExposureMode exposureMode = cameraValue.exposureMode;
+      final bool isLocked = exposureMode == ExposureMode.locked;
+      return Column(
+        children: <Widget>[
+          ValueListenableBuilder<bool>(
+            valueListenable: _isExposureModeDisplays,
+            builder: (_, bool value, Widget? child) => AnimatedOpacity(
+              duration: _kDuration,
+              opacity: value ? 1 : 0,
+              child: child,
+            ),
+            child: GestureDetector(
+              onTap: switchExposureMode,
+              child: SizedBox.fromSize(
+                size: Size.square(size),
+                child: Icon(
+                  isLocked ? Icons.lock_rounded : Icons.lock_open_rounded,
+                  size: size,
+                  color: isLocked ? _lockedColor : null,
                 ),
               ),
-              const SizedBox(height: verticalGap),
-              Expanded(
-                child: _exposureSlider(mode, size, height, verticalGap),
-              ),
-              const SizedBox(height: verticalGap),
-              SizedBox.fromSize(size: Size.square(size)),
-            ],
-          );
-        },
+            ),
+          ),
+          const SizedBox(height: verticalGap),
+          Expanded(
+            child: _exposureSlider(exposureMode, size, height, verticalGap),
+          ),
+          const SizedBox(height: verticalGap),
+          SizedBox.fromSize(size: Size.square(size)),
+        ],
       );
     }
 
@@ -1450,7 +1454,9 @@ class CameraPickerState extends State<CameraPicker>
                   if (enableSetExposure)
                     _exposureDetectorWidget(c, constraints),
                   _initializeWrapper(
-                    builder: (_, __) => _focusingAreaWidget(constraints),
+                    builder: (CameraValue cameraValue, Widget? w) {
+                      return _focusingAreaWidget(cameraValue, constraints);
+                    },
                   ),
                   _contentBuilder(constraints),
                   if (config.foregroundBuilder != null)

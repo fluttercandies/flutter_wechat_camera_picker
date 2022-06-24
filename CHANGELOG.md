@@ -12,6 +12,7 @@ that can be found in the LICENSE file. -->
 
 ### Improvements
 
+- Catch more errors with handler. (#110)
 - Improve tapping exposure updates. (#109)
 - Prevent unnecessary zoom updates. (#107)
 
