@@ -426,10 +426,10 @@ class CameraPickerState extends State<CameraPicker>
                 .getExposureOffsetStepSize()
                 .then((double value) => _exposureStep = value),
             newController
-                .getMinExposureOffset()
+                .getMaxExposureOffset()
                 .then((double value) => _maxAvailableExposureOffset = value),
             newController
-                .getMaxExposureOffset()
+                .getMinExposureOffset()
                 .then((double value) => _minAvailableExposureOffset = value),
             newController
                 .getMaxZoomLevel()
