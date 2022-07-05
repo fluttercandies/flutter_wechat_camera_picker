@@ -109,6 +109,16 @@ Fields in `CameraPickerConfig`:
 | onError                      | `CameraErrorHandler?`       | The error handler when any error occurred during the picking process.                                 | null                                       |
 | onXFileCaptured              | `XFileCapturedCallback?`    | The callback type definition when the XFile is captured by the camera.                                | null                                       |
 
+### Using custom `State`s
+
+All user interface can be customized through custom `State`s, including:
+- `CameraPickerState`
+- `CameraPickerViewerState`
+
+After override `State`s, pass them through the picking method, more specifically:
+- `CameraPicker.pickFromCamera(createPickerState: () => CustomCameraPickerState());`
+- `CameraPickerViewer.pushToViewer(..., createViewerState: () => CustomCameraPickerViewerState());`
+
 ## Frequently asked question 💭
 
 ### Why the orientation behavior is strange on iOS?

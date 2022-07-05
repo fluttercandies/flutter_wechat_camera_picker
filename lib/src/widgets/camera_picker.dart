@@ -28,7 +28,11 @@ class CameraPicker extends StatefulWidget {
     this.createPickerState,
   }) : super(key: key);
 
+  /// {@macro wechat_camera_picker.CameraPickerConfig}
   final CameraPickerConfig pickerConfig;
+
+  /// Creates a customized [CameraPickerState].
+  /// 构建一个自定义的 [CameraPickerState]。
   final CameraPickerState Function()? createPickerState;
 
   /// Static method to create [AssetEntity] through camera.

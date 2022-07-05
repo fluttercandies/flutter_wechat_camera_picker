@@ -124,6 +124,16 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 | onError                      | `CameraErrorHandler?`       | 拍摄照片过程中的自定义错误处理                                    | null                                       |
 | onXFileCaptured              | `XFileCapturedCallback?`    | 拍摄文件生成后的回调                                         | null                                       |
 
+### 使用自定义的 `State`
+
+所有的用户界面都可以通过自定义 `State` 实现，包括：
+- `CameraPickerState`
+- `CameraPickerViewerState`
+
+在完成 `State` 的重载后，可以在调用时进行构建，具体来说：
+- `CameraPicker.pickFromCamera(createPickerState: () => CustomCameraPickerState());`
+- `CameraPickerViewer.pushToViewer(..., createViewerState: () => CustomCameraPickerViewerState());`
+
 ## 常见问题 💭
 
 ### iOS 上的预览在旋转时行为诡异
