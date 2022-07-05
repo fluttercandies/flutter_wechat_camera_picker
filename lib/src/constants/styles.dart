@@ -4,8 +4,5 @@
 
 import 'package:flutter/painting.dart';
 
-class C {
-  static const Color themeColor = Color(0xff00bc56); // WeChat
-}
-
-const BorderRadius maxBorderRadius = BorderRadius.all(Radius.circular(999999));
+const BorderRadius maxBorderRadius = BorderRadius.all(Radius.circular(9999999));
+const Color wechatThemeColor = Color(0xff00bc56); // WeChat

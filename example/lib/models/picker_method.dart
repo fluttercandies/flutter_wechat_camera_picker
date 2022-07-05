@@ -107,12 +107,10 @@ List<PickMethod> get pickMethods {
     PickMethod(
       icon: '↩️',
       name: 'Rotate picker in turns',
-      description: 'Use a customized (different main color) theme.',
+      description: 'Rotate the picker layout in quarter turns.',
       method: (BuildContext context) => CameraPicker.pickFromCamera(
         context,
-        pickerConfig: CameraPickerConfig(
-          theme: CameraPicker.themeData(Colors.blue),
-        ),
+        pickerConfig: const CameraPickerConfig(cameraQuarterTurns: 1),
       ),
     ),
     PickMethod(
