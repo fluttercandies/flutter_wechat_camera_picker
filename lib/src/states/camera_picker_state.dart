@@ -998,18 +998,15 @@ class CameraPickerState extends State<CameraPicker>
   }) {
     final bool isLocked = mode == ExposureMode.locked;
     final Color? color = isLocked ? _lockedColor : theme.iconTheme.color;
-
-    Widget _line() {
-      return ValueListenableBuilder<bool>(
-        valueListenable: isExposureModeDisplays,
-        builder: (_, bool value, Widget? child) => AnimatedOpacity(
-          duration: _kDuration,
-          opacity: value ? 1 : 0,
-          child: child,
-        ),
-        child: Center(child: Container(width: 1, color: color)),
-      );
-    }
+    final Widget lineWidget = ValueListenableBuilder<bool>(
+      valueListenable: isExposureModeDisplays,
+      builder: (_, bool value, Widget? child) => AnimatedOpacity(
+        duration: _kDuration,
+        opacity: value ? 1 : 0,
+        child: child,
+      ),
+      child: Center(child: Container(width: 1, color: color)),
+    );
 
     return ValueListenableBuilder<double>(
       valueListenable: currentExposureOffset,
@@ -1022,25 +1019,15 @@ class CameraPickerState extends State<CameraPicker>
         return Stack(
           clipBehavior: Clip.none,
           children: <Widget>[
-            Positioned.fill(
-              top: effectiveTop + gap,
-              child: _line(),
-            ),
-            Positioned.fill(
-              bottom: effectiveBottom + gap,
-              child: _line(),
-            ),
+            Positioned.fill(top: effectiveTop + gap, child: lineWidget),
+            Positioned.fill(bottom: effectiveBottom + gap, child: lineWidget),
             Positioned(
               top: (minAvailableExposureOffset.abs() - exposure) *
                   (height - size * 3) /
                   (maxAvailableExposureOffset - minAvailableExposureOffset),
               child: Transform.rotate(
                 angle: exposure,
-                child: Icon(
-                  Icons.wb_sunny_outlined,
-                  size: size,
-                  color: color,
-                ),
+                child: Icon(Icons.wb_sunny_outlined, size: size, color: color),
               ),
             ),
             Positioned.fill(
