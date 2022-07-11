@@ -4,6 +4,16 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.5.0-dev.1
+
+### New features
+
+- Support customize UI by override `State`s. (#113)
+
+### Improvements
+
+- Expose multiple internal widgets. (#113)
+
 ## 3.4.0
 
 ### New features

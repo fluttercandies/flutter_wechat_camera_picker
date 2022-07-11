@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 
 import 'builder/tween_animation_builder_2.dart';
 
-class ExposurePointWidget extends StatelessWidget {
-  const ExposurePointWidget({
+class CameraFocusPoint extends StatelessWidget {
+  const CameraFocusPoint({
     Key? key,
     required this.size,
     required this.color,
@@ -30,7 +30,7 @@ class ExposurePointWidget extends StatelessWidget {
           child: SizedBox.fromSize(
             size: Size.square(size),
             child: CustomPaint(
-              painter: ExposurePointPainter(size: size, color: color),
+              painter: CameraFocusPointPainter(size: size, color: color),
             ),
           ),
         ),
@@ -40,9 +40,9 @@ class ExposurePointWidget extends StatelessWidget {
 }
 
 /// A [CustomPaint] that draws the exposure point with four arcs and one circle.
-/// 包含了四条弧及一个圆的曝光点绘制
-class ExposurePointPainter extends CustomPainter {
-  const ExposurePointPainter({
+/// 包含了四条弧及一个圆的曝光点绘制。
+class CameraFocusPointPainter extends CustomPainter {
+  const CameraFocusPointPainter({
     required this.size,
     required this.color,
     this.radius = 2,
@@ -66,36 +66,36 @@ class ExposurePointPainter extends CustomPainter {
       ..strokeWidth = strokeWidth;
 
     final Path path = Path()
-      // 先移动到左上组弧的顺时针起始位
+      // Move to the start of the arc-line group at the left-top.
       ..moveTo(0, dividedSize.height)
-      // 左上组弧
+      // Draw arc-line group from the left-top.
       ..relativeLineTo(0, -lineLength)
       ..relativeArcToPoint(Offset(radius, -radius), radius: _circularRadius)
       ..relativeLineTo(lineLength, 0)
-      // 移动至右上组弧起始位
+      // Move to the start of the arc-line group at the right-top.
       ..relativeMoveTo(dividedSize.width, 0)
-      // 右上组弧
+      // Draw arc-line group from the right-top.
       ..relativeLineTo(lineLength, 0)
       ..relativeArcToPoint(Offset(radius, radius), radius: _circularRadius)
       ..relativeLineTo(0, lineLength)
-      // 移动至右下组弧起始位
+      // Move to the start of the arc-line group at the right-bottom.
       ..relativeMoveTo(0, dividedSize.height)
-      // 右下组弧
+      // Draw arc-line group from the right-bottom.
       ..relativeLineTo(0, lineLength)
       ..relativeArcToPoint(Offset(-radius, radius), radius: _circularRadius)
       ..relativeLineTo(-lineLength, 0)
-      // 移动至左下组弧起始位
+      // Move to the start of the arc-line group at the left-bottom.
       ..relativeMoveTo(-dividedSize.width, 0)
-      // 左下组弧
+      // Draw arc-line group from the left-bottom.
       ..relativeLineTo(-lineLength, 0)
       ..relativeArcToPoint(Offset(-radius, -radius), radius: _circularRadius)
       ..relativeLineTo(0, -lineLength)
-      // 移动至左上组弧起始位
+      // Move to the start of the arc-line group at the left-top.
       ..relativeMoveTo(0, -dividedSize.height)
       ..close();
     canvas
       ..drawPath(path, paint)
-      // 中心圆
+      // Draw the center circle.
       ..drawCircle(
         Offset(size.width / 2, size.height / 2),
         dividedSize.width / 2,
@@ -104,7 +104,10 @@ class ExposurePointPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(ExposurePointPainter oldDelegate) {
-    return oldDelegate.size != size || oldDelegate.radius != radius;
+  bool shouldRepaint(CameraFocusPointPainter oldDelegate) {
+    return oldDelegate.size != size ||
+        oldDelegate.radius != radius ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.color != color;
   }
 }

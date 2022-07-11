@@ -98,31 +98,41 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 
 `CameraPickerConfig` 的成员说明：
 
-| 参数名                          | 类型                          | 描述                                                 | 默认值                                    |
-|------------------------------|-----------------------------|----------------------------------------------------|----------------------------------------|
-| enableRecording              | `bool`                      | 选择器是否可以录像                                          | `false`                                |
-| onlyEnableRecording          | `bool`                      | 选择器是否仅可以录像。只在 `enableRecording` 为 `true` 时有效。      | `false`                                |
-| enableTapRecording           | `bool`                      | 选择器是否可以单击录像。只在 `onlyEnableRecording` 为 `true` 时生效。 | `false`                                |
-| enableAudio                  | `bool`                      | 选择器是否需要录制音频。只在 `enableRecording` 为 `true` 时有效。     | `true`                                 |
-| enableSetExposure            | `bool`                      | 用户是否可以在界面上通过点击设定曝光点                                | `true`                                 |
-| enableExposureControlOnPoint | `bool`                      | 用户是否可以根据已经设置的曝光点调节曝光度                              | `true`                                 |
-| enablePinchToZoom            | `bool`                      | 用户是否可以在界面上双指缩放相机对焦                                 | `true`                                 |
-| enablePullToZoomInRecord     | `bool`                      | 用户是否可以在录制视频时上拉缩放                                   | `true`                                 |
-| shouldDeletePreviewFile      | `bool`                      | 返回页面时是否删除预览文件                                      | `false`                                |
-| shouldAutoPreviewVideo       | `bool`                      | 在预览时是否直接播放视频                                       | `false`                                |
-| maximumRecordingDuration     | `Duration`                  | 录制视频最长时长                                           | `const Duration(seconds: 15)`          |
-| theme                        | `ThemeData?`                | 选择器的主题                                             | `CameraPicker.themeData(C.themeColor)` |
-| textDelegate                 | `CameraPickerTextDelegate?` | 控制部件中的文字实现                                         | `DefaultCameraPickerTextDelegate`      |
-| resolutionPreset             | `ResolutionPreset`          | 相机的分辨率预设                                           | `ResolutionPreset.max`                 |
-| cameraQuarterTurns           | `int`                       | 摄像机视图顺时针旋转次数，每次 90 度                               | `0`                                    |
-| imageFormatGroup             | `ImageFormatGroup`          | 输出图像的格式描述                                          | `ImageFormatGroup.unknown`             |
-| preferredLensDirection       | `CameraLensDirection`       | 首次使用相机时首选的镜头方向                                     | `CameraLensDirection.back`             |
-| lockCaptureOrientation       | `DeviceOrientation?`        | 摄像机在拍摄时锁定的旋转角度                                     | null                                   |
-| foregroundBuilder            | `ForegroundBuilder?`        | 覆盖在相机预览上方的前景构建                                     | null                                   |
-| previewTransformBuilder      | `PreviewTransformBuilder?`  | 对相机预览做变换的构建                                        | null                                   |
-| onEntitySaving               | `EntitySaveCallback?`       | 在查看器中保存图片时的回调                                      | null                                   |
-| onError                      | `CameraErrorHandler?`       | 拍摄照片过程中的自定义错误处理                                    | null                                   |
-| onXFileCaptured              | `XFileCapturedCallback?`    | 拍摄文件生成后的回调                                         | null                                   |
+| 参数名                          | 类型                          | 描述                                                 | 默认值                                        |
+|------------------------------|-----------------------------|----------------------------------------------------|--------------------------------------------|
+| enableRecording              | `bool`                      | 选择器是否可以录像                                          | `false`                                    |
+| onlyEnableRecording          | `bool`                      | 选择器是否仅可以录像。只在 `enableRecording` 为 `true` 时有效。      | `false`                                    |
+| enableTapRecording           | `bool`                      | 选择器是否可以单击录像。只在 `onlyEnableRecording` 为 `true` 时生效。 | `false`                                    |
+| enableAudio                  | `bool`                      | 选择器是否需要录制音频。只在 `enableRecording` 为 `true` 时有效。     | `true`                                     |
+| enableSetExposure            | `bool`                      | 用户是否可以在界面上通过点击设定曝光点                                | `true`                                     |
+| enableExposureControlOnPoint | `bool`                      | 用户是否可以根据已经设置的曝光点调节曝光度                              | `true`                                     |
+| enablePinchToZoom            | `bool`                      | 用户是否可以在界面上双指缩放相机对焦                                 | `true`                                     |
+| enablePullToZoomInRecord     | `bool`                      | 用户是否可以在录制视频时上拉缩放                                   | `true`                                     |
+| shouldDeletePreviewFile      | `bool`                      | 返回页面时是否删除预览文件                                      | `false`                                    |
+| shouldAutoPreviewVideo       | `bool`                      | 在预览时是否直接播放视频                                       | `false`                                    |
+| maximumRecordingDuration     | `Duration`                  | 录制视频最长时长                                           | `const Duration(seconds: 15)`              |
+| theme                        | `ThemeData?`                | 选择器的主题                                             | `CameraPicker.themeData(wechatThemeColor)` |
+| textDelegate                 | `CameraPickerTextDelegate?` | 控制部件中的文字实现                                         | `CameraPickerTextDelegate`                 |
+| resolutionPreset             | `ResolutionPreset`          | 相机的分辨率预设                                           | `ResolutionPreset.max`                     |
+| cameraQuarterTurns           | `int`                       | 摄像机视图顺时针旋转次数，每次 90 度                               | `0`                                        |
+| imageFormatGroup             | `ImageFormatGroup`          | 输出图像的格式描述                                          | `ImageFormatGroup.unknown`                 |
+| preferredLensDirection       | `CameraLensDirection`       | 首次使用相机时首选的镜头方向                                     | `CameraLensDirection.back`                 |
+| lockCaptureOrientation       | `DeviceOrientation?`        | 摄像机在拍摄时锁定的旋转角度                                     | null                                       |
+| foregroundBuilder            | `ForegroundBuilder?`        | 覆盖在相机预览上方的前景构建                                     | null                                       |
+| previewTransformBuilder      | `PreviewTransformBuilder?`  | 对相机预览做变换的构建                                        | null                                       |
+| onEntitySaving               | `EntitySaveCallback?`       | 在查看器中保存图片时的回调                                      | null                                       |
+| onError                      | `CameraErrorHandler?`       | 拍摄照片过程中的自定义错误处理                                    | null                                       |
+| onXFileCaptured              | `XFileCapturedCallback?`    | 拍摄文件生成后的回调                                         | null                                       |
+
+### 使用自定义的 `State`
+
+所有的用户界面都可以通过自定义 `State` 实现，包括：
+- `CameraPickerState`
+- `CameraPickerViewerState`
+
+在完成 `State` 的重载后，可以在调用时进行构建，具体来说：
+- `CameraPicker.pickFromCamera(createPickerState: () => CustomCameraPickerState());`
+- `CameraPickerViewer.pushToViewer(..., createViewerState: () => CustomCameraPickerViewerState());`
 
 ## 常见问题 💭
 

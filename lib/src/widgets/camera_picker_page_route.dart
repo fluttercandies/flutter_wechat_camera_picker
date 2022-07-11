@@ -4,12 +4,6 @@
 
 import 'package:flutter/material.dart';
 
-/// Build [CameraPickerPageRoute] with the given generic type.
-/// 构建匹配泛型的 [CameraPickerPageRoute]
-typedef CameraPickerPageRouteBuilder<T> = CameraPickerPageRoute<T> Function(
-  Widget picker,
-);
-
 /// Built a slide page transition for the picker.
 /// 为选择器构造一个上下进出的页面过渡动画
 class CameraPickerPageRoute<T> extends PageRoute<T> {
@@ -23,7 +17,12 @@ class CameraPickerPageRoute<T> extends PageRoute<T> {
     this.maintainState = true,
     this.opaque = true,
     this.canTransitionFromPredicate,
-  });
+    bool fullscreenDialog = false,
+    RouteSettings? settings,
+  }) : super(
+          settings: settings,
+          fullscreenDialog: fullscreenDialog,
+        );
 
   final WidgetBuilder builder;
 

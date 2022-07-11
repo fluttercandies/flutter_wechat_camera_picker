@@ -9,12 +9,12 @@ import 'package:flutter/material.dart';
 
 import '../constants/styles.dart';
 
-class CircularProgressBar extends StatefulWidget {
-  const CircularProgressBar({
+class CameraProgressButton extends StatefulWidget {
+  const CameraProgressButton({
     Key? key,
     required this.outerRadius,
     required this.ringsWidth,
-    this.ringsColor = C.themeColor,
+    this.ringsColor = wechatThemeColor,
     this.progress = 0.0,
     this.duration = const Duration(seconds: 15),
   }) : super(key: key);
@@ -26,10 +26,10 @@ class CircularProgressBar extends StatefulWidget {
   final Duration duration;
 
   @override
-  State<CircularProgressBar> createState() => _CircleProgressState();
+  State<CameraProgressButton> createState() => _CircleProgressState();
 }
 
-class _CircleProgressState extends State<CircularProgressBar>
+class _CircleProgressState extends State<CameraProgressButton>
     with SingleTickerProviderStateMixin {
   final GlobalKey paintKey = GlobalKey();
 
@@ -61,7 +61,7 @@ class _CircleProgressState extends State<CircularProgressBar>
         builder: (_, __) => CustomPaint(
           key: paintKey,
           size: size,
-          painter: ProgressPainter(
+          painter: CameraProgressButtonPainter(
             progress: progressController.value,
             ringsWidth: widget.ringsWidth,
             ringsColor: widget.ringsColor,
@@ -72,8 +72,8 @@ class _CircleProgressState extends State<CircularProgressBar>
   }
 }
 
-class ProgressPainter extends CustomPainter {
-  const ProgressPainter({
+class CameraProgressButtonPainter extends CustomPainter {
+  const CameraProgressButtonPainter({
     required this.ringsWidth,
     required this.ringsColor,
     required this.progress,
