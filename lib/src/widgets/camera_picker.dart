@@ -11,7 +11,6 @@ import 'package:flutter/services.dart';
 
 import '../constants/config.dart';
 import '../constants/constants.dart';
-import '../delegates/camera_picker_text_delegate.dart';
 import '../states/camera_picker_state.dart';
 
 import 'camera_picker_page_route.dart';
@@ -22,10 +21,11 @@ import 'camera_picker_page_route.dart';
 /// The picker provides create an [AssetEntity] through the [CameraController].
 /// 该选择器可以通过 [CameraController] 创建 [AssetEntity]。
 class CameraPicker extends StatefulWidget {
-  const CameraPicker._({
+  const CameraPicker({
     Key? key,
     this.pickerConfig = const CameraPickerConfig(),
     this.createPickerState,
+    this.locale,
   }) : super(key: key);
 
   /// {@macro wechat_camera_picker.CameraPickerConfig}
@@ -34,6 +34,9 @@ class CameraPicker extends StatefulWidget {
   /// Creates a customized [CameraPickerState].
   /// 构建一个自定义的 [CameraPickerState]。
   final CameraPickerState Function()? createPickerState;
+
+  /// The [Locale] to determine text delegates for the picker.
+  final Locale? locale;
 
   /// Static method to create [AssetEntity] through camera.
   /// 通过相机创建 [AssetEntity] 的静态方法
@@ -46,13 +49,10 @@ class CameraPicker extends StatefulWidget {
         pageRouteBuilder,
     Locale? locale,
   }) {
-    Constants.textDelegate = pickerConfig.textDelegate ??
-        cameraPickerTextDelegateFromLocale(
-          locale ?? Localizations.maybeLocaleOf(context),
-        );
-    final Widget picker = CameraPicker._(
+    final Widget picker = CameraPicker(
       pickerConfig: pickerConfig,
       createPickerState: createPickerState,
+      locale: locale,
     );
     return Navigator.of(
       context,
@@ -111,5 +111,5 @@ class CameraPicker extends StatefulWidget {
   @override
   CameraPickerState createState() =>
       // ignore: no_logic_in_create_state
-      createPickerState?.call() ?? CameraPickerState();
+      createPickerState?.call() ?? CameraPickerState(locale: locale);
 }

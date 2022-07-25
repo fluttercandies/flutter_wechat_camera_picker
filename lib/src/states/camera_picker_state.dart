@@ -32,6 +32,11 @@ const Duration _kDuration = Duration(milliseconds: 300);
 
 class CameraPickerState extends State<CameraPicker>
     with WidgetsBindingObserver {
+  CameraPickerState({Locale? locale}) {
+    Constants.textDelegate = widget.pickerConfig.textDelegate ??
+        cameraPickerTextDelegateFromLocale(locale);
+  }
+
   /// The [Duration] for record detection. (200ms)
   /// 检测是否开始录制的时长 (200毫秒)
   final Duration recordDetectDuration = const Duration(milliseconds: 200);
