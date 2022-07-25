@@ -48,7 +48,9 @@ class CameraPickerState extends State<CameraPicker>
   /// 在开始录像前，最后一次在拍照按钮按下的位置
   Offset? lastShootingButtonPressedPosition;
 
-  final ValueNotifier<bool> isExposureModeDisplays = ValueNotifier<bool>(false);
+  /// Whether the focus point is displaying.
+  /// 是否正在展示当前的聚焦点
+  final ValueNotifier<bool> isFocusPointDisplays = ValueNotifier<bool>(false);
 
   /// The controller for the current camera.
   /// 当前相机实例的控制器
@@ -57,7 +59,7 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Available cameras.
   /// 可用的相机实例
-  late List<CameraDescription> cameras;
+  late final List<CameraDescription> cameras;
 
   /// Current exposure offset.
   /// 当前曝光值
@@ -182,7 +184,7 @@ class CameraPickerState extends State<CameraPicker>
     innerController?.dispose();
     currentExposureOffset.dispose();
     lastExposurePoint.dispose();
-    isExposureModeDisplays.dispose();
+    isFocusPointDisplays.dispose();
     exposurePointDisplayTimer?.cancel();
     exposureModeDisplayTimer?.cancel();
     recordDetectTimer?.cancel();
@@ -263,7 +265,7 @@ class CameraPickerState extends State<CameraPicker>
 
       // After cameras fetched, judge again with the list is empty or not to
       // ensure there is at least an available camera for use.
-      if (cameraDescription == null && (cameras.isEmpty)) {
+      if (cameraDescription == null && cameras.isEmpty) {
         handleErrorWithHandler(
           CameraException(
             'No CameraDescription found.',
@@ -435,7 +437,7 @@ class CameraPickerState extends State<CameraPicker>
   void restartDisplayModeDisplayTimer() {
     exposureModeDisplayTimer?.cancel();
     exposureModeDisplayTimer = Timer(const Duration(seconds: 2), () {
-      isExposureModeDisplays.value = false;
+      isFocusPointDisplays.value = false;
     });
   }
 
@@ -469,7 +471,7 @@ class CameraPickerState extends State<CameraPicker>
     Offset position,
     BoxConstraints constraints,
   ) async {
-    isExposureModeDisplays.value = false;
+    isFocusPointDisplays.value = false;
     // Ignore point update when the new point is less than 8% and higher than
     // 92% of the screen's height.
     if (position.dy < constraints.maxHeight / 12 ||
@@ -530,8 +532,8 @@ class CameraPickerState extends State<CameraPicker>
     } catch (e, s) {
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     }
-    if (!isExposureModeDisplays.value) {
-      isExposureModeDisplays.value = true;
+    if (!isFocusPointDisplays.value) {
+      isFocusPointDisplays.value = true;
     }
     restartDisplayModeDisplayTimer();
     restartExposurePointDisplayTimer();
@@ -1003,7 +1005,7 @@ class CameraPickerState extends State<CameraPicker>
     final bool isLocked = mode == ExposureMode.locked;
     final Color? color = isLocked ? _lockedColor : theme.iconTheme.color;
     final Widget lineWidget = ValueListenableBuilder<bool>(
-      valueListenable: isExposureModeDisplays,
+      valueListenable: isFocusPointDisplays,
       builder: (_, bool value, Widget? child) => AnimatedOpacity(
         duration: _kDuration,
         opacity: value ? 1 : 0,
@@ -1072,7 +1074,7 @@ class CameraPickerState extends State<CameraPicker>
       return Column(
         children: <Widget>[
           ValueListenableBuilder<bool>(
-            valueListenable: isExposureModeDisplays,
+            valueListenable: isFocusPointDisplays,
             builder: (_, bool value, Widget? child) => AnimatedOpacity(
               duration: _kDuration,
               opacity: value ? 1 : 0,
