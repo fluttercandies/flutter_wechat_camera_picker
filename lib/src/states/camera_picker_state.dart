@@ -7,7 +7,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:bindings_compatible/bindings_compatible.dart';
 import 'package:camera/camera.dart';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:flutter/gestures.dart';
@@ -162,7 +161,7 @@ class CameraPickerState extends State<CameraPicker>
   @override
   void initState() {
     super.initState();
-    useWidgetsBinding().addObserver(this);
+    ambiguate(WidgetsBinding.instance)?.addObserver(this);
 
     // TODO(Alex): Currently hide status bar will cause the viewport shaking on Android.
     /// Hide system status bar automatically when the platform is not Android.
@@ -179,7 +178,7 @@ class CameraPickerState extends State<CameraPicker>
     if (!Platform.isAndroid) {
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     }
-    useWidgetsBinding().removeObserver(this);
+    ambiguate(WidgetsBinding.instance)?.removeObserver(this);
     innerController?.dispose();
     currentExposureOffset.dispose();
     lastExposurePoint.dispose();
@@ -255,7 +254,7 @@ class CameraPickerState extends State<CameraPicker>
     });
     // **IMPORTANT**: Push methods into a post frame callback, which ensures the
     // controller has already unbind from widgets.
-    useWidgetsBinding().addPostFrameCallback((_) async {
+    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) async {
       // When the [cameraDescription] is null, which means this is the first
       // time initializing cameras, so available cameras should be fetched.
       if (cameraDescription == null) {
