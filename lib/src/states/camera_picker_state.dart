@@ -349,6 +349,10 @@ class CameraPickerState extends State<CameraPicker>
   /// of cameras, start from the beginning.
   /// 按顺序切换相机。当达到相机数量时从头开始。
   void switchCameras() {
+    // Skip switching when taking picture or recording video.
+    if (controller.value.isTakingPicture || controller.value.isRecordingVideo) {
+      return;
+    }
     ++currentCameraIndex;
     if (currentCameraIndex == cameras.length) {
       currentCameraIndex = 0;
