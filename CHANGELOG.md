@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.5.0-dev.3
+
+### Improvements
+
+- Prevent switching cameras when taking picture or recording video. (#120)
+
 ## 3.5.0-dev.2
 
 ### Improvements
