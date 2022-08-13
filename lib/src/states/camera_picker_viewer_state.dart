@@ -47,6 +47,9 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   /// 初始化视频控制器时是否发生错误
   bool hasErrorWhenInitializing = false;
 
+  /// Whether the saving process is ongoing.
+  bool isSavingEntity = false;
+
   CameraErrorHandler? get onError => widget.pickerConfig.onError;
 
   @override
@@ -121,13 +124,23 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   /// While the entity might returned null, there's no side effects if popping `null`
   /// because the parent picker will ignore it.
   Future<void> createAssetEntityAndPop() async {
+    if (isSavingEntity) {
+      return;
+    }
+    isSavingEntity = true;
     final CameraPickerViewType viewType = widget.viewType;
     if (widget.pickerConfig.onEntitySaving != null) {
-      await widget.pickerConfig.onEntitySaving!(
-        context,
-        widget.viewType,
-        File(widget.previewXFile.path),
-      );
+      try {
+        await widget.pickerConfig.onEntitySaving!(
+          context,
+          widget.viewType,
+          File(widget.previewXFile.path),
+        );
+      } catch (e, s) {
+        handleErrorWithHandler(e, widget.pickerConfig.onError, s: s);
+      } finally {
+        isSavingEntity = false;
+      }
       return;
     }
     AssetEntity? entity;
@@ -165,6 +178,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
       realDebugPrint('Saving entity failed: $e');
       handleErrorWithHandler(e, widget.pickerConfig.onError, s: s);
     } finally {
+      isSavingEntity = false;
       if (mounted) {
         Navigator.of(context).pop(entity);
       }

@@ -4,10 +4,10 @@
 
 import 'dart:math' as math;
 
-import 'package:bindings_compatible/bindings_compatible.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/styles.dart';
+import '../internals/methods.dart';
 
 class CameraProgressButton extends StatefulWidget {
   const CameraProgressButton({
@@ -41,7 +41,7 @@ class _CircleProgressState extends State<CameraProgressButton>
   @override
   void initState() {
     super.initState();
-    useWidgetsBinding().addPostFrameCallback((Duration _) {
+    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
       progressController.forward();
     });
   }

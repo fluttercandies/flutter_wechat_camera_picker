@@ -27,3 +27,5 @@ void handleErrorWithHandler(
   }
   throw e;
 }
+
+T? ambiguate<T>(T value) => value;
