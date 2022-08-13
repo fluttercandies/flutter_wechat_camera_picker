@@ -4,19 +4,7 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
-## 3.5.0-dev.3
-
-### Improvements
-
-- Prevent switching cameras when taking picture or recording video. (#120)
-
-## 3.5.0-dev.2
-
-### Improvements
-
-- Re-export `CameraPicker`'s constructor. (#116)
-
-## 3.5.0-dev.1
+## 3.5.0
 
 ### New features
 
@@ -25,6 +13,9 @@ that can be found in the LICENSE file. -->
 ### Improvements
 
 - Expose multiple internal widgets. (#113)
+- Re-export `CameraPicker`'s constructor. (#116)
+- Avoid duplicate entity saving. (#117)
+- Prevent switching cameras when taking picture or recording video. (#120)
 
 ## 3.4.0
 
