@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.5.0+1
+
+### Fixes
+
+- Fix the too early `widget` access in `CameraPickerState`. (#124)
+
 ## 3.5.0
 
 ### New features

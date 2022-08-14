@@ -31,11 +31,6 @@ const Duration _kDuration = Duration(milliseconds: 300);
 
 class CameraPickerState extends State<CameraPicker>
     with WidgetsBindingObserver {
-  CameraPickerState({Locale? locale}) {
-    Constants.textDelegate = widget.pickerConfig.textDelegate ??
-        cameraPickerTextDelegateFromLocale(locale);
-  }
-
   /// The [Duration] for record detection. (200ms)
   /// 检测是否开始录制的时长 (200毫秒)
   final Duration recordDetectDuration = const Duration(milliseconds: 200);
@@ -164,6 +159,8 @@ class CameraPickerState extends State<CameraPicker>
   void initState() {
     super.initState();
     ambiguate(WidgetsBinding.instance)?.addObserver(this);
+    Constants.textDelegate = widget.pickerConfig.textDelegate ??
+        cameraPickerTextDelegateFromLocale(widget.locale);
 
     // TODO(Alex): Currently hide status bar will cause the viewport shaking on Android.
     /// Hide system status bar automatically when the platform is not Android.
