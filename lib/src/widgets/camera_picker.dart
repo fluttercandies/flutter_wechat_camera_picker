@@ -111,5 +111,6 @@ class CameraPicker extends StatefulWidget {
   @override
   CameraPickerState createState() =>
       // ignore: no_logic_in_create_state
-      createPickerState?.call() ?? CameraPickerState(locale: locale);
+      createPickerState?.call() ??
+      CameraPickerState(widget: this, locale: locale);
 }

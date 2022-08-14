@@ -31,8 +31,8 @@ const Duration _kDuration = Duration(milliseconds: 300);
 
 class CameraPickerState extends State<CameraPicker>
     with WidgetsBindingObserver {
-  CameraPickerState({Locale? locale}) {
-    Constants.textDelegate = widget.pickerConfig.textDelegate ??
+  CameraPickerState({CameraPicker? widget, Locale? locale}) {
+    Constants.textDelegate = widget?.pickerConfig?.textDelegate ??
         cameraPickerTextDelegateFromLocale(locale);
   }
 
