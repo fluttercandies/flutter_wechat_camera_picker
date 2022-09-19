@@ -205,14 +205,11 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
           iconSize: 18,
           icon: Container(
             padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              color: Theme.of(context).iconTheme.color,
+            decoration: const BoxDecoration(
+              color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.keyboard_return_rounded,
-              color: Theme.of(context).canvasColor,
-            ),
+            child: const Icon(Icons.keyboard_return_rounded, color: Colors.black,),
           ),
         ),
       ),
