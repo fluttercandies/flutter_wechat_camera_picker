@@ -60,6 +60,21 @@ Flutter SDK：`>=2.0.0` 。
 - [wechat_assets_picker#准备工作](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/README-ZH.md#preparing-for-use-)
 - [camera#installation](https://pub.flutter-io.cn/packages/camera#installation)
 
+#### Android 13 (API 33) 权限配置
+
+如果你不需要拍照或录像，你可以考虑将对应权限移除：
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.your.app">
+    <!-- 如果不需要拍照，移除 READ_MEDIA_IMAGES -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <!-- 如果不需要拍照，移除 READ_MEDIA_VIDEO -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+</manifest>
+```
+
 ## 使用方法 📖
 
 ### 简单的使用方法

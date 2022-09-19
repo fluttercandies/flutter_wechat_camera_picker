@@ -62,6 +62,22 @@ Flutter SDK: `>=2.0.0` .
 - [wechat_assets_picker#preparing-for-use](https://github.com/fluttercandies/flutter_wechat_assets_picker#preparing-for-use-)
 - [camera#installation](https://pub.dev/packages/camera#installation)
 
+#### Android 13 (API 33) permissions
+
+If you don't need to take photos or videos,
+consider removing relevant permission in your apps, more specifically:
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.your.app">
+    <!-- Remove READ_MEDIA_IMAGES if you don't need to take photos. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <!-- Remove READ_MEDIA_VIDEO if you don't need to take videos. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+</manifest>
+```
+
 ## Usage 📖
 
 ### Simple usage
