@@ -4,6 +4,13 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.6.0
+
+### New features
+
+- Upgrade `camera` to `0.10.x`.
+- Upgrade `photo_maanger` for Android 13.
+
 ## 3.5.0+1
 
 ### Fixes
