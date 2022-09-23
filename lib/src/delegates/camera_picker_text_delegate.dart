@@ -10,6 +10,7 @@ const List<CameraPickerTextDelegate> cameraPickerTextDelegates =
     <CameraPickerTextDelegate>[
   CameraPickerTextDelegate(),
   EnglishCameraPickerTextDelegate(),
+  FrenchCameraPickerTextDelegate(),
 ];
 
 /// Obtain the text delegate from the given locale.
@@ -176,4 +177,79 @@ class EnglishCameraPickerTextDelegate extends CameraPickerTextDelegate {
   @override
   String sSwitchCameraLensDirectionLabel(CameraLensDirection value) =>
       'Switch to the ${sCameraLensDirectionLabel(value)} camera';
+}
+
+/// Text delegate implements with French.
+class FrenchCameraPickerTextDelegate extends CameraPickerTextDelegate {
+  const FrenchCameraPickerTextDelegate();
+
+  @override
+  String get languageCode => 'fr';
+
+  @override
+  String get confirm => 'Confirmer';
+
+  @override
+  String get shootingTips => 'Appuyez pour prendre une photo.';
+
+  @override
+  String get shootingWithRecordingTips =>
+      'Appuyez pour prendre une photo. Appuyez longuement pour enregistrer la vidéo.';
+
+  @override
+  String get shootingOnlyRecordingTips => 'Long press to record video.';
+
+  @override
+  String get shootingTapRecordingTips =>
+      'Appuyez longuement pour enregistrer la vidéo.';
+
+  @override
+  String get loadFailed => 'Échec du chargement';
+
+  @override
+  String get sActionManuallyFocusHint => 'mise au point manuelle';
+
+  @override
+  String get sActionPreviewHint => 'Aperçu';
+
+  @override
+  String get sActionRecordHint => 'enregistrer';
+
+  @override
+  String get sActionShootHint => 'prendre une photo';
+
+  @override
+  String get sActionShootingButtonTooltip => 'bouton de prise de vue';
+
+  @override
+  String get sActionStopRecordingHint => "arrêter l'enregistrement";
+
+  @override
+  String sCameraLensDirectionLabel(CameraLensDirection value) {
+    switch (value) {
+      case CameraLensDirection.back:
+        return 'arrière';
+      case CameraLensDirection.front:
+        return 'frontale';
+      case CameraLensDirection.external:
+        return 'externe';
+      default:
+        return value.name;
+    }
+  }
+
+  @override
+  String? sCameraPreviewLabel(CameraLensDirection? value) {
+    if (value == null) {
+      return null;
+    }
+    return 'aperçu de la caméra ${sCameraLensDirectionLabel(value)}';
+  }
+
+  @override
+  String sFlashModeLabel(FlashMode mode) => 'Mode flash: ${mode.name}';
+
+  @override
+  String sSwitchCameraLensDirectionLabel(CameraLensDirection value) =>
+      'Basculer vers la caméra ${sCameraLensDirectionLabel(value)}>';
 }
