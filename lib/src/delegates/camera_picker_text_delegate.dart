@@ -234,7 +234,6 @@ class FrenchCameraPickerTextDelegate extends CameraPickerTextDelegate {
       case CameraLensDirection.external:
         return 'externe';
     }
-    return value.name;
   }
 
   @override
