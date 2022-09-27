@@ -379,6 +379,8 @@ class CameraPickerState extends State<CameraPicker>
         newFlashMode = FlashMode.always;
         break;
       case FlashMode.always:
+        newFlashMode = FlashMode.torch;
+        break;
       case FlashMode.torch:
         newFlashMode = FlashMode.off;
         break;
@@ -851,8 +853,10 @@ class CameraPickerState extends State<CameraPicker>
         icon = Icons.flash_auto;
         break;
       case FlashMode.always:
-      case FlashMode.torch:
         icon = Icons.flash_on;
+        break;
+      case FlashMode.torch:
+        icon = Icons.flashlight_on;
         break;
     }
     return IconButton(
