@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.6.1
+
+### New features
+
+- Add torch flashlight support. (#137)
+
 ## 3.6.0
 
 ### New features
