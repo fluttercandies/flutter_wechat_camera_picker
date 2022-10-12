@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.6.2
+
+### Improvements
+
+- Bump `photo_manager` to explicitly remove the requirements of `requiredLegacyExternalStorage`.
+
 ## 3.6.1
 
 ### New features

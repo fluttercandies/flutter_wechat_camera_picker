@@ -15,8 +15,9 @@ that can be found in the LICENSE file. -->
 
 Language: [English](README.md) | 中文简体
 
+基于微信界面的相机选择器，可单独运行，是
 [**仿微信资源选择器**](https://pub.flutter-io.cn/packages/wechat_assets_picker) 的扩展。
-基于 `camera` 实现相机相关功能，`photo_manager` 实现资源相关内容。
+选择器基于 `camera` 实现相机相关功能，`photo_manager` 实现资源相关内容。
 
 ## 目录 🗂
 
@@ -33,15 +34,19 @@ Language: [English](README.md) | 中文简体
 
 ## 特性 ✨
 
-- [x] 🔐 支持健全的空安全
-- [x] 💚 99% 的微信风格
-- [x] 📷 支持拍照
-  - [x] ☀️ 支持设置曝光参数
-  - [x] 🔍️ 支持捏合缩放
-- [x] 🎥 支持录像
-  - [x] ⏱ 支持限制录像时间
-  - [x] 🔍 支持录像时缩放
-- [x] 🖾 支持自定义前景 widget 构建
+- ♻️ 支持基于 `State` 重载的全量自定义
+- 💚 99% 的微信风格
+- 📷 支持拍照
+- 🎥 支持录像
+  - ⏱ 支持限制录像时间
+  - 🔍 支持录像时缩放
+- ☀️ 支持设置曝光参数
+- 🔍️ 支持捏合缩放
+- 💱 国际化支持
+  - ⏪ RTL 语言支持
+- 🎏 完整的自定义主题
+- 🖾 支持自定义前景 widget 构建
+- 🕹️ 保存时拦截自定义操作
 
 ## 截图 📸
 
@@ -53,7 +58,7 @@ Language: [English](README.md) | 中文简体
 
 ### 版本限制
 
-Flutter SDK：`>=2.0.0` 。
+Flutter SDK：`>=2.2.0` 。
 
 ### 配置
 
@@ -68,10 +73,10 @@ Flutter SDK：`>=2.0.0` 。
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.your.app">
-    <!-- 如果不需要拍照，移除 READ_MEDIA_IMAGES -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
-    <!-- 如果不需要拍照，移除 READ_MEDIA_VIDEO -->
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+    <!-- 如果需要拍照，添加该权限 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- 如果需要录像，添加该权限 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 </manifest>
 ```
 

@@ -15,9 +15,10 @@ that can be found in the LICENSE file. -->
 
 Language: English | [中文简体](README-ZH.md)
 
-A **camera picker** which is an extension for
+A **camera picker** based on WeChat's UI which is a separate runnable extension to
 [wechat_assets_picker](https://pub.dev/packages/wechat_assets_picker).
-Based on `camera` for camera functions and `photo_manager` for asset implementation.
+The package based on `camera` for camera functions
+and `photo_manager` for asset implementation.
 
 ## Category 🗂
 
@@ -35,15 +36,19 @@ Based on `camera` for camera functions and `photo_manager` for asset implementat
 
 ## Features ✨
 
-- [x] 🔐 Non-nullable by default
-- [x] 💚 99% similar to WeChat style
-- [x] 📷 Picture taking support
-  - [x] ☀️ Exposure adjust support
-  - [x] 🔍️ Scale with pinch support
-- [x] 🎥 Video recording support
-  - [x] ⏱ Duration limitation support
-  - [x] 🔍 Scale when recording support
-- [x] 🖾 Foreground custom widget builder support
+- ♻️ Fully implementable with `State`s override
+- 💚 99% similar to WeChat style
+- 📷 Picture taking support
+- 🎥 Video recording support
+  - ⏱ Duration limitation support
+  - 🔍 Scale when recording support
+- ☀️ Exposure adjust support
+- 🔍️ Scale with pinch support
+- 💱 i18n support
+  - ⏪ RTL language support
+- 🎏 Fully customizable theme
+- 🖾 Foreground custom widget builder support
+- 🕹️ Intercept saving with custom process
 
 ## Screenshots 📸
 
@@ -55,7 +60,7 @@ Based on `camera` for camera functions and `photo_manager` for asset implementat
 
 ### Version constraints
 
-Flutter SDK: `>=2.0.0` .
+Flutter SDK: `>=2.2.0` .
 
 ### Setup
 
@@ -71,10 +76,10 @@ consider removing relevant permission in your apps, more specifically:
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.your.app">
-    <!-- Remove READ_MEDIA_IMAGES if you don't need to take photos. -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
-    <!-- Remove READ_MEDIA_VIDEO if you don't need to take videos. -->
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+    <!-- Add this if you need to take photos. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- Add this if you need to take videos. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 </manifest>
 ```
 
