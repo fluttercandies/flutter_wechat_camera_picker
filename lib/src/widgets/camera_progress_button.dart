@@ -56,15 +56,17 @@ class _CircleProgressState extends State<CameraProgressButton>
   Widget build(BuildContext context) {
     final Size size = Size.square(widget.outerRadius * 2);
     return Center(
-      child: AnimatedBuilder(
-        animation: progressController,
-        builder: (_, __) => CustomPaint(
-          key: paintKey,
-          size: size,
-          painter: CameraProgressButtonPainter(
-            progress: progressController.value,
-            ringsWidth: widget.ringsWidth,
-            ringsColor: widget.ringsColor,
+      child: RepaintBoundary(
+        child: AnimatedBuilder(
+          animation: progressController,
+          builder: (_, __) => CustomPaint(
+            key: paintKey,
+            size: size,
+            painter: CameraProgressButtonPainter(
+              progress: progressController.value,
+              ringsWidth: widget.ringsWidth,
+              ringsColor: widget.ringsColor,
+            ),
           ),
         ),
       ),
@@ -88,8 +90,6 @@ class CameraProgressButtonPainter extends CustomPainter {
     final double center = size.width / 2;
     final Offset offsetCenter = Offset(center, center);
     final double drawRadius = size.width / 2 - ringsWidth;
-    final double angle = 360.0 * progress;
-    final double radians = angle.toRad;
 
     final double outerRadius = center;
     final double innerRadius = center - ringsWidth * 2;
@@ -97,7 +97,7 @@ class CameraProgressButtonPainter extends CustomPainter {
     final double progressWidth = outerRadius - innerRadius;
     canvas.save();
     canvas.translate(0.0, size.width);
-    canvas.rotate(-90.0.toRad);
+    canvas.rotate(-math.pi / 2);
     final Rect arcRect = Rect.fromCircle(
       center: offsetCenter,
       radius: drawRadius,
@@ -107,14 +107,10 @@ class CameraProgressButtonPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = progressWidth;
     canvas
-      ..drawArc(arcRect, 0, radians, false, progressPaint)
+      ..drawArc(arcRect, 0, math.pi * 2 * progress, false, progressPaint)
       ..restore();
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
-}
-
-extension _MathExtension on double {
-  double get toRad => this * (math.pi / 180.0);
+  bool shouldRepaint(CameraProgressButtonPainter oldDelegate) => true;
 }
