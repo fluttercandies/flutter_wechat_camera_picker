@@ -57,6 +57,14 @@ class CameraPickerTextDelegate {
   /// 资源加载失败时的字段
   String get loadFailed => '加载失败';
 
+  /// Default loading string for the dialog.
+  /// 加载中弹窗的默认文字
+  String get loading => '加载中…';
+
+  /// Saving string for the dialog.
+  /// 保存中弹窗的默认文字
+  String get saving => '保存中…';
+
   /// Semantics fields.
   ///
   /// Fields below are only for semantics usage. For customizable these fields,
@@ -140,6 +148,12 @@ class EnglishCameraPickerTextDelegate extends CameraPickerTextDelegate {
 
   @override
   String get loadFailed => 'Load failed';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get saving => 'Saving...';
 
   @override
   String get sActionManuallyFocusHint => 'manually focus';

@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.6.3
+
+### Improvements
+
+- Add the loading indicator when saving. (#140)
+
 ## 3.6.2
 
 ### Improvements

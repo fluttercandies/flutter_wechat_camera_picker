@@ -4,6 +4,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
@@ -127,7 +128,9 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
     if (isSavingEntity) {
       return;
     }
-    isSavingEntity = true;
+    setState(() {
+      isSavingEntity = true;
+    });
     final CameraPickerViewType viewType = widget.viewType;
     if (widget.pickerConfig.onEntitySaving != null) {
       try {
@@ -138,8 +141,10 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
         );
       } catch (e, s) {
         handleErrorWithHandler(e, widget.pickerConfig.onError, s: s);
-      } finally {
-        isSavingEntity = false;
+      }
+      isSavingEntity = false;
+      if (mounted) {
+        setState(() {});
       }
       return;
     }
@@ -194,6 +199,9 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
         padding: const EdgeInsets.all(10),
         child: IconButton(
           onPressed: () {
+            if (isSavingEntity) {
+              return;
+            }
             if (previewFile.existsSync()) {
               previewFile.delete();
             }
@@ -209,7 +217,10 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.keyboard_return_rounded, color: Colors.black,),
+            child: const Icon(
+              Icons.keyboard_return_rounded,
+              color: Colors.black,
+            ),
           ),
         ),
       ),
@@ -329,6 +340,16 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
     );
   }
 
+  Widget buildLoading(BuildContext context) {
+    return IgnorePointer(
+      child: AnimatedOpacity(
+        duration: kThemeAnimationDuration,
+        opacity: isSavingEntity ? 1 : 0,
+        child: _WechatLoading(tip: Constants.textDelegate.saving),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (hasErrorWhenInitializing) {
@@ -349,8 +370,115 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
         children: <Widget>[
           buildPreview(context),
           buildForeground(context),
+          buildLoading(context),
         ],
       ),
     );
   }
+}
+
+class _WechatLoading extends StatefulWidget {
+  const _WechatLoading({Key? key, required this.tip}) : super(key: key);
+
+  final String tip;
+
+  @override
+  State<_WechatLoading> createState() => _WechatLoadingState();
+}
+
+class _WechatLoadingState extends State<_WechatLoading>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(seconds: 2),
+    vsync: this,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _buildContent(BuildContext context, double minWidth) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        SizedBox.fromSize(
+          size: Size.square(minWidth / 3),
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (_, Widget? child) => Transform.rotate(
+              angle: math.pi * 2 * _controller.value,
+              child: child,
+            ),
+            child: CustomPaint(
+              painter: _LoadingPainter(
+                Theme.of(context).textTheme.bodyMedium?.color,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: minWidth / 10),
+        Text(
+          widget.tip,
+          style: const TextStyle(fontSize: 14),
+          textScaleFactor: 1,
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double minWidth = MediaQuery.of(context).size.shortestSide / 3;
+    return Container(
+      color: Colors.black38,
+      alignment: Alignment.center,
+      child: RepaintBoundary(
+        child: Container(
+          constraints: BoxConstraints(minWidth: minWidth),
+          padding: EdgeInsets.all(minWidth / 5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Theme.of(context).canvasColor,
+          ),
+          child: _buildContent(context, minWidth),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadingPainter extends CustomPainter {
+  const _LoadingPainter(this.activeColor);
+
+  final Color? activeColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Color color = activeColor ?? Colors.white;
+    final Offset center = Offset(size.width / 2, size.height / 2);
+    final Rect rect = Rect.fromCenter(
+      center: center,
+      width: size.width,
+      height: size.height,
+    );
+    final Paint paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 4
+      ..shader = SweepGradient(
+        colors: <Color>[color.withOpacity(0), color],
+      ).createShader(rect);
+    canvas.drawArc(rect, 0.1, math.pi * 2 * 0.9, false, paint);
+  }
+
+  @override
+  bool shouldRepaint(_LoadingPainter oldDelegate) => false;
 }
