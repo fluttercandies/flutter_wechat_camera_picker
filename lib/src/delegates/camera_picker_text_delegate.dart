@@ -180,6 +180,7 @@ class EnglishCameraPickerTextDelegate extends CameraPickerTextDelegate {
 }
 
 /// Text delegate implements with French.
+/// Implémentation du texte avec le français.
 class FrenchCameraPickerTextDelegate extends CameraPickerTextDelegate {
   const FrenchCameraPickerTextDelegate();
 
