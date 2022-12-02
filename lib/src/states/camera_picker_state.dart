@@ -719,7 +719,10 @@ class CameraPickerState extends State<CameraPicker>
   Future<AssetEntity?> pushToViewer({
     required XFile file,
     required CameraPickerViewType viewType,
-  }) {
+  }) async {
+    if (viewType == CameraPickerViewType.image) {
+      await precacheImage(FileImage(File(file.path)), context);
+    }
     return CameraPickerViewer.pushToViewer(
       context,
       pickerConfig: pickerConfig,
