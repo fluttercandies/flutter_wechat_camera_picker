@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.6.4
+
+### Improvements
+
+- Precache captured image for better experience. (#145)
+
 ## 3.6.3
 
 ### Improvements
