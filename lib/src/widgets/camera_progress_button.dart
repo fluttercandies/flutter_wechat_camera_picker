@@ -12,6 +12,7 @@ import '../internals/methods.dart';
 class CameraProgressButton extends StatefulWidget {
   const CameraProgressButton({
     Key? key,
+    required this.isAnimating,
     required this.outerRadius,
     required this.ringsWidth,
     this.ringsColor = wechatThemeColor,
@@ -19,6 +20,7 @@ class CameraProgressButton extends StatefulWidget {
     this.duration = const Duration(seconds: 15),
   }) : super(key: key);
 
+  final bool isAnimating;
   final double outerRadius;
   final double ringsWidth;
   final Color ringsColor;
@@ -42,8 +44,22 @@ class _CircleProgressState extends State<CameraProgressButton>
   void initState() {
     super.initState();
     ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) {
-      progressController.forward();
+      if (widget.isAnimating) {
+        progressController.forward();
+      }
     });
+  }
+
+  @override
+  void didUpdateWidget(CameraProgressButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isAnimating != oldWidget.isAnimating) {
+      if (widget.isAnimating) {
+        progressController.forward();
+      } else {
+        progressController.stop();
+      }
+    }
   }
 
   @override
@@ -112,5 +128,9 @@ class CameraProgressButtonPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CameraProgressButtonPainter oldDelegate) => true;
+  bool shouldRepaint(CameraProgressButtonPainter oldDelegate) {
+    return oldDelegate.ringsWidth != ringsWidth ||
+        oldDelegate.ringsColor != ringsColor ||
+        oldDelegate.progress != progress;
+  }
 }
