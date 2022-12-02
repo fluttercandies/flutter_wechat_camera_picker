@@ -8,7 +8,8 @@ that can be found in the LICENSE file. -->
 
 ### Improvements
 
-- Precache captured image for better experience. (#145)
+- Improve stop-capturing experiences. (#146)
+- Precache captured images for better experiences. (#145)
 
 ## 3.6.3
 
