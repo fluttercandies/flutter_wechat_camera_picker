@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.6.5
+
+### Fixes
+
+- Correct sizes when using `cameraQuarterTurns`. (#149)
+
 ## 3.6.4
 
 ### Improvements
