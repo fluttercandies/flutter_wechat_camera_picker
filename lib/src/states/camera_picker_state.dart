@@ -1180,7 +1180,7 @@ class CameraPickerState extends State<CameraPicker>
       // Only call exposure point updates when the controller is initialized.
       if (innerController?.value.isInitialized ?? false) {
         Feedback.forTap(context);
-        setExposureAndFocusPoint(d.globalPosition, constraints);
+        setExposureAndFocusPoint(d.localPosition, constraints);
       }
     }
 
@@ -1340,6 +1340,7 @@ class CameraPickerState extends State<CameraPicker>
 
   @override
   Widget build(BuildContext context) {
+    final MediaQueryData mq = MediaQuery.of(context);
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Theme(
@@ -1348,7 +1349,14 @@ class CameraPickerState extends State<CameraPicker>
           color: Colors.black,
           child: RotatedBox(
             quarterTurns: pickerConfig.cameraQuarterTurns,
-            child: buildBody(context),
+            child: MediaQuery(
+              data: mq.copyWith(
+                size: pickerConfig.cameraQuarterTurns.isOdd
+                    ? mq.size.flipped
+                    : mq.size,
+              ),
+              child: Builder(builder: buildBody),
+            ),
           ),
         ),
       ),
