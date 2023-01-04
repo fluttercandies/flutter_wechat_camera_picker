@@ -82,10 +82,6 @@ class CameraPickerState extends State<CameraPicker>
   /// 当前相机的索引。默认为0
   int currentCameraIndex = 0;
 
-  /// Whether the flash mode has been initialized.
-  /// 是否初始化过相机闪光灯模式
-  bool isInitFlashMode = false;
-
   /// Whether the [buildCaptureButton] should animate according to the gesture.
   /// 拍照按钮是否需要执行动画
   ///
@@ -333,6 +329,7 @@ class CameraPickerState extends State<CameraPicker>
             newController
                 .getMinZoomLevel()
                 .then((double value) => minAvailableZoom = value),
+            newController.setFlashMode(pickerConfig.flashMode),
           ],
           eagerError: true,
         );
@@ -373,27 +370,22 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The method to switch between flash modes.
   /// 切换闪光灯模式的方法
-  Future<void> switchFlashesMode({FlashMode? flashMode}) async {
+  Future<void> switchFlashesMode() async {
     final FlashMode newFlashMode;
-    if (flashMode == null) {
-      switch (controller.value.flashMode) {
-        case FlashMode.off:
-          newFlashMode = FlashMode.auto;
-          break;
-        case FlashMode.auto:
-          newFlashMode = FlashMode.always;
-          break;
-        case FlashMode.always:
-          newFlashMode = FlashMode.torch;
-          break;
-        case FlashMode.torch:
-          newFlashMode = FlashMode.off;
-          break;
-      }
-    } else {
-      newFlashMode = flashMode;
+    switch (controller.value.flashMode) {
+      case FlashMode.off:
+        newFlashMode = FlashMode.auto;
+        break;
+      case FlashMode.auto:
+        newFlashMode = FlashMode.always;
+        break;
+      case FlashMode.always:
+        newFlashMode = FlashMode.torch;
+        break;
+      case FlashMode.torch:
+        newFlashMode = FlashMode.off;
+        break;
     }
-
     try {
       await controller.setFlashMode(newFlashMode);
     } catch (e, s) {
@@ -857,17 +849,7 @@ class CameraPickerState extends State<CameraPicker>
   /// 切换闪光灯模式的按钮
   Widget buildFlashModeSwitch(BuildContext context, CameraValue value) {
     IconData icon;
-    FlashMode flashMode = value.flashMode;
-    bool shouldSwitchFlashMode = false;
-    if (!isInitFlashMode) {
-      isInitFlashMode = true;
-      final FlashMode configFlashMode = pickerConfig.flashMode;
-      if (flashMode != configFlashMode) {
-        flashMode = configFlashMode;
-        shouldSwitchFlashMode = true;
-      }
-    }
-    switch (flashMode) {
+    switch (value.flashMode) {
       case FlashMode.off:
         icon = Icons.flash_off;
         break;
@@ -880,9 +862,6 @@ class CameraPickerState extends State<CameraPicker>
       case FlashMode.torch:
         icon = Icons.flashlight_on;
         break;
-    }
-    if (shouldSwitchFlashMode) {
-      switchFlashesMode(flashMode: pickerConfig.flashMode);
     }
     return IconButton(
       onPressed: switchFlashesMode,
