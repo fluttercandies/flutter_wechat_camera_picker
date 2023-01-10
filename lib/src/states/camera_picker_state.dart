@@ -369,9 +369,14 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The method to switch between flash modes.
   /// 切换闪光灯模式的方法
-  Future<void> switchFlashesMode() async {
+  Future<void> switchFlashesMode(
+      {
+        FlashMode? currentFlashMode,
+        int infiniteLoopControl = 5,
+      }
+      ) async {
     final FlashMode newFlashMode;
-    switch (controller.value.flashMode) {
+    switch (currentFlashMode ?? controller.value.flashMode) {
       case FlashMode.off:
         newFlashMode = FlashMode.auto;
         break;
@@ -388,6 +393,13 @@ class CameraPickerState extends State<CameraPicker>
     try {
       await controller.setFlashMode(newFlashMode);
     } catch (e, s) {
+      // forcing unsupported flash mode push
+      if (infiniteLoopControl > 0) {
+        await switchFlashesMode(
+          currentFlashMode: newFlashMode,
+          infiniteLoopControl: infiniteLoopControl - 1,
+        );
+      }
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     }
   }
