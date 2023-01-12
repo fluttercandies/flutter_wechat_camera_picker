@@ -118,7 +118,7 @@ class CameraPickerState extends State<CameraPicker>
   /// not valid, it is removed from the list.
   /// 使用每个相机的所有闪光灯模式进行初始化。
   /// 如果闪光灯模式无效，则将其从列表中删除。
-  Map<CameraDescription, List<FlashMode>> validFlashModes =
+  final Map<CameraDescription, List<FlashMode>> validFlashModes =
       <CameraDescription, List<FlashMode>>{};
 
   ////////////////////////////////////////////////////////////////////////////
@@ -265,9 +265,6 @@ class CameraPickerState extends State<CameraPicker>
       // time initializing cameras, so available cameras should be fetched.
       if (cameraDescription == null) {
         cameras = await availableCameras();
-        if (validFlashModes.isEmpty) {
-          initFlashModes();
-        }
       }
 
       // After cameras fetched, judge again with the list is empty or not to
@@ -282,6 +279,7 @@ class CameraPickerState extends State<CameraPicker>
         );
       }
 
+      initFlashModesForCameras();
       final int preferredIndex = cameras.indexWhere(
         (CameraDescription e) =>
             e.lensDirection == pickerConfig.preferredLensDirection,
@@ -356,16 +354,18 @@ class CameraPickerState extends State<CameraPicker>
   /// Initializes the flash modes in [validFlashModes] for each
   /// [CameraDescription].
   /// 为每个 [CameraDescription] 在 [validFlashModes] 中初始化闪光灯模式。
-  void initFlashModes() {
-    // Mind the order of this list as it has an impact on the switch cycle.
-    final List<FlashMode> initFlashModes = <FlashMode>[
-      FlashMode.auto,
-      FlashMode.always,
-      FlashMode.torch,
-      FlashMode.off,
-    ];
-    for (int i = 0; i < cameras.length; i++) {
-      validFlashModes[cameras[i]] = List<FlashMode>.from(initFlashModes);
+  void initFlashModesForCameras() {
+    for (final CameraDescription camera in cameras) {
+      if (!validFlashModes.containsKey(camera)) {
+        // Mind the order of this list as it has an impact on the switch cycle.
+        // Do not use FlashMode.values.
+        validFlashModes[camera] = <FlashMode>[
+          FlashMode.auto,
+          FlashMode.always,
+          FlashMode.torch,
+          FlashMode.off,
+        ];
+      }
     }
   }
 
@@ -395,31 +395,33 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The method to switch between flash modes.
   /// 切换闪光灯模式的方法
-  Future<void> switchFlashesMode() async {
-    final List<FlashMode> validFlashModesForSelectedCamera =
-        validFlashModes[currentCamera]!;
-    if (validFlashModesForSelectedCamera.isEmpty) {
+  Future<void> switchFlashesMode(CameraValue value) async {
+    final List<FlashMode> flashModes = validFlashModes[currentCamera]!;
+    if (flashModes.isEmpty) {
       // Unlikely event that no flash mode is valid for current camera.
+      handleErrorWithHandler(
+        CameraException(
+          'No FlashMode found.',
+          'No flash modes are available with the camera.',
+        ),
+        pickerConfig.onError,
+      );
       return;
     }
-    int currentFlashModeIndex = -1;
-    for (int i = 0; i < validFlashModesForSelectedCamera.length; i++) {
-      if (validFlashModesForSelectedCamera[i] == controller.value.flashMode) {
-        currentFlashModeIndex = i;
-        break;
-      }
-    }
-    int nextFlashModeIndex = currentFlashModeIndex + 1;
-    if (nextFlashModeIndex >= validFlashModesForSelectedCamera.length) {
+    final int currentFlashModeIndex = flashModes.indexOf(value.flashMode);
+    final int nextFlashModeIndex;
+    if (currentFlashModeIndex + 1 >= flashModes.length) {
       nextFlashModeIndex = 0;
+    } else {
+      nextFlashModeIndex = currentFlashModeIndex + 1;
     }
+    final FlashMode nextFlashMode = flashModes[nextFlashModeIndex];
     try {
-      await controller
-          .setFlashMode(validFlashModesForSelectedCamera[nextFlashModeIndex]);
+      await controller.setFlashMode(nextFlashMode);
     } catch (e, s) {
-      // forcing unsupported flash mode removal
-      validFlashModesForSelectedCamera.removeAt(nextFlashModeIndex);
-      switchFlashesMode();
+      // Remove the flash mode that throws an exception.
+      validFlashModes[currentCamera]!.remove(nextFlashMode);
+      switchFlashesMode(value);
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     }
   }
@@ -895,7 +897,7 @@ class CameraPickerState extends State<CameraPicker>
         break;
     }
     return IconButton(
-      onPressed: switchFlashesMode,
+      onPressed: () => switchFlashesMode(value),
       tooltip: textDelegate.sFlashModeLabel(value.flashMode),
       icon: Icon(icon, size: 24),
     );
