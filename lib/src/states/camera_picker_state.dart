@@ -337,6 +337,8 @@ class CameraPickerState extends State<CameraPicker>
             newController
                 .getMinZoomLevel()
                 .then((double value) => minAvailableZoom = value),
+            if (pickerConfig.preferredFlashMode != FlashMode.auto)
+              newController.setFlashMode(pickerConfig.preferredFlashMode),
           ],
           eagerError: true,
         );
