@@ -139,8 +139,9 @@ class CameraPickerConfig {
   /// 摄像机在拍摄时锁定的旋转角度
   final DeviceOrientation? lockCaptureOrientation;
 
-  /// The possible flash modes that can be set for a camera.
-  /// 可以为相机设置闪光模式
+  /// Which flash mode is preferred when first using the camera,
+  /// typically with the auto mode.
+  /// 首次使用相机时首选的闪光灯，通常是自动模式。
   final FlashMode preferredFlashMode;
 
   /// {@macro wechat_camera_picker.EntitySaveCallback}
