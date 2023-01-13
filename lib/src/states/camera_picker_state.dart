@@ -114,6 +114,13 @@ class CameraPickerState extends State<CameraPicker>
   /// 但如果录像时间没有限制，定时器将不会起作用。
   Timer? recordCountdownTimer;
 
+  /// Initialized with all the flash modes for each camera. If a flash mode is
+  /// not valid, it is removed from the list.
+  /// 使用每个相机的所有闪光灯模式进行初始化。
+  /// 如果闪光灯模式无效，则将其从列表中删除。
+  final Map<CameraDescription, List<FlashMode>> validFlashModes =
+      <CameraDescription, List<FlashMode>>{};
+
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////// Global Getters //////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
@@ -276,6 +283,7 @@ class CameraPickerState extends State<CameraPicker>
         );
       }
 
+      initFlashModesForCameras();
       final int preferredIndex = cameras.indexWhere(
         (CameraDescription e) =>
             e.lensDirection == pickerConfig.preferredLensDirection,
@@ -333,6 +341,8 @@ class CameraPickerState extends State<CameraPicker>
             newController
                 .getMinZoomLevel()
                 .then((double value) => minAvailableZoom = value),
+            if (pickerConfig.preferredFlashMode != FlashMode.auto)
+              newController.setFlashMode(pickerConfig.preferredFlashMode),
           ],
           eagerError: true,
         );
@@ -345,6 +355,24 @@ class CameraPickerState extends State<CameraPicker>
         safeSetState(() {});
       }
     });
+  }
+
+  /// Initializes the flash modes in [validFlashModes] for each
+  /// [CameraDescription].
+  /// 为每个 [CameraDescription] 在 [validFlashModes] 中初始化闪光灯模式。
+  void initFlashModesForCameras() {
+    for (final CameraDescription camera in cameras) {
+      if (!validFlashModes.containsKey(camera)) {
+        // Mind the order of this list as it has an impact on the switch cycle.
+        // Do not use FlashMode.values.
+        validFlashModes[camera] = <FlashMode>[
+          FlashMode.auto,
+          FlashMode.always,
+          FlashMode.torch,
+          FlashMode.off,
+        ];
+      }
+    }
   }
 
   /// Switch cameras in order. When the [currentCameraIndex] reached the length
@@ -373,25 +401,33 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The method to switch between flash modes.
   /// 切换闪光灯模式的方法
-  Future<void> switchFlashesMode() async {
-    final FlashMode newFlashMode;
-    switch (controller.value.flashMode) {
-      case FlashMode.off:
-        newFlashMode = FlashMode.auto;
-        break;
-      case FlashMode.auto:
-        newFlashMode = FlashMode.always;
-        break;
-      case FlashMode.always:
-        newFlashMode = FlashMode.torch;
-        break;
-      case FlashMode.torch:
-        newFlashMode = FlashMode.off;
-        break;
+  Future<void> switchFlashesMode(CameraValue value) async {
+    final List<FlashMode> flashModes = validFlashModes[currentCamera]!;
+    if (flashModes.isEmpty) {
+      // Unlikely event that no flash mode is valid for current camera.
+      handleErrorWithHandler(
+        CameraException(
+          'No FlashMode found.',
+          'No flash modes are available with the camera.',
+        ),
+        pickerConfig.onError,
+      );
+      return;
     }
+    final int currentFlashModeIndex = flashModes.indexOf(value.flashMode);
+    final int nextFlashModeIndex;
+    if (currentFlashModeIndex + 1 >= flashModes.length) {
+      nextFlashModeIndex = 0;
+    } else {
+      nextFlashModeIndex = currentFlashModeIndex + 1;
+    }
+    final FlashMode nextFlashMode = flashModes[nextFlashModeIndex];
     try {
-      await controller.setFlashMode(newFlashMode);
+      await controller.setFlashMode(nextFlashMode);
     } catch (e, s) {
+      // Remove the flash mode that throws an exception.
+      validFlashModes[currentCamera]!.remove(nextFlashMode);
+      switchFlashesMode(value);
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     }
   }
@@ -867,7 +903,7 @@ class CameraPickerState extends State<CameraPicker>
         break;
     }
     return IconButton(
-      onPressed: switchFlashesMode,
+      onPressed: () => switchFlashesMode(value),
       tooltip: textDelegate.sFlashModeLabel(value.flashMode),
       icon: Icon(icon, size: 24),
     );

@@ -33,6 +33,7 @@ class CameraPickerConfig {
     this.resolutionPreset = ResolutionPreset.max,
     this.imageFormatGroup = ImageFormatGroup.unknown,
     this.preferredLensDirection = CameraLensDirection.back,
+    this.preferredFlashMode = FlashMode.auto,
     this.lockCaptureOrientation,
     this.foregroundBuilder,
     this.previewTransformBuilder,
@@ -137,6 +138,11 @@ class CameraPickerConfig {
   /// during captures.
   /// 摄像机在拍摄时锁定的旋转角度
   final DeviceOrientation? lockCaptureOrientation;
+
+  /// Which flash mode is preferred when first using the camera,
+  /// typically with the auto mode.
+  /// 首次使用相机时首选的闪光灯，通常是自动模式。
+  final FlashMode preferredFlashMode;
 
   /// {@macro wechat_camera_picker.EntitySaveCallback}
   final EntitySaveCallback? onEntitySaving;
