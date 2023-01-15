@@ -199,18 +199,14 @@ class CameraPickerState extends State<CameraPicker>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final CameraController? c = innerController;
-    if (c == null || !c.value.isInitialized) {
-      if (state == AppLifecycleState.resumed) {
-        initCameras(currentCamera);
-      }
+    if (state == AppLifecycleState.resumed) {
+      initCameras(currentCamera);
+    } else if (c == null || !c.value.isInitialized) {
       // App state changed before we got the chance to initialize.
       return;
-    }
-    if (state == AppLifecycleState.inactive) {
+    } else if (state == AppLifecycleState.inactive) {
       c.dispose();
       innerController = null;
-    } else if (state == AppLifecycleState.resumed) {
-      initCameras(currentCamera);
     }
   }
 
