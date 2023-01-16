@@ -14,6 +14,10 @@ that can be found in the LICENSE file. -->
 
 - Allow flash modes failed to switch and can move on to next when switching. (#156)
 
+### Fixes
+
+- Fix lifecycle integrations with the camera preview. (#157)
+
 ## 3.6.5
 
 ### Fixes
