@@ -13,6 +13,6 @@ dependencies:
 
   camera: 0.10.3+2
   camera_platform_interface: 2.3.2
-  path: 1.8.1
+  path: 1.8.2
   photo_manager: 2.4.0
   video_player: 2.4.5
