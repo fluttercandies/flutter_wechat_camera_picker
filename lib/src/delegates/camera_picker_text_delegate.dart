@@ -10,6 +10,7 @@ const List<CameraPickerTextDelegate> cameraPickerTextDelegates =
     <CameraPickerTextDelegate>[
   CameraPickerTextDelegate(),
   EnglishCameraPickerTextDelegate(),
+  VietnameseCameraPickerTextDelegate(),
 ];
 
 /// Obtain the text delegate from the given locale.
@@ -190,4 +191,74 @@ class EnglishCameraPickerTextDelegate extends CameraPickerTextDelegate {
   @override
   String sSwitchCameraLensDirectionLabel(CameraLensDirection value) =>
       'Switch to the ${sCameraLensDirectionLabel(value)} camera';
+}
+
+/// Text delegate implemented with Vietnamese.
+/// Dịch tiếng Việt
+class VietnameseCameraPickerTextDelegate extends CameraPickerTextDelegate {
+  const VietnameseCameraPickerTextDelegate();
+
+  @override
+  String get languageCode => 'vi';
+
+  @override
+  String get confirm => 'Xác nhận';
+
+  @override
+  String get shootingTips => 'Chạm để chụp ảnh.';
+
+  @override
+  String get shootingWithRecordingTips =>
+      'Chạm để chụp ảnh. Giữ để quay video.';
+
+  @override
+  String get shootingOnlyRecordingTips => 'Giữ để quay video.';
+
+  @override
+  String get shootingTapRecordingTips => 'Chạm để quay video.';
+
+  @override
+  String get loadFailed => 'Tải thất bại';
+
+  @override
+  String get loading => 'Đang tải...';
+
+  @override
+  String get saving => 'Đang lưu...';
+
+  @override
+  String get sActionManuallyFocusHint => 'lấy nét bằng tay';
+
+  @override
+  String get sActionPreviewHint => 'xem trước';
+
+  @override
+  String get sActionRecordHint => 'quay';
+
+  @override
+  String get sActionShootHint => 'chụp';
+
+  @override
+  String get sActionShootingButtonTooltip => 'nút chụp';
+
+  @override
+  String get sActionStopRecordingHint => 'dừng quay';
+
+  @override
+  String sCameraLensDirectionLabel(CameraLensDirection value) => value.name;
+
+  @override
+  String? sCameraPreviewLabel(CameraLensDirection? value) {
+    if (value == null) {
+      return null;
+    }
+    return 'Xem trước camera ${sCameraLensDirectionLabel(value)}';
+  }
+
+  @override
+  String sFlashModeLabel(FlashMode mode) => 'Chế độ flash: ${mode.name}';
+
+  @override
+  String sSwitchCameraLensDirectionLabel(CameraLensDirection value) =>
+      'Chuyển sang camera ${sCameraLensDirectionLabel(value)}';
 }
