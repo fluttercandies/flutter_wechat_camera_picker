@@ -49,7 +49,7 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The controller for the current camera.
   /// 当前相机实例的控制器
-  CameraController get controller => innerController!;
+  CameraController? get controller => innerController;
   CameraController? innerController;
 
   /// Available cameras.
@@ -375,8 +375,12 @@ class CameraPickerState extends State<CameraPicker>
   /// of cameras, start from the beginning.
   /// 按顺序切换相机。当达到相机数量时从头开始。
   void switchCameras() {
+    if (controller == null) {
+      return;
+    }
     // Skip switching when taking picture or recording video.
-    if (controller.value.isTakingPicture || controller.value.isRecordingVideo) {
+    if (controller!.value.isTakingPicture ||
+        controller!.value.isRecordingVideo) {
       return;
     }
     ++currentCameraIndex;
@@ -398,6 +402,9 @@ class CameraPickerState extends State<CameraPicker>
   /// The method to switch between flash modes.
   /// 切换闪光灯模式的方法
   Future<void> switchFlashesMode(CameraValue value) async {
+    if (controller == null) {
+      return;
+    }
     final List<FlashMode> flashModes = validFlashModes[currentCamera]!;
     if (flashModes.isEmpty) {
       // Unlikely event that no flash mode is valid for current camera.
@@ -419,7 +426,7 @@ class CameraPickerState extends State<CameraPicker>
     }
     final FlashMode nextFlashMode = flashModes[nextFlashModeIndex];
     try {
-      await controller.setFlashMode(nextFlashMode);
+      await controller!.setFlashMode(nextFlashMode);
     } catch (e, s) {
       // Remove the flash mode that throws an exception.
       validFlashModes[currentCamera]!.remove(nextFlashMode);
@@ -429,6 +436,9 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   Future<void> zoom(double scale) async {
+    if (controller == null) {
+      return;
+    }
     if (maxAvailableZoom == minAvailableZoom) {
       return;
     }
@@ -444,7 +454,7 @@ class CameraPickerState extends State<CameraPicker>
     }
     currentZoom = zoom;
     try {
-      await controller.setZoomLevel(currentZoom);
+      await controller!.setZoomLevel(currentZoom);
     } catch (e, s) {
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     }
@@ -483,7 +493,10 @@ class CameraPickerState extends State<CameraPicker>
   /// Use the specific [mode] to update the exposure mode.
   /// 设置曝光模式
   Future<void> switchExposureMode() async {
-    final ExposureMode mode = controller.value.exposureMode;
+    if (controller == null) {
+      return;
+    }
+    final ExposureMode mode = controller!.value.exposureMode;
     final ExposureMode newMode;
     if (mode == ExposureMode.auto) {
       newMode = ExposureMode.locked;
@@ -497,7 +510,7 @@ class CameraPickerState extends State<CameraPicker>
       });
     }
     try {
-      await controller.setExposureMode(newMode);
+      await controller!.setExposureMode(newMode);
     } catch (e, s) {
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     }
@@ -510,6 +523,9 @@ class CameraPickerState extends State<CameraPicker>
     Offset position,
     BoxConstraints constraints,
   ) async {
+    if (controller == null) {
+      return;
+    }
     isFocusPointDisplays.value = false;
     // Ignore point update when the new point is less than 8% and higher than
     // 92% of the screen's height.
@@ -524,18 +540,18 @@ class CameraPickerState extends State<CameraPicker>
     restartExposurePointDisplayTimer();
     currentExposureOffset.value = 0;
     try {
-      if (controller.value.exposureMode == ExposureMode.locked) {
-        await controller.setExposureMode(ExposureMode.auto);
+      if (controller!.value.exposureMode == ExposureMode.locked) {
+        await controller!.setExposureMode(ExposureMode.auto);
       }
       final Offset newPoint = lastExposurePoint.value!.scale(
         1 / constraints.maxWidth,
         1 / constraints.maxHeight,
       );
-      if (controller.value.exposurePointSupported) {
-        controller.setExposurePoint(newPoint);
+      if (controller!.value.exposurePointSupported) {
+        controller!.setExposurePoint(newPoint);
       }
-      if (controller.value.focusPointSupported) {
-        controller.setFocusPoint(newPoint);
+      if (controller!.value.focusPointSupported) {
+        controller!.setFocusPoint(newPoint);
       }
     } catch (e, s) {
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
@@ -545,6 +561,9 @@ class CameraPickerState extends State<CameraPicker>
   /// Update the exposure offset using the exposure controller.
   /// 使用曝光控制器更新曝光值
   Future<void> updateExposureOffset(double value) async {
+    if (controller == null) {
+      return;
+    }
     // Normalize the new exposure value if exposures have steps.
     if (exposureStep > 0) {
       final double inv = 1.0 / exposureStep;
@@ -565,7 +584,7 @@ class CameraPickerState extends State<CameraPicker>
     try {
       // Use [CameraPlatform] explicitly to reduce channel calls.
       await CameraPlatform.instance.setExposureOffset(
-        controller.cameraId,
+        controller!.cameraId,
         value,
       );
     } catch (e, s) {
@@ -584,8 +603,11 @@ class CameraPickerState extends State<CameraPicker>
     PointerMoveEvent event,
     BoxConstraints constraints,
   ) {
+    if (controller == null) {
+      return;
+    }
     lastShootingButtonPressedPosition ??= event.position;
-    if (controller.value.isRecordingVideo) {
+    if (controller!.value.isRecordingVideo) {
       // First calculate relative offset.
       final Offset offset = event.position - lastShootingButtonPressedPosition!;
       // Then turn negative,
@@ -600,18 +622,21 @@ class CameraPickerState extends State<CameraPicker>
   /// and the camera is not taking pictures.
   /// 仅当初始化成功且相机未在拍照时拍照。
   Future<void> takePicture() async {
-    if (!controller.value.isInitialized) {
+    if (controller == null) {
+      return;
+    }
+    if (!controller!.value.isInitialized) {
       handleErrorWithHandler(
         StateError('Camera has not initialized.'),
         pickerConfig.onError,
       );
     }
-    if (controller.value.isTakingPicture) {
+    if (controller!.value.isTakingPicture) {
       return;
     }
     try {
-      final XFile file = await controller.takePicture();
-      await controller.pausePreview();
+      final XFile file = await controller!.takePicture();
+      await controller!.pausePreview();
       final bool? isCapturedFileHandled = pickerConfig.onXFileCaptured?.call(
         file,
         CameraPickerViewType.image,
@@ -627,7 +652,7 @@ class CameraPickerState extends State<CameraPicker>
         Navigator.of(context).pop(entity);
         return;
       }
-      await controller.resumePreview();
+      await controller!.resumePreview();
     } catch (e) {
       realDebugPrint('Error when preview the captured file: $e');
       handleErrorWithHandler(e, pickerConfig.onError);
@@ -658,13 +683,16 @@ class CameraPickerState extends State<CameraPicker>
   /// 这个方法会赋值给 [buildCaptureButton] 中的 [Listener]。当按钮释放了点击后，定时器
   /// 将被取消，并且状态会重置。
   void recordDetectionCancel(PointerUpEvent event) {
+    if (controller == null) {
+      return;
+    }
     recordDetectTimer?.cancel();
     if (isShootingButtonAnimate) {
       safeSetState(() {
         isShootingButtonAnimate = false;
       });
     }
-    if (controller.value.isRecordingVideo) {
+    if (controller!.value.isRecordingVideo) {
       lastShootingButtonPressedPosition = null;
       safeSetState(() {});
       stopRecordingVideo();
@@ -674,11 +702,14 @@ class CameraPickerState extends State<CameraPicker>
   /// Set record file path and start recording.
   /// 设置拍摄文件路径并开始录制视频
   Future<void> startRecordingVideo() async {
-    if (controller.value.isRecordingVideo) {
+    if (controller == null) {
+      return;
+    }
+    if (controller!.value.isRecordingVideo) {
       return;
     }
     try {
-      await controller.startVideoRecording();
+      await controller!.startVideoRecording();
       if (isRecordingRestricted) {
         recordCountdownTimer =
             Timer(pickerConfig.maximumRecordingDuration!, () {
@@ -687,12 +718,12 @@ class CameraPickerState extends State<CameraPicker>
       }
     } catch (e, s) {
       realDebugPrint('Error when start recording video: $e');
-      if (!controller.value.isRecordingVideo) {
+      if (!controller!.value.isRecordingVideo) {
         handleErrorWithHandler(e, pickerConfig.onError, s: s);
         return;
       }
       try {
-        await controller.stopVideoRecording();
+        await controller!.stopVideoRecording();
       } catch (e, s) {
         realDebugPrint(
           'Error when stop recording video after an error start: $e',
@@ -709,13 +740,16 @@ class CameraPickerState extends State<CameraPicker>
   /// Stop the recording process.
   /// 停止录制视频
   Future<void> stopRecordingVideo() async {
+    if (controller == null) {
+      return;
+    }
     void handleError() {
       recordCountdownTimer?.cancel();
       isShootingButtonAnimate = false;
       safeSetState(() {});
     }
 
-    if (!controller.value.isRecordingVideo) {
+    if (!controller!.value.isRecordingVideo) {
       handleError();
       return;
     }
@@ -723,8 +757,8 @@ class CameraPickerState extends State<CameraPicker>
       isShootingButtonAnimate = false;
     });
     try {
-      final XFile file = await controller.stopVideoRecording();
-      await controller.pausePreview();
+      final XFile file = await controller!.stopVideoRecording();
+      await controller!.pausePreview();
       final bool? isCapturedFileHandled = pickerConfig.onXFileCaptured?.call(
         file,
         CameraPickerViewType.video,
@@ -739,7 +773,7 @@ class CameraPickerState extends State<CameraPicker>
       if (entity != null) {
         Navigator.of(context).pop(entity);
       } else {
-        await controller.resumePreview();
+        await controller!.resumePreview();
       }
     } catch (e, s) {
       realDebugPrint('Error when stop recording video: $e');
@@ -1253,6 +1287,9 @@ class CameraPickerState extends State<CameraPicker>
     required DeviceOrientation orientation,
     required BoxConstraints constraints,
   }) {
+    if (controller == null) {
+      return Container();
+    }
     Widget preview = Listener(
       onPointerDown: (_) => pointers++,
       onPointerUp: (_) => pointers--,
@@ -1263,7 +1300,7 @@ class CameraPickerState extends State<CameraPicker>
         // Enabled cameras switching by default if we have multiple cameras.
         onDoubleTap: cameras.length > 1 ? switchCameras : null,
         child: innerController != null
-            ? CameraPreview(controller)
+            ? CameraPreview(controller!)
             : const SizedBox.shrink(),
       ),
     );
@@ -1272,14 +1309,14 @@ class CameraPickerState extends State<CameraPicker>
     final Widget? transformedWidget =
         pickerConfig.previewTransformBuilder?.call(
       context,
-      controller,
+      controller!,
       preview,
     );
     preview = Center(child: transformedWidget ?? preview);
     // Scale the preview if the config is enabled.
     if (pickerConfig.enableScaledPreview) {
       preview = Transform.scale(
-        scale: effectiveCameraScale(constraints, controller),
+        scale: effectiveCameraScale(constraints, controller!),
         child: preview,
       );
     }
@@ -1302,7 +1339,7 @@ class CameraPickerState extends State<CameraPicker>
       return const SizedBox.shrink();
     }
     return ValueListenableBuilder<CameraValue>(
-      valueListenable: controller,
+      valueListenable: controller!,
       builder: (_, CameraValue value, Widget? w) {
         if (isInitialized?.call() ?? value.isInitialized) {
           return builder(value, w);
