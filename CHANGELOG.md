@@ -4,6 +4,12 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.7.1
+
+### New features
+
+- Add Vietnamese language text delegate. (#166).
+
 ## 3.7.0
 
 ### New features

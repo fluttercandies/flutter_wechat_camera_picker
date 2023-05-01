@@ -245,7 +245,16 @@ class VietnameseCameraPickerTextDelegate extends CameraPickerTextDelegate {
   String get sActionStopRecordingHint => 'dừng quay';
 
   @override
-  String sCameraLensDirectionLabel(CameraLensDirection value) => value.name;
+  String sCameraLensDirectionLabel(CameraLensDirection value) {
+    switch (value) {
+      case CameraLensDirection.front:
+        return 'trước';
+      case CameraLensDirection.back:
+        return 'sau';
+      case CameraLensDirection.external:
+        return 'ngoài';
+    }
+  }
 
   @override
   String? sCameraPreviewLabel(CameraLensDirection? value) {
@@ -255,8 +264,24 @@ class VietnameseCameraPickerTextDelegate extends CameraPickerTextDelegate {
     return 'Xem trước camera ${sCameraLensDirectionLabel(value)}';
   }
 
-  @override
-  String sFlashModeLabel(FlashMode mode) => 'Chế độ flash: ${mode.name}';
+  String sFlashModeLabel(FlashMode mode) {
+    final String modeString;
+    switch (mode) {
+      case FlashMode.off:
+        modeString = 'Tắt';
+        break;
+      case FlashMode.auto:
+        modeString = 'Tự động';
+        break;
+      case FlashMode.always:
+        modeString = 'Luôn bật đèn flash khi chụp ảnh';
+        break;
+      case FlashMode.torch:
+        modeString = 'Luôn bật đèn flash';
+        break;
+    }
+    return 'Chế độ đèn flash: $modeString';
+  }
 
   @override
   String sSwitchCameraLensDirectionLabel(CameraLensDirection value) =>
