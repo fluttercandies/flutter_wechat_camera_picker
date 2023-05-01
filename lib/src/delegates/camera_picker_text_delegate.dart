@@ -264,6 +264,7 @@ class VietnameseCameraPickerTextDelegate extends CameraPickerTextDelegate {
     return 'Xem trước camera ${sCameraLensDirectionLabel(value)}';
   }
 
+  @override
   String sFlashModeLabel(FlashMode mode) {
     final String modeString;
     switch (mode) {
