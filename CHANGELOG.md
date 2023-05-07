@@ -10,6 +10,10 @@ that can be found in the LICENSE file. -->
 
 - Add Vietnamese language text delegate. (#166).
 
+### Improvements
+
+- Hide the loading widget in the preview until an actual saving process has been invoked.
+
 ## 3.7.0
 
 ### New features
