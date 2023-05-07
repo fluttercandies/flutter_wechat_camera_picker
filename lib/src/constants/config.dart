@@ -105,8 +105,8 @@ class CameraPickerConfig {
   /// 默认为 15 秒，可以使用 `null` 来设置无限制的视频录制
   final Duration? maximumRecordingDuration;
 
-  /// The maximum duration of the video recording process.
-  /// 录制视频最短时长
+  /// The minimum duration of the video recording process.
+  /// 录制视频最短时长。
   ///
   /// Defaults to and cannot be lower than 1 second.
   /// 默认且不能少于 1 秒。

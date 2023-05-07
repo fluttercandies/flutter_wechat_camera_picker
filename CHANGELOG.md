@@ -9,6 +9,7 @@ that can be found in the LICENSE file. -->
 ### New features
 
 - Add Vietnamese language text delegate. (#166).
+- Add `CameraPickerConfig.minimumRecordingDuration`. (#168)
 
 ### Improvements
 
