@@ -114,6 +114,11 @@ class CameraPickerState extends State<CameraPicker>
   /// 但如果录像时间没有限制，定时器将不会起作用。
   Timer? recordCountdownTimer;
 
+  /// The [Stopwatch] to monitor if the record has reached
+  /// the minimum record duration requirement.
+  /// 录像时长计时器，用来检测是否达到了最短录制时长。
+  final Stopwatch recordStopwatch = Stopwatch();
+
   /// Initialized with all the flash modes for each camera. If a flash mode is
   /// not valid, it is removed from the list.
   /// 使用每个相机的所有闪光灯模式进行初始化。
@@ -150,6 +155,20 @@ class CameraPickerState extends State<CameraPicker>
   /// 录像是否有限制的时长
   bool get isRecordingRestricted =>
       pickerConfig.maximumRecordingDuration != null;
+
+  /// The minimum recording duration limit.
+  /// 录制视频的最短时长限制。
+  ///
+  /// If the maximum duration is less than the minimum, use the maximum instead.
+  /// 如果最大时长大于最小时长，则使用最大时长。
+  Duration get minimumRecordingDuration {
+    if (pickerConfig.maximumRecordingDuration != null &&
+        pickerConfig.maximumRecordingDuration! <
+            pickerConfig.minimumRecordingDuration) {
+      return pickerConfig.maximumRecordingDuration!;
+    }
+    return pickerConfig.minimumRecordingDuration;
+  }
 
   /// A getter to the current [CameraDescription].
   /// 获取当前相机实例
@@ -680,11 +699,14 @@ class CameraPickerState extends State<CameraPicker>
     try {
       await controller.startVideoRecording();
       if (isRecordingRestricted) {
-        recordCountdownTimer =
-            Timer(pickerConfig.maximumRecordingDuration!, () {
-          stopRecordingVideo();
-        });
+        recordCountdownTimer = Timer(
+          pickerConfig.maximumRecordingDuration!,
+          stopRecordingVideo,
+        );
       }
+      recordStopwatch
+        ..reset()
+        ..start();
     } catch (e, s) {
       realDebugPrint('Error when start recording video: $e');
       if (!controller.value.isRecordingVideo) {
@@ -701,6 +723,7 @@ class CameraPickerState extends State<CameraPicker>
         isShootingButtonAnimate = false;
         handleErrorWithHandler(e, pickerConfig.onError, s: s);
       }
+      recordStopwatch.stop();
     } finally {
       safeSetState(() {});
     }
@@ -715,6 +738,7 @@ class CameraPickerState extends State<CameraPicker>
       safeSetState(() {});
     }
 
+    recordStopwatch.stop();
     if (!controller.value.isRecordingVideo) {
       handleError();
       return;
@@ -724,6 +748,10 @@ class CameraPickerState extends State<CameraPicker>
     });
     try {
       final XFile file = await controller.stopVideoRecording();
+      if (recordStopwatch.elapsed < minimumRecordingDuration) {
+        pickerConfig.onMinimumRecordDurationNotMet?.call();
+        return;
+      }
       await controller.pausePreview();
       final bool? isCapturedFileHandled = pickerConfig.onXFileCaptured?.call(
         file,
