@@ -26,6 +26,7 @@ analyzer:
     missing_return: warning
     # allow having TODO comments in the code
     todo: ignore
+    deprecated_member_use: ignore
 
 linter:
   rules:
