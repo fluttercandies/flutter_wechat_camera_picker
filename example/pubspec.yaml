@@ -1,11 +1,11 @@
 name: wechat_camera_picker_demo
 description: A new Flutter project.
-version: 3.7.0+22
+version: 3.8.0+23
 publish_to: none
 
 environment:
-  sdk: ">=2.14.0 <3.0.0"
-  flutter: ">=2.5.0"
+  sdk: ">=2.15.0 <3.0.0"
+  flutter: ">=2.8.0"
 
 dependencies:
   flutter:
@@ -16,7 +16,7 @@ dependencies:
   wechat_camera_picker:
     path: ../
 
-  package_info_plus: ^1.4.2
+  package_info_plus: ^4.0.0
   video_player: ^2.3.0
 
 flutter:
