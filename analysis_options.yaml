@@ -178,7 +178,7 @@ linter:
     - provide_deprecation_message
     # - public_member_api_docs # enabled on a case-by-case basis; see e.g. packages/analysis_options.yaml
     - recursive_getters
-    # - require_trailing_commas # blocked on https://github.com/dart-lang/sdk/issues/47441
+    - require_trailing_commas
     - secure_pubspec_urls
     - sized_box_for_whitespace
     # - sized_box_shrink_expand # not yet tested

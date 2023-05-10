@@ -2,7 +2,6 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
-// ignore_for_file: deprecated_member_use
 import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
@@ -187,22 +186,11 @@ class CameraPickerState extends State<CameraPicker>
     ambiguate(WidgetsBinding.instance)?.addObserver(this);
     Constants.textDelegate = widget.pickerConfig.textDelegate ??
         cameraPickerTextDelegateFromLocale(widget.locale);
-
-    // TODO(Alex): Currently hide status bar will cause the viewport shaking on Android.
-    /// Hide system status bar automatically when the platform is not Android.
-    /// 在非 Android 设备上自动隐藏状态栏
-    if (!Platform.isAndroid) {
-      SystemChrome.setEnabledSystemUIOverlays(<SystemUiOverlay>[]);
-    }
-
     initCameras();
   }
 
   @override
   void dispose() {
-    if (!Platform.isAndroid) {
-      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    }
     ambiguate(WidgetsBinding.instance)?.removeObserver(this);
     innerController?.dispose();
     currentExposureOffset.dispose();

@@ -14,6 +14,7 @@ that can be found in the LICENSE file. -->
 ### Improvements
 
 - Hide the loading widget in the preview until an actual saving process has been invoked.
+- Remove the implied system UI overlay manipulations.
 
 ## 3.7.0
 
