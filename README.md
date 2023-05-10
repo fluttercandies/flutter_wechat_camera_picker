@@ -60,7 +60,7 @@ and `photo_manager` for asset implementation.
 
 ### Version constraints
 
-Flutter SDK: `>=2.2.0` .
+Flutter SDK: `>=2.8.0` .
 
 ### Setup
 

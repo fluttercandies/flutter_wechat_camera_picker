@@ -15,6 +15,7 @@ that can be found in the LICENSE file. -->
 
 - Hide the loading widget in the preview until an actual saving process has been invoked.
 - Remove the implied system UI overlay manipulations.
+- Raise the lowest SDK constraint to 2.8.0.
 
 ## 3.7.0
 

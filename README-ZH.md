@@ -58,7 +58,7 @@ Language: [English](README.md) | 中文简体
 
 ### 版本限制
 
-Flutter SDK：`>=2.2.0` 。
+Flutter SDK：`>=2.8.0` 。
 
 ### 配置
 
