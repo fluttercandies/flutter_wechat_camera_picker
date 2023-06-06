@@ -60,7 +60,7 @@ and `photo_manager` for asset implementation.
 
 ### Version constraints
 
-Flutter SDK: `>=2.2.0` .
+Flutter SDK: `>=2.8.0` .
 
 ### Setup
 
@@ -104,31 +104,33 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 
 Fields in `CameraPickerConfig`:
 
-| Name                         | Type                        | Description                                                                                           | Default Value                              |
-|------------------------------|-----------------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------|
-| enableRecording              | `bool`                      | Whether the picker can record video.                                                                  | `false`                                    |
-| onlyEnableRecording          | `bool`                      | Whether the picker can only record video. Only available when `enableRecording` is `true `.           | `false`                                    |
-| enableTapRecording           | `bool`                      | Whether allow the record can start with single tap. Only available when `enableRecording` is `true `. | `false`                                    |
-| enableAudio                  | `bool`                      | Whether Whether the picker should record audio. Only available with recording.                        | `true`                                     |
-| enableSetExposure            | `bool`                      | Whether users can set the exposure point by tapping.                                                  | `true`                                     |
-| enableExposureControlOnPoint | `bool`                      | Whether users can adjust exposure according to the set point.                                         | `true`                                     |
-| enablePinchToZoom            | `bool`                      | Whether users can zoom the camera by pinch.                                                           | `true`                                     |
-| enablePullToZoomInRecord     | `bool`                      | Whether users can zoom by pulling up when recording video.                                            | `true`                                     |
-| shouldDeletePreviewFile      | `bool`                      | Whether the preview file will be delete when pop.                                                     | `false`                                    |
-| shouldAutoPreviewVideo       | `bool`                      | Whether the video should be played instantly in the preview.                                          | `false`                                    |
-| maximumRecordingDuration     | `Duration`                  | The maximum duration of the video recording process.                                                  | `const Duration(seconds: 15)`              |
-| theme                        | `ThemeData?`                | Theme data for the picker.                                                                            | `CameraPicker.themeData(wechatThemeColor)` |
-| textDelegate                 | `CameraPickerTextDelegate?` | Text delegate that controls text in widgets.                                                          | `CameraPickerTextDelegate`                 |
-| resolutionPreset             | `ResolutionPreset`          | Present resolution for the camera.                                                                    | `ResolutionPreset.max`                     |
-| cameraQuarterTurns           | `int`                       | The number of clockwise quarter turns the camera view should be rotated.                              | `0`                                        |
-| imageFormatGroup             | `ImageFormatGroup`          | Describes the output of the raw image format.                                                         | `ImageFormatGroup.unknown`                 |
-| preferredLensDirection       | `CameraLensDirection`       | Which lens direction is preferred when first using the camera.                                        | `CameraLensDirection.back`                 |
-| lockCaptureOrientation       | `DeviceOrientation?`        | Whether the camera should be locked to the specific orientation during captures.                      | null                                       |
-| foregroundBuilder            | `ForegroundBuilder?`        | The foreground widget builder which will cover the whole camera preview.                              | null                                       |
-| previewTransformBuilder      | `PreviewTransformBuilder?`  | The widget builder which will transform the camera preview.                                           | null                                       |
-| onEntitySaving               | `EntitySaveCallback?`       | The callback type define for saving entity in the viewer.                                             | null                                       |
-| onError                      | `CameraErrorHandler?`       | The error handler when any error occurred during the picking process.                                 | null                                       |
-| onXFileCaptured              | `XFileCapturedCallback?`    | The callback type definition when the XFile is captured by the camera.                                | null                                       |
+| Name                          | Type                        | Description                                                                                           | Default Value                              |
+|-------------------------------|-----------------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| enableRecording               | `bool`                      | Whether the picker can record video.                                                                  | `false`                                    |
+| onlyEnableRecording           | `bool`                      | Whether the picker can only record video. Only available when `enableRecording` is `true `.           | `false`                                    |
+| enableTapRecording            | `bool`                      | Whether allow the record can start with single tap. Only available when `enableRecording` is `true `. | `false`                                    |
+| enableAudio                   | `bool`                      | Whether Whether the picker should record audio. Only available with recording.                        | `true`                                     |
+| enableSetExposure             | `bool`                      | Whether users can set the exposure point by tapping.                                                  | `true`                                     |
+| enableExposureControlOnPoint  | `bool`                      | Whether users can adjust exposure according to the set point.                                         | `true`                                     |
+| enablePinchToZoom             | `bool`                      | Whether users can zoom the camera by pinch.                                                           | `true`                                     |
+| enablePullToZoomInRecord      | `bool`                      | Whether users can zoom by pulling up when recording video.                                            | `true`                                     |
+| shouldDeletePreviewFile       | `bool`                      | Whether the preview file will be delete when pop.                                                     | `false`                                    |
+| shouldAutoPreviewVideo        | `bool`                      | Whether the video should be played instantly in the preview.                                          | `false`                                    |
+| maximumRecordingDuration      | `Duration?`                 | The maximum duration of the video recording process.                                                  | `const Duration(seconds: 15)`              |
+| minimumRecordingDuration      | `Duration`                  | The minimum duration of the video recording process.                                                  | `const Duration(seconds: 1)`               |
+| theme                         | `ThemeData?`                | Theme data for the picker.                                                                            | `CameraPicker.themeData(wechatThemeColor)` |
+| textDelegate                  | `CameraPickerTextDelegate?` | Text delegate that controls text in widgets.                                                          | `CameraPickerTextDelegate`                 |
+| resolutionPreset              | `ResolutionPreset`          | Present resolution for the camera.                                                                    | `ResolutionPreset.max`                     |
+| cameraQuarterTurns            | `int`                       | The number of clockwise quarter turns the camera view should be rotated.                              | `0`                                        |
+| imageFormatGroup              | `ImageFormatGroup`          | Describes the output of the raw image format.                                                         | `ImageFormatGroup.unknown`                 |
+| preferredLensDirection        | `CameraLensDirection`       | Which lens direction is preferred when first using the camera.                                        | `CameraLensDirection.back`                 |
+| lockCaptureOrientation        | `DeviceOrientation?`        | Whether the camera should be locked to the specific orientation during captures.                      | null                                       |
+| foregroundBuilder             | `ForegroundBuilder?`        | The foreground widget builder which will cover the whole camera preview.                              | null                                       |
+| previewTransformBuilder       | `PreviewTransformBuilder?`  | The widget builder which will transform the camera preview.                                           | null                                       |
+| onEntitySaving                | `EntitySaveCallback?`       | The callback type define for saving entity in the viewer.                                             | null                                       |
+| onError                       | `CameraErrorHandler?`       | The error handler when any error occurred during the picking process.                                 | null                                       |
+| onXFileCaptured               | `XFileCapturedCallback?`    | The callback type definition when the XFile is captured by the camera.                                | null                                       |
+| onMinimumRecordDurationNotMet | `VoidCallback?`             | The callback when the recording is not met the minimum recording duration.                            | null                                       |
 
 ### Using custom `State`s
 
@@ -156,19 +158,22 @@ Thank goes to these wonderful people ([emoji key](https://allcontributors.org/do
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 <table>
-  <tr>
-    <td align="center"><a href="https://blog.alexv525.com"><img src="https://avatars1.githubusercontent.com/u/15884415?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Alex Li</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=AlexV525" title="Code">💻</a> <a href="#design-AlexV525" title="Design">🎨</a> <a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=AlexV525" title="Documentation">📖</a> <a href="#example-AlexV525" title="Examples">💡</a> <a href="#ideas-AlexV525" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-AlexV525" title="Maintenance">🚧</a> <a href="#question-AlexV525" title="Answering Questions">💬</a> <a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/pulls?q=is%3Apr+reviewed-by%3AAlexV525" title="Reviewed Pull Requests">👀</a></td>
-    <td align="center"><a href="https://www.kikt.top"><img src="https://avatars0.githubusercontent.com/u/14145407?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Caijinglong</b></sub></a><br /><a href="#example-CaiJingLong" title="Examples">💡</a> <a href="#ideas-CaiJingLong" title="Ideas, Planning, & Feedback">🤔</a></td>
-    <td align="center"><a href="https://github.com/LaelLuo"><img src="https://avatars3.githubusercontent.com/u/26056971?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Lael</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=LaelLuo" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/mjl0602"><img src="https://avatars1.githubusercontent.com/u/32868496?v=4?s=50" width="50px;" alt=""/><br /><sub><b>mjl0602</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=mjl0602" title="Code">💻</a> <a href="#ideas-mjl0602" title="Ideas, Planning, & Feedback">🤔</a></td>
-    <td align="center"><a href="https://github.com/siyukok"><img src="https://avatars0.githubusercontent.com/u/21030561?v=4?s=50" width="50px;" alt=""/><br /><sub><b>AliasWang</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=siyukok" title="Code">💻</a> <a href="#ideas-siyukok" title="Ideas, Planning, & Feedback">🤔</a></td>
-    <td align="center"><a href="https://github.com/leftcoding"><img src="https://avatars.githubusercontent.com/u/7122926?v=4?s=50" width="50px;" alt=""/><br /><sub><b>leftcoding</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/issues?q=author%3Aleftcoding" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://github.com/TheVinhLuong"><img src="https://avatars.githubusercontent.com/u/20371879?v=4?s=50" width="50px;" alt=""/><br /><sub><b>Luong The Vinh</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=TheVinhLuong" title="Code">💻</a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://github.com/luomo-pro"><img src="https://avatars.githubusercontent.com/u/41097395?v=4?s=50" width="50px;" alt=""/><br /><sub><b>luomo-pro</b></sub></a><br /><a href="#a11y-luomo-pro" title="Accessibility">️️️️♿️</a> <a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/issues?q=author%3Aluomo-pro" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://github.com/ZhuBoao"><img src="https://avatars.githubusercontent.com/u/17305573?v=4?s=50" width="50px;" alt=""/><br /><sub><b>LeonardoZhu</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=ZhuBoao" title="Code">💻</a></td>
-  </tr>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://blog.alexv525.com"><img src="https://avatars1.githubusercontent.com/u/15884415?v=4?s=50" width="50px;" alt="Alex Li"/><br /><sub><b>Alex Li</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=AlexV525" title="Code">💻</a> <a href="#design-AlexV525" title="Design">🎨</a> <a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=AlexV525" title="Documentation">📖</a> <a href="#example-AlexV525" title="Examples">💡</a> <a href="#ideas-AlexV525" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-AlexV525" title="Maintenance">🚧</a> <a href="#question-AlexV525" title="Answering Questions">💬</a> <a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/pulls?q=is%3Apr+reviewed-by%3AAlexV525" title="Reviewed Pull Requests">👀</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.kikt.top"><img src="https://avatars0.githubusercontent.com/u/14145407?v=4?s=50" width="50px;" alt="Caijinglong"/><br /><sub><b>Caijinglong</b></sub></a><br /><a href="#example-CaiJingLong" title="Examples">💡</a> <a href="#ideas-CaiJingLong" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/LaelLuo"><img src="https://avatars3.githubusercontent.com/u/26056971?v=4?s=50" width="50px;" alt="Lael"/><br /><sub><b>Lael</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=LaelLuo" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mjl0602"><img src="https://avatars1.githubusercontent.com/u/32868496?v=4?s=50" width="50px;" alt="mjl0602"/><br /><sub><b>mjl0602</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=mjl0602" title="Code">💻</a> <a href="#ideas-mjl0602" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/siyukok"><img src="https://avatars0.githubusercontent.com/u/21030561?v=4?s=50" width="50px;" alt="AliasWang"/><br /><sub><b>AliasWang</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=siyukok" title="Code">💻</a> <a href="#ideas-siyukok" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/leftcoding"><img src="https://avatars.githubusercontent.com/u/7122926?v=4?s=50" width="50px;" alt="leftcoding"/><br /><sub><b>leftcoding</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/issues?q=author%3Aleftcoding" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/TheVinhLuong"><img src="https://avatars.githubusercontent.com/u/20371879?v=4?s=50" width="50px;" alt="Luong The Vinh"/><br /><sub><b>Luong The Vinh</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=TheVinhLuong" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/luomo-pro"><img src="https://avatars.githubusercontent.com/u/41097395?v=4?s=50" width="50px;" alt="luomo-pro"/><br /><sub><b>luomo-pro</b></sub></a><br /><a href="#a11y-luomo-pro" title="Accessibility">️️️️♿️</a> <a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/issues?q=author%3Aluomo-pro" title="Bug reports">🐛</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZhuBoao"><img src="https://avatars.githubusercontent.com/u/17305573?v=4?s=50" width="50px;" alt="LeonardoZhu"/><br /><sub><b>LeonardoZhu</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=ZhuBoao" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/loinp"><img src="https://avatars.githubusercontent.com/u/34020090?v=4?s=50" width="50px;" alt="Nguyen Phuc Loi"/><br /><sub><b>Nguyen Phuc Loi</b></sub></a><br /><a href="#translation-nploi" title="Translation">🌍</a></td>
+    </tr>
+  </tbody>
 </table>
 
 <!-- markdownlint-restore -->

@@ -4,6 +4,19 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+## 3.8.0
+
+### New features
+
+- Add Vietnamese language text delegate. (#166).
+- Add `CameraPickerConfig.minimumRecordingDuration`. (#168)
+
+### Improvements
+
+- Hide the loading widget in the preview until an actual saving process has been invoked.
+- Remove the implied system UI overlay manipulations.
+- Raise the lowest SDK constraint to 2.8.0.
+
 ## 3.7.0
 
 ### New features

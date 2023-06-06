@@ -370,7 +370,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
         children: <Widget>[
           buildPreview(context),
           buildForeground(context),
-          buildLoading(context),
+          if (isSavingEntity) buildLoading(context),
         ],
       ),
     );

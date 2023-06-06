@@ -39,7 +39,7 @@ class _PreviewAssetWidgetState extends State<PreviewAssetWidget> {
   Future<void> _initializeController() async {
     final String? url = await widget.asset.getMediaUrl();
     if (url == null) {
-      _error = NullThrownError();
+      _error = StateError('The media URL of the preview asset is null.');
       return;
     }
     final VideoPlayerController controller;
