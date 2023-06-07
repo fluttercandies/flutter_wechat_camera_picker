@@ -183,7 +183,7 @@ class CameraPickerState extends State<CameraPicker>
   @override
   void initState() {
     super.initState();
-    ambiguate(WidgetsBinding.instance)?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     Constants.textDelegate = widget.pickerConfig.textDelegate ??
         cameraPickerTextDelegateFromLocale(widget.locale);
     initCameras();
@@ -191,7 +191,7 @@ class CameraPickerState extends State<CameraPicker>
 
   @override
   void dispose() {
-    ambiguate(WidgetsBinding.instance)?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     innerController?.dispose();
     currentExposureOffset.dispose();
     lastExposurePoint.dispose();
@@ -244,14 +244,7 @@ class CameraPickerState extends State<CameraPicker>
   /// Initialize cameras instances.
   /// 初始化相机实例
   Future<void> initCameras([CameraDescription? cameraDescription]) async {
-    // Save the current controller to a local variable.
-    final CameraController? c = innerController;
-    // Dispose at last to avoid disposed usage with assertions.
-    if (c != null) {
-      innerController = null;
-      await c.dispose();
-    }
-    // Then request a new frame to unbind the controller from elements.
+    // Request a new frame to unbind the controller from elements.
     safeSetState(() {
       maxAvailableZoom = 1;
       minAvailableZoom = 1;
@@ -267,7 +260,7 @@ class CameraPickerState extends State<CameraPicker>
     });
     // **IMPORTANT**: Push methods into a post frame callback, which ensures the
     // controller has already unbind from widgets.
-    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // When the [cameraDescription] is null, which means this is the first
       // time initializing cameras, so available cameras should be fetched.
       if (cameraDescription == null) {
@@ -292,23 +285,32 @@ class CameraPickerState extends State<CameraPicker>
             e.lensDirection == pickerConfig.preferredLensDirection,
       );
       final int index;
-      if (preferredIndex != -1 && c == null) {
+      if (preferredIndex != -1 && innerController == null) {
         index = preferredIndex;
         currentCameraIndex = preferredIndex;
       } else {
         index = currentCameraIndex;
       }
       // Initialize the controller with the given resolution preset.
-      final CameraController newController = CameraController(
-        cameraDescription ?? cameras[index],
-        pickerConfig.resolutionPreset,
-        enableAudio: enableAudio,
-        imageFormatGroup: pickerConfig.imageFormatGroup,
-      );
+      CameraController cameraController;
+      if (innerController == null) {
+        cameraController = CameraController(
+          cameraDescription ?? cameras[index],
+          pickerConfig.resolutionPreset,
+          enableAudio: enableAudio,
+          imageFormatGroup: pickerConfig.imageFormatGroup,
+        );
+      } else {
+        cameraController = innerController!;
+      }
 
       try {
         final Stopwatch stopwatch = Stopwatch()..start();
-        await newController.initialize();
+        if (innerController == null) {
+          await cameraController.initialize();
+        } else {
+          cameraController.setDescription(cameraDescription ?? cameras[index]);
+        }
         stopwatch.stop();
         realDebugPrint("${stopwatch.elapsed} for controller's initialization.");
         // Call recording preparation first.
@@ -316,7 +318,7 @@ class CameraPickerState extends State<CameraPicker>
           stopwatch
             ..reset()
             ..start();
-          await newController.prepareForVideoRecording();
+          await cameraController.prepareForVideoRecording();
           stopwatch.stop();
           realDebugPrint("${stopwatch.elapsed} for recording's preparation.");
         }
@@ -324,34 +326,31 @@ class CameraPickerState extends State<CameraPicker>
         stopwatch
           ..reset()
           ..start();
-        await Future.wait(
-          <Future<void>>[
-            if (pickerConfig.lockCaptureOrientation != null)
-              newController
-                  .lockCaptureOrientation(pickerConfig.lockCaptureOrientation),
-            newController
-                .getExposureOffsetStepSize()
-                .then((double value) => exposureStep = value),
-            newController
-                .getMaxExposureOffset()
-                .then((double value) => maxAvailableExposureOffset = value),
-            newController
-                .getMinExposureOffset()
-                .then((double value) => minAvailableExposureOffset = value),
-            newController
-                .getMaxZoomLevel()
-                .then((double value) => maxAvailableZoom = value),
-            newController
-                .getMinZoomLevel()
-                .then((double value) => minAvailableZoom = value),
-            if (pickerConfig.preferredFlashMode != FlashMode.auto)
-              newController.setFlashMode(pickerConfig.preferredFlashMode),
-          ],
-          eagerError: true,
-        );
+        if (pickerConfig.lockCaptureOrientation != null) {
+          await cameraController
+              .lockCaptureOrientation(pickerConfig.lockCaptureOrientation);
+        }
+        await cameraController
+            .getExposureOffsetStepSize()
+            .then((double value) => exposureStep = value);
+        await cameraController
+            .getMaxExposureOffset()
+            .then((double value) => maxAvailableExposureOffset = value);
+        await cameraController
+            .getMinExposureOffset()
+            .then((double value) => minAvailableExposureOffset = value);
+        await cameraController
+            .getMaxZoomLevel()
+            .then((double value) => maxAvailableZoom = value);
+        await cameraController
+            .getMinZoomLevel()
+            .then((double value) => minAvailableZoom = value);
+        if (pickerConfig.preferredFlashMode != FlashMode.auto) {
+          await cameraController.setFlashMode(pickerConfig.preferredFlashMode);
+        }
         stopwatch.stop();
         realDebugPrint("${stopwatch.elapsed} for config's update.");
-        innerController = newController;
+        innerController ??= cameraController;
       } catch (e, s) {
         handleErrorWithHandler(e, pickerConfig.onError, s: s);
       } finally {
