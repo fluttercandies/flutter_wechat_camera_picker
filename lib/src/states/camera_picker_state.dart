@@ -53,7 +53,7 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Available cameras.
   /// 可用的相机实例
-  late final List<CameraDescription> cameras;
+  late List<CameraDescription> cameras;
 
   /// Current exposure offset.
   /// 当前曝光值
