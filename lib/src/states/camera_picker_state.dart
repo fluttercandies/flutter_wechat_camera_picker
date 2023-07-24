@@ -869,7 +869,8 @@ class CameraPickerState extends State<CameraPicker>
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: <Widget>[
-              if (cameras.length > 1) buildCameraSwitch(context),
+              if (innerController?.value.isRecordingVideo != true)
+                buildBackButton(context),
               const Spacer(),
               buildFlashModeSwitch(context, v),
             ],
@@ -962,37 +963,28 @@ class CameraPickerState extends State<CameraPicker>
       height: 118,
       child: Row(
         children: <Widget>[
-          if (controller?.value.isRecordingVideo != true)
-            Expanded(child: buildBackButton(context, constraints))
-          else
-            const Spacer(),
+          const Spacer(),
           Expanded(
             child: Center(
               child: MergeSemantics(child: buildCaptureButton(constraints)),
             ),
           ),
-          const Spacer(),
+          if (innerController != null && cameras.length > 1)
+            Expanded(child: buildCameraSwitch(context))
+          else
+            const Spacer(),
         ],
       ),
     );
   }
 
-  /// The back button near to the [buildCaptureButton].
-  /// 靠近拍照键的返回键
-  Widget buildBackButton(BuildContext context, BoxConstraints constraints) {
+  /// The back button.
+  /// 返回键
+  Widget buildBackButton(BuildContext context) {
     return IconButton(
-      onPressed: Navigator.of(context).pop,
+      onPressed: () => Navigator.of(context).maybePop(),
       tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-      icon: Container(
-        alignment: Alignment.center,
-        width: 27,
-        height: 27,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-        ),
-        child: const Icon(Icons.keyboard_arrow_down, color: Colors.black),
-      ),
+      icon: const Icon(Icons.clear),
     );
   }
 
