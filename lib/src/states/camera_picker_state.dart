@@ -489,7 +489,6 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   void restartExposureModeDisplayTimer() {
-    isFocusPointDisplays.value = true;
     exposureModeDisplayTimer?.cancel();
     exposureModeDisplayTimer = Timer(const Duration(seconds: 2), () {
       isFocusPointDisplays.value = false;
@@ -499,7 +498,7 @@ class CameraPickerState extends State<CameraPicker>
   void restartExposureFadeOutTimer() {
     isFocusPointFadeOut.value = false;
     exposureFadeOutTimer?.cancel();
-    exposureFadeOutTimer = Timer(const Duration(seconds: 1), () {
+    exposureFadeOutTimer = Timer(const Duration(seconds: 2), () {
       isFocusPointFadeOut.value = true;
     });
   }
@@ -604,6 +603,9 @@ class CameraPickerState extends State<CameraPicker>
       );
     } catch (e, s) {
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
+    }
+    if (!isFocusPointDisplays.value) {
+      isFocusPointDisplays.value = true;
     }
     restartExposurePointDisplayTimer();
     restartExposureModeDisplayTimer();
