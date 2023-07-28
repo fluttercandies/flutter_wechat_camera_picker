@@ -34,7 +34,7 @@ class CameraPickerConfig {
     this.resolutionPreset = ResolutionPreset.max,
     this.imageFormatGroup = ImageFormatGroup.unknown,
     this.preferredLensDirection = CameraLensDirection.back,
-    this.preferredFlashMode = FlashMode.auto,
+    this.preferredFlashMode = FlashMode.off,
     this.lockCaptureOrientation,
     this.foregroundBuilder,
     this.previewTransformBuilder,
