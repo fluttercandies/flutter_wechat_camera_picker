@@ -20,19 +20,31 @@ A **camera picker** based on WeChat's UI which is a separate runnable extension 
 The package based on `camera` for camera functions
 and `photo_manager` for asset implementation.
 
-## Category 🗂
+Current WeChat version that UI based on: **8.3.x**
+UI designs will be updated following the WeChat update in anytime.
 
-- [Flutter WeChat Camera Picker](#flutter-wechat-camera-picker)
-  - [Category 🗂](#category-)
-  - [Features ✨](#features-)
-  - [Screenshots 📸](#screenshots-)
-  - [Preparing for use 🍭](#preparing-for-use-)
-  - [Usage 📖](#usage-)
-    - [Simple usage](#simple-usage)
-    - [With configurations](#with-configurations)
-  - [Frequently asked question 💭](#frequently-asked-question-)
-    - [Why the orientation behavior is strange on iOS?](#why-the-orientation-behavior-is-strange-on-ios)
-  - [Contributors ✨](#contributors-)
+See the [Migration Guide][] to learn how to migrate between breaking changes.
+
+<details>
+  <summary>Table of content</summary>
+
+<!-- TOC -->
+* [Flutter WeChat Camera Picker](#flutter-wechat-camera-picker)
+  * [Features ✨](#features-)
+  * [Screenshots 📸](#screenshots-)
+  * [Preparing for use 🍭](#preparing-for-use-)
+    * [Version constraints](#version-constraints)
+    * [Setup](#setup)
+      * [Android 13 (API 33) permissions](#android-13-api-33-permissions)
+  * [Usage 📖](#usage-)
+    * [Simple usage](#simple-usage)
+    * [With configurations](#with-configurations)
+    * [Using custom `State`s](#using-custom-states)
+  * [Frequently asked question 💭](#frequently-asked-question-)
+    * [Why the orientation behavior is strange on iOS?](#why-the-orientation-behavior-is-strange-on-ios)
+  * [Contributors ✨](#contributors-)
+<!-- TOC -->
+</details>
 
 ## Features ✨
 
@@ -181,3 +193,5 @@ Thank goes to these wonderful people ([emoji key](https://allcontributors.org/do
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+[Migration Guide]: https://github.com/fluttercandies/flutter_wechat_camera_picker/blob/main/guides/migration_guide.md
