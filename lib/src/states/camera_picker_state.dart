@@ -536,11 +536,13 @@ class CameraPickerState extends State<CameraPicker>
     BoxConstraints constraints,
   ) async {
     isFocusPointDisplays.value = false;
-    // Ignore point update when the new point is less than 8% and higher than
-    // 92% of the screen's height.
-    if (position.dy < constraints.maxHeight / 12 ||
-        position.dy > constraints.maxHeight / 12 * 11) {
-      return;
+    if (pickerConfig.enableScaledPreview) {
+      // Ignore point update when the new point is less than 8% and higher than
+      // 92% of the screen's height.
+      if (position.dy < constraints.maxHeight / 12 ||
+          position.dy > constraints.maxHeight / 12 * 11) {
+        return;
+      }
     }
     realDebugPrint(
       'Setting new exposure point (x: ${position.dx}, y: ${position.dy})',
@@ -1304,7 +1306,7 @@ class CameraPickerState extends State<CameraPicker>
 
   Widget buildCameraPreview({
     required BuildContext context,
-    required DeviceOrientation orientation,
+    required CameraValue cameraValue,
     required BoxConstraints constraints,
   }) {
     Widget preview = Listener(
@@ -1337,6 +1339,19 @@ class CameraPickerState extends State<CameraPicker>
             top: null,
             child: ExcludeSemantics(child: buildCaptureTips(innerController)),
           ),
+          if (pickerConfig.enableSetExposure)
+            buildExposureDetector(context, constraints),
+          buildFocusingPoint(
+            cameraValue: cameraValue,
+            constraints: constraints,
+          ),
+          if (pickerConfig.foregroundBuilder != null)
+            Positioned.fill(
+              child: pickerConfig.foregroundBuilder!(
+                context,
+                innerController,
+              ),
+            ),
         ],
       );
     }
@@ -1411,38 +1426,40 @@ class CameraPickerState extends State<CameraPicker>
 
   Widget buildBody(BuildContext context) {
     return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        Widget preview = ExcludeSemantics(
-          child: buildInitializeWrapper(
-            builder: (CameraValue v, Widget? w) => buildCameraPreview(
-              context: context,
-              orientation: v.deviceOrientation,
-              constraints: constraints,
+      builder: (BuildContext context, BoxConstraints constraints) => Stack(
+        fit: StackFit.expand,
+        alignment: Alignment.center,
+        children: <Widget>[
+          ExcludeSemantics(
+            child: buildInitializeWrapper(
+              builder: (CameraValue v, Widget? w) {
+                if (pickerConfig.enableScaledPreview) {
+                  return buildCameraPreview(
+                    context: context,
+                    cameraValue: v,
+                    constraints: constraints,
+                  );
+                }
+                return Align(
+                  alignment: Alignment.topCenter,
+                  child: AspectRatio(
+                    aspectRatio: 1 / v.aspectRatio,
+                    child: LayoutBuilder(
+                      builder:
+                          (BuildContext context, BoxConstraints constraints) {
+                        return buildCameraPreview(
+                          context: context,
+                          cameraValue: v,
+                          constraints: constraints,
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-        );
-        if (!pickerConfig.enableScaledPreview &&
-            pickerConfig.foregroundBuilder != null) {
-          preview = Stack(
-            children: <Widget>[
-              preview,
-              Positioned.fill(
-                child: pickerConfig.foregroundBuilder!(
-                  context,
-                  innerController,
-                ),
-              ),
-            ],
-          );
-        }
-        if (!pickerConfig.enableScaledPreview) {
-          preview = Positioned.fill(bottom: null, child: preview);
-        }
-        return Stack(
-          fit: StackFit.expand,
-          alignment: Alignment.center,
-          children: <Widget>[
-            preview,
+          if (pickerConfig.enableScaledPreview) ...<Widget>[
             if (pickerConfig.enableSetExposure)
               buildExposureDetector(context, constraints),
             buildInitializeWrapper(
@@ -1451,16 +1468,15 @@ class CameraPickerState extends State<CameraPicker>
                 constraints: constraints,
               ),
             ),
-            buildForegroundBody(context, constraints),
-            if (pickerConfig.enableScaledPreview &&
-                pickerConfig.foregroundBuilder != null)
+            if (pickerConfig.foregroundBuilder != null)
               Positioned.fill(
                 child:
                     pickerConfig.foregroundBuilder!(context, innerController),
               ),
           ],
-        );
-      },
+          buildForegroundBody(context, constraints),
+        ],
+      ),
     );
   }
 
