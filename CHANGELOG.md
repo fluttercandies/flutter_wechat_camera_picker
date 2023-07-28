@@ -14,6 +14,11 @@ To know more about breaking changes, see [Migration Guide][].
 
 - Sync all UI details from WeChat 8.3.x. (#181)
 
+### Improvements
+
+- Prefer `FlashMode.off` for better performance.
+- Allow `cameras` to be set repeatedly.
+
 ## 3.8.0
 
 ### New features
