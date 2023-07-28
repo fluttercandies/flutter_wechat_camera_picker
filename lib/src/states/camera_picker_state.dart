@@ -172,6 +172,11 @@ class CameraPickerState extends State<CameraPicker>
     return pickerConfig.minimumRecordingDuration;
   }
 
+  /// Whether the camera preview should be rotated.
+  bool get isCameraRotated => pickerConfig.cameraQuarterTurns % 4 != 0;
+
+  int get cameraQuarterTurns => pickerConfig.cameraQuarterTurns;
+
   /// A getter to the current [CameraDescription].
   /// 获取当前相机实例
   CameraDescription get currentCamera => cameras.elementAt(currentCameraIndex);
@@ -229,7 +234,7 @@ class CameraPickerState extends State<CameraPicker>
     BoxConstraints constraints,
     CameraController controller,
   ) {
-    final int turns = pickerConfig.cameraQuarterTurns;
+    final int turns = cameraQuarterTurns;
     final String orientation = controller.value.deviceOrientation.toString();
     // Fetch the biggest size from the constraints.
     Size size = constraints.biggest;
@@ -875,6 +880,26 @@ class CameraPickerState extends State<CameraPicker>
     return null;
   }
 
+  Future<void> requestFocusOnPosition(
+    Offset localPosition,
+    BoxConstraints constraints, {
+    bool lock = false,
+  }) async {
+    // Only call exposure point updates when the controller is initialized.
+    if (innerController?.value.isInitialized ?? false) {
+      final Offset position = cameraQuarterTurns % 2 != 0
+          ? Offset(localPosition.dy, localPosition.dx)
+          : localPosition;
+      final BoxConstraints cs =
+          cameraQuarterTurns % 2 != 0 ? constraints.flipped : constraints;
+      Feedback.forTap(context);
+      await setExposureAndFocusPoint(position, cs);
+      if (lock) {
+        await switchExposureMode();
+      }
+    }
+  }
+
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
   /////////////////////////// Just a line breaker ////////////////////////////
@@ -892,14 +917,25 @@ class CameraPickerState extends State<CameraPicker>
         if (v.isRecordingVideo) {
           return const SizedBox.shrink();
         }
+        Widget backButton = buildBackButton(context);
+        Widget flashModeSwitch = buildFlashModeSwitch(context, v);
+        if (isCameraRotated && !pickerConfig.enableScaledPreview) {
+          backButton = RotatedBox(
+            quarterTurns: cameraQuarterTurns,
+            child: backButton,
+          );
+          flashModeSwitch = RotatedBox(
+            quarterTurns: cameraQuarterTurns,
+            child: flashModeSwitch,
+          );
+        }
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: <Widget>[
-              if (innerController?.value.isRecordingVideo != true)
-                buildBackButton(context),
+              if (innerController?.value.isRecordingVideo != true) backButton,
               const Spacer(),
-              buildFlashModeSwitch(context, v),
+              flashModeSwitch,
             ],
           ),
         );
@@ -910,16 +946,18 @@ class CameraPickerState extends State<CameraPicker>
   /// The button to switch between cameras.
   /// 切换相机的按钮
   Widget buildCameraSwitch(BuildContext context) {
-    return IconButton(
-      tooltip: textDelegate.sSwitchCameraLensDirectionLabel(
-        nextCameraDescription.lensDirection,
-      ),
-      onPressed: switchCameras,
-      icon: Icon(
-        Platform.isIOS
-            ? Icons.flip_camera_ios_outlined
-            : Icons.flip_camera_android_outlined,
-        size: 24,
+    return MergeSemantics(
+      child: IconButton(
+        tooltip: textDelegate.sSwitchCameraLensDirectionLabel(
+          nextCameraDescription.lensDirection,
+        ),
+        onPressed: () => switchCameras(),
+        icon: Icon(
+          Platform.isIOS
+              ? Icons.flip_camera_ios_outlined
+              : Icons.flip_camera_android_outlined,
+          size: 24,
+        ),
       ),
     );
   }
@@ -997,11 +1035,17 @@ class CameraPickerState extends State<CameraPicker>
           const Spacer(),
           Expanded(
             child: Center(
-              child: MergeSemantics(child: buildCaptureButton(constraints)),
+              child: buildCaptureButton(context, constraints),
             ),
           ),
           if (innerController != null && cameras.length > 1)
-            Expanded(child: buildCameraSwitch(context))
+            Expanded(
+              child: RotatedBox(
+                quarterTurns:
+                    !pickerConfig.enableScaledPreview ? cameraQuarterTurns : 0,
+                child: buildCameraSwitch(context),
+              ),
+            )
           else
             const Spacer(),
         ],
@@ -1021,28 +1065,29 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The shooting button.
   /// 拍照按钮
-  Widget buildCaptureButton(BoxConstraints constraints) {
+  Widget buildCaptureButton(BuildContext context, BoxConstraints constraints) {
     const Size outerSize = Size.square(115);
     const Size innerSize = Size.square(82);
-    return Semantics(
-      label: textDelegate.sActionShootingButtonTooltip,
-      onTap: onTap,
-      onTapHint: onTapHint,
-      onLongPress: onLongPress,
-      onLongPressHint: onLongPressHint,
-      child: Listener(
-        behavior: HitTestBehavior.opaque,
-        onPointerUp: onPointerUp,
-        onPointerMove: onPointerMove(constraints),
-        child: GestureDetector(
-          onTap: onTap,
-          onLongPress: onLongPress,
-          child: SizedBox.fromSize(
-            size: outerSize,
-            child: Stack(
-              children: <Widget>[
-                Center(
-                  child: AnimatedContainer(
+    return MergeSemantics(
+      child: Semantics(
+        label: textDelegate.sActionShootingButtonTooltip,
+        onTap: onTap,
+        onTapHint: onTapHint,
+        onLongPress: onLongPress,
+        onLongPressHint: onLongPressHint,
+        child: Listener(
+          behavior: HitTestBehavior.opaque,
+          onPointerUp: onPointerUp,
+          onPointerMove: onPointerMove(constraints),
+          child: GestureDetector(
+            onTap: onTap,
+            onLongPress: onLongPress,
+            child: SizedBox.fromSize(
+              size: outerSize,
+              child: Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  AnimatedContainer(
                     duration: kThemeChangeDuration,
                     width: isShootingButtonAnimate
                         ? outerSize.width
@@ -1052,7 +1097,7 @@ class CameraPickerState extends State<CameraPicker>
                         : innerSize.height,
                     padding: EdgeInsets.all(isShootingButtonAnimate ? 41 : 11),
                     decoration: BoxDecoration(
-                      color: theme.canvasColor.withOpacity(0.85),
+                      color: Theme.of(context).canvasColor.withOpacity(0.85),
                       shape: BoxShape.circle,
                     ),
                     child: const DecoratedBox(
@@ -1062,17 +1107,22 @@ class CameraPickerState extends State<CameraPicker>
                       ),
                     ),
                   ),
-                ),
-                if ((innerController?.value.isRecordingVideo ?? false) &&
-                    isRecordingRestricted)
-                  CameraProgressButton(
-                    isAnimating: isShootingButtonAnimate,
-                    duration: pickerConfig.maximumRecordingDuration!,
-                    outerRadius: outerSize.width,
-                    ringsColor: theme.indicatorColor,
-                    ringsWidth: 2,
-                  ),
-              ],
+                  if ((innerController?.value.isRecordingVideo ?? false) &&
+                      isRecordingRestricted)
+                    RotatedBox(
+                      quarterTurns: !pickerConfig.enableScaledPreview
+                          ? cameraQuarterTurns
+                          : 0,
+                      child: CameraProgressButton(
+                        isAnimating: isShootingButtonAnimate,
+                        duration: pickerConfig.maximumRecordingDuration!,
+                        outerRadius: outerSize.width,
+                        ringsColor: theme.indicatorColor,
+                        ringsWidth: 2,
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -1150,6 +1200,7 @@ class CameraPickerState extends State<CameraPicker>
   Widget buildFocusingPoint({
     required CameraValue cameraValue,
     required BoxConstraints constraints,
+    int quarterTurns = 0,
   }) {
     Widget buildControls(double size, double height) {
       const double verticalGap = 3;
@@ -1215,7 +1266,7 @@ class CameraPickerState extends State<CameraPicker>
           child: ValueListenableBuilder<bool>(
             valueListenable: isFocusPointFadeOut,
             builder: (BuildContext context, bool isFadeOut, Widget? child) {
-              return AnimatedOpacity(
+              Widget body = AnimatedOpacity(
                 curve: Curves.ease,
                 duration: _kDuration,
                 opacity: isFadeOut ? .5 : 1,
@@ -1235,6 +1286,10 @@ class CameraPickerState extends State<CameraPicker>
                   ],
                 ),
               );
+              if (quarterTurns != 0) {
+                body = RotatedBox(quarterTurns: quarterTurns, child: body);
+              }
+              return body;
             },
             child: CameraFocusPoint(
               key: ValueKey<Offset>(point),
@@ -1265,43 +1320,31 @@ class CameraPickerState extends State<CameraPicker>
     BuildContext context,
     BoxConstraints constraints,
   ) {
-    Future<void> focus(Offset localPosition, {bool lock = false}) async {
-      // Only call exposure point updates when the controller is initialized.
-      if (innerController?.value.isInitialized ?? false) {
-        Feedback.forTap(context);
-        await setExposureAndFocusPoint(localPosition, constraints);
-        if (lock) {
-          await switchExposureMode();
-        }
-      }
-    }
-
-    return Positioned.fill(
-      child: Semantics(
-        label: textDelegate.sCameraPreviewLabel(
-          innerController?.description.lensDirection,
-        ),
-        image: true,
-        onTap: () {
-          // Focus on the center point when using semantics tap.
-          final Size size = MediaQuery.of(context).size;
-          final TapUpDetails details = TapUpDetails(
-            kind: PointerDeviceKind.touch,
-            globalPosition: Offset(size.width / 2, size.height / 2),
-          );
-          focus(details.localPosition);
-        },
-        onTapHint: textDelegate.sActionManuallyFocusHint,
-        sortKey: const OrdinalSortKey(1),
-        hidden: innerController == null,
-        excludeSemantics: true,
-        child: GestureDetector(
-          onTapUp: (TapUpDetails d) => focus(d.localPosition),
-          onLongPressStart: (LongPressStartDetails d) =>
-              focus(d.localPosition, lock: true),
-          behavior: HitTestBehavior.translucent,
-          child: const SizedBox.expand(),
-        ),
+    return Semantics(
+      label: textDelegate.sCameraPreviewLabel(
+        innerController?.description.lensDirection,
+      ),
+      image: true,
+      onTap: () {
+        // Focus on the center point when using semantics tap.
+        final Size size = MediaQuery.of(context).size;
+        final TapUpDetails details = TapUpDetails(
+          kind: PointerDeviceKind.touch,
+          globalPosition: Offset(size.width / 2, size.height / 2),
+        );
+        requestFocusOnPosition(details.localPosition, constraints);
+      },
+      onTapHint: textDelegate.sActionManuallyFocusHint,
+      sortKey: const OrdinalSortKey(1),
+      hidden: innerController == null,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTapUp: (TapUpDetails d) =>
+            requestFocusOnPosition(d.localPosition, constraints),
+        onLongPressStart: (LongPressStartDetails d) =>
+            requestFocusOnPosition(d.localPosition, constraints, lock: true),
+        behavior: HitTestBehavior.translucent,
+        child: const SizedBox.expand(),
       ),
     );
   }
@@ -1336,16 +1379,20 @@ class CameraPickerState extends State<CameraPicker>
     if (!pickerConfig.enableScaledPreview) {
       preview = Stack(
         children: <Widget>[
-          preview,
+          RotatedBox(quarterTurns: -cameraQuarterTurns, child: preview),
           Positioned.fill(
             top: null,
             child: ExcludeSemantics(child: buildCaptureTips(innerController)),
           ),
           if (pickerConfig.enableSetExposure)
-            buildExposureDetector(context, constraints),
+            RotatedBox(
+              quarterTurns: -cameraQuarterTurns,
+              child: buildExposureDetector(context, constraints),
+            ),
           buildFocusingPoint(
             cameraValue: cameraValue,
             constraints: constraints,
+            quarterTurns: -cameraQuarterTurns,
           ),
           if (pickerConfig.foregroundBuilder != null)
             Positioned.fill(
@@ -1356,23 +1403,21 @@ class CameraPickerState extends State<CameraPicker>
             ),
         ],
       );
-    }
-    if (pickerConfig.enableScaledPreview) {
-      preview = Center(child: transformedWidget ?? preview);
+      preview = RotatedBox(quarterTurns: cameraQuarterTurns, child: preview);
     }
     // Scale the preview if the config is enabled.
     if (pickerConfig.enableScaledPreview) {
       preview = Transform.scale(
         scale: effectiveCameraScale(constraints, controller),
-        child: preview,
+        child: Center(child: transformedWidget ?? preview),
       );
-    }
-    // Rotated the preview if the turns is valid.
-    if (pickerConfig.cameraQuarterTurns % 4 != 0) {
-      preview = RotatedBox(
-        quarterTurns: -pickerConfig.cameraQuarterTurns,
-        child: preview,
-      );
+      // Rotated the preview if the turns is valid.
+      if (isCameraRotated) {
+        preview = RotatedBox(
+          quarterTurns: -cameraQuarterTurns,
+          child: preview,
+        );
+      }
     }
     return RepaintBoundary(child: preview);
   }
@@ -1428,80 +1473,108 @@ class CameraPickerState extends State<CameraPicker>
 
   Widget buildBody(BuildContext context) {
     return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) => Stack(
-        fit: StackFit.expand,
-        alignment: Alignment.center,
-        children: <Widget>[
-          ExcludeSemantics(
-            child: buildInitializeWrapper(
-              builder: (CameraValue v, Widget? w) {
-                if (pickerConfig.enableScaledPreview) {
-                  return buildCameraPreview(
-                    context: context,
-                    cameraValue: v,
-                    constraints: constraints,
-                  );
-                }
-                return Align(
-                  alignment: Alignment.topCenter,
-                  child: AspectRatio(
-                    aspectRatio: 1 / v.aspectRatio,
-                    child: LayoutBuilder(
-                      builder:
-                          (BuildContext context, BoxConstraints constraints) {
-                        return buildCameraPreview(
-                          context: context,
-                          cameraValue: v,
-                          constraints: constraints,
-                        );
-                      },
-                    ),
-                  ),
+      builder: (BuildContext context, BoxConstraints constraints) {
+        Widget previewWidget = ExcludeSemantics(
+          child: buildInitializeWrapper(
+            builder: (CameraValue v, Widget? w) {
+              if (pickerConfig.enableScaledPreview) {
+                return buildCameraPreview(
+                  context: context,
+                  cameraValue: v,
+                  constraints: constraints,
                 );
-              },
-            ),
+              }
+              return Align(
+                alignment: AlignmentDirectional.topCenter,
+                child: AspectRatio(
+                  aspectRatio: 1 / v.aspectRatio,
+                  child: LayoutBuilder(
+                    builder: (BuildContext c, BoxConstraints constraints) {
+                      return buildCameraPreview(
+                        context: c,
+                        cameraValue: v,
+                        constraints: constraints,
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
           ),
-          if (pickerConfig.enableScaledPreview) ...<Widget>[
-            if (pickerConfig.enableSetExposure)
-              buildExposureDetector(context, constraints),
-            buildInitializeWrapper(
-              builder: (CameraValue v, _) => buildFocusingPoint(
-                cameraValue: v,
-                constraints: constraints,
-              ),
+        );
+        if (!pickerConfig.enableScaledPreview) {
+          previewWidget = Semantics(
+            label: textDelegate.sCameraPreviewLabel(
+              innerController?.description.lensDirection,
             ),
-            if (pickerConfig.foregroundBuilder != null)
-              Positioned.fill(
-                child:
-                    pickerConfig.foregroundBuilder!(context, innerController),
+            image: true,
+            onTap: () {
+              // Focus on the center point when using semantics tap.
+              final Size size = MediaQuery.of(context).size;
+              final TapUpDetails details = TapUpDetails(
+                kind: PointerDeviceKind.touch,
+                globalPosition: Offset(size.width / 2, size.height / 2),
+              );
+              requestFocusOnPosition(details.localPosition, constraints);
+            },
+            onTapHint: textDelegate.sActionManuallyFocusHint,
+            sortKey: const OrdinalSortKey(1),
+            hidden: innerController == null,
+            excludeSemantics: true,
+            child: previewWidget,
+          );
+        }
+        return Stack(
+          fit: StackFit.expand,
+          alignment: Alignment.center,
+          children: <Widget>[
+            previewWidget,
+            if (pickerConfig.enableScaledPreview) ...<Widget>[
+              if (pickerConfig.enableSetExposure)
+                buildExposureDetector(context, constraints),
+              buildInitializeWrapper(
+                builder: (CameraValue v, _) => buildFocusingPoint(
+                  cameraValue: v,
+                  constraints: constraints,
+                ),
               ),
+              if (pickerConfig.foregroundBuilder != null)
+                Positioned.fill(
+                  child:
+                      pickerConfig.foregroundBuilder!(context, innerController),
+                ),
+            ],
+            buildForegroundBody(context, constraints),
           ],
-          buildForegroundBody(context, constraints),
-        ],
-      ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData mq = MediaQuery.of(context);
+    Widget body = Builder(builder: buildBody);
+    if (isCameraRotated && pickerConfig.enableScaledPreview) {
+      final MediaQueryData mq = MediaQuery.of(context);
+      body = RotatedBox(
+        quarterTurns: pickerConfig.cameraQuarterTurns,
+        child: MediaQuery(
+          data: mq.copyWith(
+            size: pickerConfig.cameraQuarterTurns.isOdd
+                ? mq.size.flipped
+                : mq.size,
+          ),
+          child: body,
+        ),
+      );
+    }
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Theme(
         data: theme,
         child: Material(
           color: Colors.black,
-          child: RotatedBox(
-            quarterTurns: pickerConfig.cameraQuarterTurns,
-            child: MediaQuery(
-              data: mq.copyWith(
-                size: pickerConfig.cameraQuarterTurns.isOdd
-                    ? mq.size.flipped
-                    : mq.size,
-              ),
-              child: Builder(builder: buildBody),
-            ),
-          ),
+          child: body,
         ),
       ),
     );
