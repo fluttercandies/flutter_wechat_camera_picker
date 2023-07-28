@@ -25,7 +25,7 @@ import '../widgets/camera_picker.dart';
 import '../widgets/camera_picker_viewer.dart';
 import '../widgets/camera_progress_button.dart';
 
-const Color _lockedColor = Colors.amber;
+const Color _lockedColor = Colors.orangeAccent;
 const Duration _kDuration = Duration(milliseconds: 300);
 
 class CameraPickerState extends State<CameraPicker>
@@ -45,6 +45,7 @@ class CameraPickerState extends State<CameraPicker>
   /// Whether the focus point is displaying.
   /// 是否正在展示当前的聚焦点
   final ValueNotifier<bool> isFocusPointDisplays = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> isFocusPointFadeOut = ValueNotifier<bool>(false);
 
   /// The controller for the current camera.
   /// 当前相机实例的控制器
@@ -58,6 +59,8 @@ class CameraPickerState extends State<CameraPicker>
   /// Current exposure offset.
   /// 当前曝光值
   final ValueNotifier<double> currentExposureOffset = ValueNotifier<double>(0);
+  final ValueNotifier<double> currentExposureSliderOffset =
+      ValueNotifier<double>(0);
 
   double maxAvailableExposureOffset = 0;
   double minAvailableExposureOffset = 0;
@@ -92,8 +95,8 @@ class CameraPickerState extends State<CameraPicker>
   /// The [Timer] for keep the [lastExposurePoint] displays.
   /// 用于控制上次手动聚焦点显示的计时器
   Timer? exposurePointDisplayTimer;
-
   Timer? exposureModeDisplayTimer;
+  Timer? exposureFadeOutTimer;
 
   /// The [Timer] for record start detection.
   /// 用于检测是否开始录制的计时器
@@ -194,10 +197,13 @@ class CameraPickerState extends State<CameraPicker>
     ambiguate(WidgetsBinding.instance)?.removeObserver(this);
     innerController?.dispose();
     currentExposureOffset.dispose();
+    currentExposureSliderOffset.dispose();
     lastExposurePoint.dispose();
     isFocusPointDisplays.dispose();
+    isFocusPointFadeOut.dispose();
     exposurePointDisplayTimer?.cancel();
     exposureModeDisplayTimer?.cancel();
+    exposureFadeOutTimer?.cancel();
     recordDetectTimer?.cancel();
     recordCountdownTimer?.cancel();
     super.dispose();
@@ -258,12 +264,14 @@ class CameraPickerState extends State<CameraPicker>
       currentZoom = 1;
       baseZoom = 1;
       // Meanwhile, cancel the existed exposure point and mode display.
-      exposureModeDisplayTimer?.cancel();
       exposurePointDisplayTimer?.cancel();
+      exposureModeDisplayTimer?.cancel();
+      exposureFadeOutTimer?.cancel();
+      isFocusPointDisplays.value = false;
+      isFocusPointFadeOut.value = false;
       lastExposurePoint.value = null;
-      if (currentExposureOffset.value != 0) {
-        currentExposureOffset.value = 0;
-      }
+      currentExposureOffset.value = 0;
+      currentExposureSliderOffset.value = 0;
     });
     // **IMPORTANT**: Push methods into a post frame callback, which ensures the
     // controller has already unbind from widgets.
@@ -480,10 +488,19 @@ class CameraPickerState extends State<CameraPicker>
     });
   }
 
-  void restartDisplayModeDisplayTimer() {
+  void restartExposureModeDisplayTimer() {
+    isFocusPointDisplays.value = true;
     exposureModeDisplayTimer?.cancel();
     exposureModeDisplayTimer = Timer(const Duration(seconds: 2), () {
       isFocusPointDisplays.value = false;
+    });
+  }
+
+  void restartExposureFadeOutTimer() {
+    isFocusPointFadeOut.value = false;
+    exposureFadeOutTimer?.cancel();
+    exposureFadeOutTimer = Timer(const Duration(seconds: 1), () {
+      isFocusPointFadeOut.value = true;
     });
   }
 
@@ -508,7 +525,8 @@ class CameraPickerState extends State<CameraPicker>
     } catch (e, s) {
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     }
-    restartDisplayModeDisplayTimer();
+    restartExposureModeDisplayTimer();
+    restartExposureFadeOutTimer();
   }
 
   /// Use the [position] to set exposure and focus.
@@ -530,20 +548,25 @@ class CameraPickerState extends State<CameraPicker>
     lastExposurePoint.value = position;
     restartExposurePointDisplayTimer();
     currentExposureOffset.value = 0;
+    currentExposureSliderOffset.value = 0;
+    restartExposureFadeOutTimer();
+    isFocusPointFadeOut.value = false;
     try {
-      if (controller.value.exposureMode == ExposureMode.locked) {
-        await controller.setExposureMode(ExposureMode.auto);
-      }
+      await Future.wait(<Future<void>>[
+        controller.setExposureOffset(0),
+        if (controller.value.exposureMode == ExposureMode.locked)
+          controller.setExposureMode(ExposureMode.auto),
+      ]);
       final Offset newPoint = lastExposurePoint.value!.scale(
         1 / constraints.maxWidth,
         1 / constraints.maxHeight,
       );
-      if (controller.value.exposurePointSupported) {
-        controller.setExposurePoint(newPoint);
-      }
-      if (controller.value.focusPointSupported) {
-        controller.setFocusPoint(newPoint);
-      }
+      await Future.wait(<Future<void>>[
+        if (controller.value.exposurePointSupported)
+          controller.setExposurePoint(newPoint),
+        if (controller.value.focusPointSupported)
+          controller.setFocusPoint(newPoint),
+      ]);
     } catch (e, s) {
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     }
@@ -552,6 +575,7 @@ class CameraPickerState extends State<CameraPicker>
   /// Update the exposure offset using the exposure controller.
   /// 使用曝光控制器更新曝光值
   Future<void> updateExposureOffset(double value) async {
+    currentExposureSliderOffset.value = value;
     // Normalize the new exposure value if exposures have steps.
     if (exposureStep > 0) {
       final double inv = 1.0 / exposureStep;
@@ -570,6 +594,7 @@ class CameraPickerState extends State<CameraPicker>
     }
     currentExposureOffset.value = value;
     try {
+      realDebugPrint('Updating the exposure offset value: $value');
       // Use [CameraPlatform] explicitly to reduce channel calls.
       await CameraPlatform.instance.setExposureOffset(
         controller.cameraId,
@@ -578,11 +603,9 @@ class CameraPickerState extends State<CameraPicker>
     } catch (e, s) {
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     }
-    if (!isFocusPointDisplays.value) {
-      isFocusPointDisplays.value = true;
-    }
-    restartDisplayModeDisplayTimer();
     restartExposurePointDisplayTimer();
+    restartExposureModeDisplayTimer();
+    restartExposureFadeOutTimer();
   }
 
   /// Update the scale value while the user is shooting.
@@ -1068,11 +1091,11 @@ class CameraPickerState extends State<CameraPicker>
         opacity: value ? 1 : 0,
         child: child,
       ),
-      child: Center(child: Container(width: 1, color: color)),
+      child: Center(child: Container(width: 1.5, color: color)),
     );
 
     return ValueListenableBuilder<double>(
-      valueListenable: currentExposureOffset,
+      valueListenable: currentExposureSliderOffset,
       builder: (_, double exposure, __) {
         final double effectiveTop = (size + gap) +
             (minAvailableExposureOffset.abs() - exposure) *
@@ -1185,23 +1208,37 @@ class CameraPickerState extends State<CameraPicker>
         width: width,
         height: pointWidth * 3,
         child: ExcludeSemantics(
-          child: Row(
-            textDirection:
-                shouldReverseLayout ? TextDirection.rtl : TextDirection.ltr,
-            children: <Widget>[
-              CameraFocusPoint(
-                key: ValueKey<int>(DateTime.now().millisecondsSinceEpoch),
-                size: pointWidth,
-                color: theme.iconTheme.color!,
-              ),
-              if (pickerConfig.enableExposureControlOnPoint)
-                const SizedBox(width: 2),
-              if (pickerConfig.enableExposureControlOnPoint)
-                SizedBox.fromSize(
-                  size: Size(exposureControlWidth, pointWidth * 3),
-                  child: buildControls(controllerWidth, pointWidth * 3),
+          child: ValueListenableBuilder<bool>(
+            valueListenable: isFocusPointFadeOut,
+            builder: (BuildContext context, bool isFadeOut, Widget? child) {
+              return AnimatedOpacity(
+                curve: Curves.ease,
+                duration: _kDuration,
+                opacity: isFadeOut ? .5 : 1,
+                child: Row(
+                  textDirection: shouldReverseLayout
+                      ? TextDirection.rtl
+                      : TextDirection.ltr,
+                  children: <Widget>[
+                    child!,
+                    if (pickerConfig.enableExposureControlOnPoint)
+                      const SizedBox(width: 2),
+                    if (pickerConfig.enableExposureControlOnPoint)
+                      SizedBox.fromSize(
+                        size: Size(exposureControlWidth, pointWidth * 3),
+                        child: buildControls(controllerWidth, pointWidth * 3),
+                      ),
+                  ],
                 ),
-            ],
+              );
+            },
+            child: CameraFocusPoint(
+              key: ValueKey<Offset>(point),
+              size: pointWidth,
+              color: cameraValue.exposureMode == ExposureMode.locked
+                  ? _lockedColor
+                  : theme.iconTheme.color!,
+            ),
           ),
         ),
       );
@@ -1224,11 +1261,14 @@ class CameraPickerState extends State<CameraPicker>
     BuildContext context,
     BoxConstraints constraints,
   ) {
-    void focus(TapUpDetails d) {
+    Future<void> focus(Offset localPosition, {bool lock = false}) async {
       // Only call exposure point updates when the controller is initialized.
       if (innerController?.value.isInitialized ?? false) {
         Feedback.forTap(context);
-        setExposureAndFocusPoint(d.localPosition, constraints);
+        await setExposureAndFocusPoint(localPosition, constraints);
+        if (lock) {
+          await switchExposureMode();
+        }
       }
     }
 
@@ -1245,14 +1285,16 @@ class CameraPickerState extends State<CameraPicker>
             kind: PointerDeviceKind.touch,
             globalPosition: Offset(size.width / 2, size.height / 2),
           );
-          focus(details);
+          focus(details.localPosition);
         },
         onTapHint: textDelegate.sActionManuallyFocusHint,
         sortKey: const OrdinalSortKey(1),
         hidden: innerController == null,
         excludeSemantics: true,
         child: GestureDetector(
-          onTapUp: focus,
+          onTapUp: (TapUpDetails d) => focus(d.localPosition),
+          onLongPressStart: (LongPressStartDetails d) =>
+              focus(d.localPosition, lock: true),
           behavior: HitTestBehavior.translucent,
           child: const SizedBox.expand(),
         ),
