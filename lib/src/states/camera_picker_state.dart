@@ -56,12 +56,15 @@ class CameraPickerState extends State<CameraPicker>
   /// 可用的相机实例
   late List<CameraDescription> cameras;
 
+  /// Whether the controller is handling taking picture or recording video.
+  /// 相机控制器是否在处理拍照或录像
+  bool isControllerBusy = false;
+
   /// Current exposure offset.
   /// 当前曝光值
   final ValueNotifier<double> currentExposureOffset = ValueNotifier<double>(0);
   final ValueNotifier<double> currentExposureSliderOffset =
       ValueNotifier<double>(0);
-
   double maxAvailableExposureOffset = 0;
   double minAvailableExposureOffset = 0;
   double exposureStep = 0;
@@ -673,9 +676,10 @@ class CameraPickerState extends State<CameraPicker>
         pickerConfig.onError,
       );
     }
-    if (controller.value.isTakingPicture) {
+    if (isControllerBusy) {
       return;
     }
+    isControllerBusy = true;
     final ExposureMode previousExposureMode = controller.value.exposureMode;
     try {
       await Future.wait(<Future<void>>[
@@ -710,6 +714,7 @@ class CameraPickerState extends State<CameraPicker>
       realDebugPrint('Error when preview the captured file: $e');
       handleErrorWithHandler(e, pickerConfig.onError);
     } finally {
+      isControllerBusy = false;
       safeSetState(() {});
     }
   }
@@ -752,9 +757,10 @@ class CameraPickerState extends State<CameraPicker>
   /// Set record file path and start recording.
   /// 设置拍摄文件路径并开始录制视频
   Future<void> startRecordingVideo() async {
-    if (controller.value.isRecordingVideo) {
+    if (isControllerBusy) {
       return;
     }
+    isControllerBusy = true;
     try {
       await controller.startVideoRecording();
       if (isRecordingRestricted) {
@@ -767,6 +773,7 @@ class CameraPickerState extends State<CameraPicker>
         ..reset()
         ..start();
     } catch (e, s) {
+      isControllerBusy = false;
       realDebugPrint('Error when start recording video: $e');
       if (!controller.value.isRecordingVideo) {
         handleErrorWithHandler(e, pickerConfig.onError, s: s);
@@ -835,6 +842,7 @@ class CameraPickerState extends State<CameraPicker>
       handleError();
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     } finally {
+      isControllerBusy = false;
       safeSetState(() {});
     }
   }
@@ -984,7 +992,7 @@ class CameraPickerState extends State<CameraPicker>
   /// The button to switch flash modes.
   /// 切换闪光灯模式的按钮
   Widget buildFlashModeSwitch(BuildContext context, CameraValue value) {
-    IconData icon;
+    final IconData icon;
     switch (value.flashMode) {
       case FlashMode.off:
         icon = Icons.flash_off;
