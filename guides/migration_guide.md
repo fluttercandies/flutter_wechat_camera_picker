@@ -22,6 +22,8 @@ few naming or signatures of methods are changed. including:
 - `restartDisplayModeDisplayTimer`
 - `buildBackButton`
 - `buildCameraPreview`
+- `buildCaptureButton`
+- `buildFocusingPoint`
 
 ### Details
 
@@ -30,11 +32,24 @@ few naming or signatures of methods are changed. including:
   the signature is `Widget buildBackButton(BuildContext context)` from now on.
 - `buildCameraPreview` no more requires `DeviceOrientation orientation` as an argument
   since the implementation does not really use it.
-  It now requires `CameraValue cameraValue` as an argument. So the signature is:
+  It now requires `CameraValue cameraValue` as an argument. So the signature becomes:
   ```dart
   Widget buildCameraPreview({
     required BuildContext context,
     required CameraValue cameraValue,
     required BoxConstraints constraints,
+  })
+  ```
+- `buildCaptureButton` now requires `BuildContext context` as an argument. So the signature becomes:
+  ```dart
+  Widget buildCaptureButton(BuildContext context, BoxConstraints constraints)
+  ```
+- `buildFocusingPoint` now adds `int quarterTurns` to make internal quarter turns.
+  So the signature becomes:
+  ```dart
+  Widget buildFocusingPoint({
+    required CameraValue cameraValue,
+    required BoxConstraints constraints,
+    int quarterTurns = 0,
   })
   ```
