@@ -4,6 +4,26 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
+See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
+
+## 4.0.0-dev.1
+
+To know more about breaking changes, see [Migration Guide][].
+
+### New features
+
+- Sync all UI details from WeChat 8.3.x. (#181)
+
+### Improvements
+
+- Improve the experience when using the exposure slider.
+- Prefer `FlashMode.off` for better performance.
+- Allow `cameras` to be set repeatedly.
+
+### Fixes
+
+- Fix accessibility on the switch cameras button.
+
 ## 3.8.0
 
 ### New features
@@ -324,3 +344,5 @@ that can be found in the LICENSE file. -->
 
 - Support taking pictures and videos.
 - Support video recording duration limitation.
+
+[Migration Guide]: guides/migration_guide.md
