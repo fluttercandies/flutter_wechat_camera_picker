@@ -16,6 +16,7 @@ To know more about breaking changes, see [Migration Guide][].
 
 ### Improvements
 
+- Improve the performance when taking photos.
 - Improve the experience when using the exposure slider.
 - Prefer `FlashMode.off` for better performance.
 - Allow `cameras` to be set repeatedly.
