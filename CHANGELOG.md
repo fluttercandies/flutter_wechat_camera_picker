@@ -16,8 +16,13 @@ To know more about breaking changes, see [Migration Guide][].
 
 ### Improvements
 
+- Improve the experience when using the exposure slider.
 - Prefer `FlashMode.off` for better performance.
 - Allow `cameras` to be set repeatedly.
+
+### Fixes
+
+- Fix accessibility on the switch cameras button.
 
 ## 3.8.0
 
