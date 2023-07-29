@@ -133,11 +133,21 @@ class CameraPickerState extends State<CameraPicker>
   ////////////////////////////////////////////////////////////////////////////
   CameraPickerConfig get pickerConfig => widget.pickerConfig;
 
+  /// Whether the camera preview should be scaled during captures.
+  /// 拍摄过程中相机预览是否需要缩放
+  bool get enableScaledPreview => pickerConfig.enableScaledPreview;
+
+  /// Whether the picker can record video.
+  /// 选择器是否可以录像
   bool get enableRecording => pickerConfig.enableRecording;
 
+  /// Whether the picker only enables video recording.
+  /// 选择器是否只可以录像
   bool get onlyEnableRecording =>
       enableRecording && pickerConfig.onlyEnableRecording;
 
+  /// Whether allow the record can start with single tap.
+  /// 选择器是否可以单击录像
   bool get enableTapRecording =>
       onlyEnableRecording && pickerConfig.enableTapRecording;
 
@@ -540,7 +550,7 @@ class CameraPickerState extends State<CameraPicker>
     BoxConstraints constraints,
   ) async {
     isFocusPointDisplays.value = false;
-    if (pickerConfig.enableScaledPreview) {
+    if (enableScaledPreview) {
       // Ignore point update when the new point is less than 8% and higher than
       // 92% of the screen's height.
       if (position.dy < constraints.maxHeight / 12 ||
@@ -615,6 +625,24 @@ class CameraPickerState extends State<CameraPicker>
     restartExposurePointDisplayTimer();
     restartExposureModeDisplayTimer();
     restartExposureFadeOutTimer();
+  }
+
+  /// Request to set the focus and the exposure point on the [localPosition],
+  /// [lock] to lock the exposure mode at the same time.
+  /// 将对焦和曝光设置为给定的点 [localPosition]，[lock] 控制是否同时锁定曝光模式。
+  Future<void> requestFocusAndExposureOnPosition(
+    Offset localPosition,
+    BoxConstraints constraints, {
+    bool lock = false,
+  }) async {
+    // Only call exposure point updates when the controller is initialized.
+    if (innerController?.value.isInitialized ?? false) {
+      Feedback.forTap(context);
+      await setExposureAndFocusPoint(localPosition, constraints);
+      if (lock) {
+        await switchExposureMode();
+      }
+    }
   }
 
   /// Update the scale value while the user is shooting.
@@ -880,26 +908,6 @@ class CameraPickerState extends State<CameraPicker>
     return null;
   }
 
-  Future<void> requestFocusOnPosition(
-    Offset localPosition,
-    BoxConstraints constraints, {
-    bool lock = false,
-  }) async {
-    // Only call exposure point updates when the controller is initialized.
-    if (innerController?.value.isInitialized ?? false) {
-      final Offset position = cameraQuarterTurns % 2 != 0
-          ? Offset(localPosition.dy, localPosition.dx)
-          : localPosition;
-      final BoxConstraints cs =
-          cameraQuarterTurns % 2 != 0 ? constraints.flipped : constraints;
-      Feedback.forTap(context);
-      await setExposureAndFocusPoint(position, cs);
-      if (lock) {
-        await switchExposureMode();
-      }
-    }
-  }
-
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////
   /////////////////////////// Just a line breaker ////////////////////////////
@@ -919,7 +927,7 @@ class CameraPickerState extends State<CameraPicker>
         }
         Widget backButton = buildBackButton(context);
         Widget flashModeSwitch = buildFlashModeSwitch(context, v);
-        if (isCameraRotated && !pickerConfig.enableScaledPreview) {
+        if (isCameraRotated && !enableScaledPreview) {
           backButton = RotatedBox(
             quarterTurns: cameraQuarterTurns,
             child: backButton,
@@ -1041,8 +1049,7 @@ class CameraPickerState extends State<CameraPicker>
           if (innerController != null && cameras.length > 1)
             Expanded(
               child: RotatedBox(
-                quarterTurns:
-                    !pickerConfig.enableScaledPreview ? cameraQuarterTurns : 0,
+                quarterTurns: !enableScaledPreview ? cameraQuarterTurns : 0,
                 child: buildCameraSwitch(context),
               ),
             )
@@ -1110,9 +1117,8 @@ class CameraPickerState extends State<CameraPicker>
                   if ((innerController?.value.isRecordingVideo ?? false) &&
                       isRecordingRestricted)
                     RotatedBox(
-                      quarterTurns: !pickerConfig.enableScaledPreview
-                          ? cameraQuarterTurns
-                          : 0,
+                      quarterTurns:
+                          !enableScaledPreview ? cameraQuarterTurns : 0,
                       child: CameraProgressButton(
                         isAnimating: isShootingButtonAnimate,
                         duration: pickerConfig.maximumRecordingDuration!,
@@ -1151,20 +1157,19 @@ class CameraPickerState extends State<CameraPicker>
     return ValueListenableBuilder<double>(
       valueListenable: currentExposureSliderOffset,
       builder: (_, double exposure, __) {
-        final double effectiveTop = (size + gap) +
+        final double topByCurrentExposure =
             (minAvailableExposureOffset.abs() - exposure) *
                 (height - size * 3) /
                 (maxAvailableExposureOffset - minAvailableExposureOffset);
-        final double effectiveBottom = height - effectiveTop - size;
+        final double lineTop = size + topByCurrentExposure;
+        final double lineBottom = height - lineTop - size;
         return Stack(
           clipBehavior: Clip.none,
           children: <Widget>[
-            Positioned.fill(top: effectiveTop + gap, child: lineWidget),
-            Positioned.fill(bottom: effectiveBottom + gap, child: lineWidget),
+            Positioned.fill(top: lineTop + gap, child: lineWidget),
+            Positioned.fill(bottom: lineBottom + gap, child: lineWidget),
             Positioned(
-              top: (minAvailableExposureOffset.abs() - exposure) *
-                  (height - size * 3) /
-                  (maxAvailableExposureOffset - minAvailableExposureOffset),
+              top: topByCurrentExposure - gap,
               child: Transform.rotate(
                 angle: exposure,
                 child: Icon(Icons.wb_sunny_outlined, size: size, color: color),
@@ -1245,23 +1250,42 @@ class CameraPickerState extends State<CameraPicker>
     Widget buildFromPoint(Offset point) {
       const double controllerWidth = 20;
       final double pointWidth = constraints.maxWidth / 5;
+      final double lineHeight = pointWidth * 2.5;
       final double exposureControlWidth =
           pickerConfig.enableExposureControlOnPoint ? controllerWidth : 0;
       final double width = pointWidth + exposureControlWidth + 2;
-      final bool shouldReverseLayout = point.dx > constraints.maxWidth / 4 * 3;
-      final double effectiveLeft = math.min(
-        constraints.maxWidth - width,
-        math.max(0, point.dx - width / 2),
-      );
-      final double effectiveTop = math.min(
-        constraints.maxHeight - pointWidth * 3,
-        math.max(0, point.dy - pointWidth * 3 / 2),
-      );
+      final bool shouldReverseLayout = cameraQuarterTurns.isEven &&
+          enableScaledPreview &&
+          point.dx > constraints.maxWidth / 4 * 3;
+      final double effectiveLeft, effectiveTop, effectiveWidth, effectiveHeight;
+      if (cameraQuarterTurns.isOdd && !enableScaledPreview) {
+        effectiveLeft = math.min(
+          constraints.maxWidth - lineHeight,
+          math.max(0, point.dx - lineHeight / 2),
+        );
+        effectiveTop = math.min(
+          constraints.maxHeight - width,
+          math.max(0, point.dy - width / 2),
+        );
+        effectiveWidth = lineHeight;
+        effectiveHeight = width;
+      } else {
+        effectiveLeft = math.min(
+          constraints.maxWidth - width,
+          math.max(0, point.dx - width / 2),
+        );
+        effectiveTop = math.min(
+          constraints.maxHeight - lineHeight,
+          math.max(0, point.dy - lineHeight / 2),
+        );
+        effectiveWidth = width;
+        effectiveHeight = lineHeight;
+      }
       return Positioned(
         left: effectiveLeft,
         top: effectiveTop,
-        width: width,
-        height: pointWidth * 3,
+        width: effectiveWidth,
+        height: effectiveHeight,
         child: ExcludeSemantics(
           child: ValueListenableBuilder<bool>(
             valueListenable: isFocusPointFadeOut,
@@ -1280,8 +1304,8 @@ class CameraPickerState extends State<CameraPicker>
                       const SizedBox(width: 2),
                     if (pickerConfig.enableExposureControlOnPoint)
                       SizedBox.fromSize(
-                        size: Size(exposureControlWidth, pointWidth * 3),
-                        child: buildControls(controllerWidth, pointWidth * 3),
+                        size: Size(exposureControlWidth, lineHeight),
+                        child: buildControls(controllerWidth, lineHeight),
                       ),
                   ],
                 ),
@@ -1332,17 +1356,26 @@ class CameraPickerState extends State<CameraPicker>
           kind: PointerDeviceKind.touch,
           globalPosition: Offset(size.width / 2, size.height / 2),
         );
-        requestFocusOnPosition(details.localPosition, constraints);
+        requestFocusAndExposureOnPosition(details.localPosition, constraints);
       },
       onTapHint: textDelegate.sActionManuallyFocusHint,
       sortKey: const OrdinalSortKey(1),
       hidden: innerController == null,
       excludeSemantics: true,
       child: GestureDetector(
-        onTapUp: (TapUpDetails d) =>
-            requestFocusOnPosition(d.localPosition, constraints),
-        onLongPressStart: (LongPressStartDetails d) =>
-            requestFocusOnPosition(d.localPosition, constraints, lock: true),
+        onTapUp: (TapUpDetails d) {
+          requestFocusAndExposureOnPosition(
+            d.localPosition,
+            constraints,
+          );
+        },
+        onLongPressStart: (LongPressStartDetails d) {
+          requestFocusAndExposureOnPosition(
+            d.localPosition,
+            constraints,
+            lock: true,
+          );
+        },
         behavior: HitTestBehavior.translucent,
         child: const SizedBox.expand(),
       ),
@@ -1376,23 +1409,27 @@ class CameraPickerState extends State<CameraPicker>
       controller,
       preview,
     );
-    if (!pickerConfig.enableScaledPreview) {
+    if (!enableScaledPreview) {
       preview = Stack(
         children: <Widget>[
-          RotatedBox(quarterTurns: -cameraQuarterTurns, child: preview),
+          preview,
           Positioned.fill(
-            top: null,
-            child: ExcludeSemantics(child: buildCaptureTips(innerController)),
+            child: ExcludeSemantics(
+              child: RotatedBox(
+                quarterTurns: cameraQuarterTurns,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: buildCaptureTips(innerController),
+                ),
+              ),
+            ),
           ),
           if (pickerConfig.enableSetExposure)
-            RotatedBox(
-              quarterTurns: -cameraQuarterTurns,
-              child: buildExposureDetector(context, constraints),
-            ),
+            buildExposureDetector(context, constraints),
           buildFocusingPoint(
             cameraValue: cameraValue,
             constraints: constraints,
-            quarterTurns: -cameraQuarterTurns,
+            quarterTurns: cameraQuarterTurns,
           ),
           if (pickerConfig.foregroundBuilder != null)
             Positioned.fill(
@@ -1403,10 +1440,9 @@ class CameraPickerState extends State<CameraPicker>
             ),
         ],
       );
-      preview = RotatedBox(quarterTurns: cameraQuarterTurns, child: preview);
     }
     // Scale the preview if the config is enabled.
-    if (pickerConfig.enableScaledPreview) {
+    if (enableScaledPreview) {
       preview = Transform.scale(
         scale: effectiveCameraScale(constraints, controller),
         child: Center(child: transformedWidget ?? preview),
@@ -1454,7 +1490,7 @@ class CameraPickerState extends State<CameraPicker>
               child: buildSettingActions(context),
             ),
             const Spacer(),
-            if (pickerConfig.enableScaledPreview)
+            if (enableScaledPreview)
               ExcludeSemantics(child: buildCaptureTips(innerController)),
             Semantics(
               sortKey: const OrdinalSortKey(2),
@@ -1477,7 +1513,7 @@ class CameraPickerState extends State<CameraPicker>
         Widget previewWidget = ExcludeSemantics(
           child: buildInitializeWrapper(
             builder: (CameraValue v, Widget? w) {
-              if (pickerConfig.enableScaledPreview) {
+              if (enableScaledPreview) {
                 return buildCameraPreview(
                   context: context,
                   cameraValue: v,
@@ -1502,7 +1538,7 @@ class CameraPickerState extends State<CameraPicker>
             },
           ),
         );
-        if (!pickerConfig.enableScaledPreview) {
+        if (!enableScaledPreview) {
           previewWidget = Semantics(
             label: textDelegate.sCameraPreviewLabel(
               innerController?.description.lensDirection,
@@ -1515,7 +1551,10 @@ class CameraPickerState extends State<CameraPicker>
                 kind: PointerDeviceKind.touch,
                 globalPosition: Offset(size.width / 2, size.height / 2),
               );
-              requestFocusOnPosition(details.localPosition, constraints);
+              requestFocusAndExposureOnPosition(
+                details.localPosition,
+                constraints,
+              );
             },
             onTapHint: textDelegate.sActionManuallyFocusHint,
             sortKey: const OrdinalSortKey(1),
@@ -1529,7 +1568,7 @@ class CameraPickerState extends State<CameraPicker>
           alignment: Alignment.center,
           children: <Widget>[
             previewWidget,
-            if (pickerConfig.enableScaledPreview) ...<Widget>[
+            if (enableScaledPreview) ...<Widget>[
               if (pickerConfig.enableSetExposure)
                 buildExposureDetector(context, constraints),
               buildInitializeWrapper(
@@ -1554,7 +1593,7 @@ class CameraPickerState extends State<CameraPicker>
   @override
   Widget build(BuildContext context) {
     Widget body = Builder(builder: buildBody);
-    if (isCameraRotated && pickerConfig.enableScaledPreview) {
+    if (isCameraRotated && enableScaledPreview) {
       final MediaQueryData mq = MediaQuery.of(context);
       body = RotatedBox(
         quarterTurns: pickerConfig.cameraQuarterTurns,

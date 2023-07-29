@@ -51,8 +51,8 @@ class CameraPickerConfig {
   /// 选择器是否可以录像
   final bool enableRecording;
 
-  /// Whether the picker can record video.
-  /// 选择器是否可以录像
+  /// Whether the picker can record video only.
+  /// 选择器是否只可以录像
   final bool onlyEnableRecording;
 
   /// Whether allow the record can start with single tap.
