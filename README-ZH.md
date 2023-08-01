@@ -47,8 +47,11 @@ Language: [English](README.md) | 中文简体
 
 ## 特性 ✨
 
+- ♿ 完整的无障碍支持，包括 **TalkBack** 和 **VoiceOver**
 - ♻️ 支持基于 `State` 重载的全量自定义
-- 💚 99% 的微信风格
+- 🎏 完全可自定义的基于 `ThemeData` 的主题
+- 💚 复刻微信风格（甚至优化了更多的细节）
+- ⚡️ 根据配置调节的性能优化
 - 📷 支持拍照
 - 🎥 支持录像
   - ⏱ 支持限制录像时间
@@ -57,7 +60,6 @@ Language: [English](README.md) | 中文简体
 - 🔍️ 支持捏合缩放
 - 💱 国际化支持
   - ⏪ RTL 语言支持
-- 🎏 完整的自定义主题
 - 🖾 支持自定义前景 widget 构建
 - 🕹️ 保存时拦截自定义操作
 
@@ -67,18 +69,67 @@ Language: [English](README.md) | 中文简体
 |-------------------------------------------------------------------------|-------------------------------------------------------------------------|
 | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6z1h7xj30u01t01kx.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6zarvhj30u01t0x5f.jpg) |
 
+## 开始前的注意事项 ‼️
+
+在开始一切之前，请明确以下两点：
+- 由于理解差异和篇幅限制，并不是所有的内容都会明确地在文档中指出。
+  当你遇到没有找到需求和无法理解的概念时，请先运行项目的示例 example，
+  它可以解决 90% 的常见需求。
+- 该库与 [photo_manager][photo_manager pub] 有强关联性，
+  大部分方法的行为是由 photo_manager 进行控制的，
+  所以请尽可能地确保你了解以下两个类的概念：
+  - 资源（图片/视频/音频） [`AssetEntity`](https://pub.flutter-io.cn/documentation/photo_manager/latest/photo_manager/AssetEntity-class.html)
+  - 资源合集（相册或集合概念） [`AssetPathEntity`](https://pub.flutter-io.cn/documentation/photo_manager/latest/photo_manager/AssetPathEntity-class.html)
+
+当你有与相关的 API 和行为的疑问时，你可以查看
+[photo_manager API 文档][] 了解更多细节。
+
+众多使用场景都已包含在示例中。
+在你提出任何问题之前，请仔细并完整地查看和使用示例。
+
 ## 准备工作 🍭
 
-### 版本限制
+### 版本兼容
+
+该插件仅保证能与 **stable 渠道的 Flutter SDK** 配合使用。
+我们不会为其他渠道的 Flutter SDK 做实时支持。
 
 Flutter SDK：`>=2.8.0` 。
 
+如果在 `flutter pub get` 时遇到了 `resolve conflict` 失败问题，
+请使用 `dependency_overrides` 解决。
+
 ### 配置
 
+执行 `flutter pub add wechat_camera_picker`，
+或者将 `wechat_camera_picker` 手动添加至 `pubspec.yaml` 引用。
+
+```yaml
+dependencies:
+  wechat_camera_picker: ^latest_version
+```
+
+最新的 **稳定** 版本是:
+[![pub package](https://img.shields.io/pub/v/wechat_camera_picker?logo=dart&label=stable&style=flat-square)](https://pub.flutter-io.cn/packages/wechat_camera_picker)
+
+最新的 **开发** 版本是:
+[![pub package](https://img.shields.io/pub/v/wechat_camera_picker?color=9d00ff&include_prereleases&label=dev&logo=dart&style=flat-square)](https://pub.flutter-io.cn/packages/wechat_camera_picker)
+
+在你的代码中导入：
+
+```dart
+import 'package:wechat_camera_picker/wechat_camera_picker.dart';
+```
+
+更多配置步骤：
 - [wechat_assets_picker#准备工作](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/README-ZH.md#preparing-for-use-)
 - [camera#installation](https://pub.flutter-io.cn/packages/camera#installation)
 
 #### Android 13 (API 33) 权限配置
+
+在使用这个 package 时，请确保
+`compileSdkVersion` 和 `targetSdkVersion` 升级到 `33`。
+否则，在 Android 13 设备上将有可能无法加载任何资源。
 
 如果你不需要拍照或录像，你可以考虑将对应权限移除：
 
@@ -94,6 +145,20 @@ Flutter SDK：`>=2.8.0` 。
 ```
 
 ## 使用方法 📖
+
+### 国际化
+
+当你在选择资源的时候，package 会通过你的 `BuildContext`
+读取 `Locale?`，返回对应语言的文字代理实现。
+请确保你可以通过 `BuildContext` 获取到 `Locale`，否则将会 **默认展示中文文字**。
+
+内置的语言文字实现有：
+* 简体中文 (默认)
+* English
+* Tiếng Việt
+
+如果你想使用自定义或固定的文字实现，请通过
+`CameraPickerConfig.textDelegate` 传递调用。
 
 ### 简单的使用方法
 
@@ -178,4 +243,5 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 https://github.com/flutter/flutter/issues/89216 。
 除此之外的问题，你可以提交 issue 进行提问。
 
+[photo_manager pub]: https://pub.flutter-io.cn/packages/photo_manager
 [迁移指南]: https://github.com/fluttercandies/flutter_wechat_camera_picker/blob/main/guides/migration_guide.md

@@ -32,11 +32,13 @@ See the [Migration Guide][] to learn how to migrate between breaking changes.
 * [Flutter WeChat Camera Picker](#flutter-wechat-camera-picker)
   * [Features ✨](#features-)
   * [Screenshots 📸](#screenshots-)
+  * [READ THIS FIRST ‼️](#read-this-first-)
   * [Preparing for use 🍭](#preparing-for-use-)
-    * [Version constraints](#version-constraints)
+    * [Versions compatibility](#versions-compatibility)
     * [Setup](#setup)
       * [Android 13 (API 33) permissions](#android-13-api-33-permissions)
   * [Usage 📖](#usage-)
+    * [Localizations](#localizations)
     * [Simple usage](#simple-usage)
     * [With configurations](#with-configurations)
     * [Using custom `State`s](#using-custom-states)
@@ -48,8 +50,11 @@ See the [Migration Guide][] to learn how to migrate between breaking changes.
 
 ## Features ✨
 
+- ♿ Complete a11y support with _TalkBack_ and _VoiceOver_
 - ♻️ Fully implementable with `State`s override
-- 💚 99% similar to WeChat style
+- 🎏 Fully customizable theme based on `ThemeData`
+- 💚 Completely WeChat style (even more)
+- ⚡️ Adjustable performance with different configurations
 - 📷 Picture taking support
 - 🎥 Video recording support
   - ⏱ Duration limitation support
@@ -58,7 +63,6 @@ See the [Migration Guide][] to learn how to migrate between breaking changes.
 - 🔍️ Scale with pinch support
 - 💱 i18n support
   - ⏪ RTL language support
-- 🎏 Fully customizable theme
 - 🖾 Foreground custom widget builder support
 - 🕹️ Intercept saving with custom process
 
@@ -68,18 +72,67 @@ See the [Migration Guide][] to learn how to migrate between breaking changes.
 |-------------------------------------------------------------------------|-------------------------------------------------------------------------|
 | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6z1h7xj30u01t01kx.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6zarvhj30u01t0x5f.jpg) |
 
+## READ THIS FIRST ‼️
+
+Be aware of below notices before you started anything:
+- Due to understanding differences and the limitation of a single document,
+  documents will not cover all the contents.
+  If you find nothing related to your expected features and cannot understand about concepts,
+  run the example project and check every options first.
+  It has covered 90% of regular requests with the package.
+- The package deeply integrates with the [photo_manager][photo_manager pub] plugin,
+  make sure you understand these two concepts as much as possible:
+  - Asset (photos/videos/audio) - [`AssetEntity`](https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetEntity-class.html)
+  - Assets collection (albums/libraries) - [`AssetPathEntity`](https://pub.dev/documentation/photo_manager/latest/photo_manager/AssetPathEntity-class.html)
+
+When you have questions about related APIs and behaviors,
+check [photo_manager's API docs][] for more details.
+
+Most usages are detailed covered by the [example](example).
+Please walk through the [example](example) carefully
+before you have any questions.
+
 ## Preparing for use 🍭
 
-### Version constraints
+### Versions compatibility
+
+The package only guarantees to be working on **the stable version of Flutter**.
+We won't update it in real-time to align with other channels of Flutter.
 
 Flutter SDK: `>=2.8.0` .
 
+If you got a `resolve conflict` error when running `flutter pub get`,
+please use `dependency_overrides` to fix it.
+
 ### Setup
 
+Run `flutter pub add wechat_camera_picker`,
+or add `wechat_camera_picker` to `pubspec.yaml` dependencies manually.
+```yaml
+dependencies:
+  wechat_camera_picker: ^latest_version
+```
+
+The latest **stable** version is:
+[![pub package](https://img.shields.io/pub/v/wechat_camera_picker?logo=dart&label=stable&style=flat-square)](https://pub.dev/packages/wechat_camera_picker)
+
+The latest **dev** version is:
+[![pub package](https://img.shields.io/pub/v/wechat_camera_picker?color=9d00ff&include_prereleases&label=dev&logo=dart&style=flat-square)](https://pub.dev/packages/wechat_camera_picker)
+
+Then import the package in your code:
+```dart
+import 'package:wechat_camera_picker/wechat_camera_picker.dart';
+```
+
+See also:
 - [wechat_assets_picker#preparing-for-use](https://github.com/fluttercandies/flutter_wechat_assets_picker#preparing-for-use-)
 - [camera#installation](https://pub.dev/packages/camera#installation)
 
 #### Android 13 (API 33) permissions
+
+When using the package, please upgrade
+`targetSdkVersion` and `compileSdkVersion` to `33`.
+Otherwise, no assets can be fetched on Android 13.
 
 If you don't need to take photos or videos,
 consider removing relevant permission in your apps, more specifically:
@@ -96,6 +149,22 @@ consider removing relevant permission in your apps, more specifically:
 ```
 
 ## Usage 📖
+
+### Localizations
+
+When you're picking assets, the package will obtain the `Locale?`
+from your `BuildContext`, and return the corresponding text delegate
+of the current language.
+Make sure you have a valid `Locale` in your widget tree that can be accessed
+from the `BuildContext`. **Otherwise, the default Chinese delegate will be used.**
+
+Embedded text delegates languages are:
+* 简体中文 (default)
+* English
+* Tiếng Việt
+
+If you want to use a custom/fixed text delegate, pass it through the
+`CameraPickerConfig.textDelegate`.
 
 ### Simple usage
 
