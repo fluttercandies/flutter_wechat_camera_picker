@@ -4,8 +4,8 @@ version: 4.0.0+24
 publish_to: none
 
 environment:
-  sdk: ">=2.15.0 <3.0.0"
-  flutter: ">=2.8.0"
+  sdk: ">=2.18.0 <3.0.0"
+  flutter: ">=3.3.0"
 
 dependencies:
   flutter:
@@ -18,7 +18,7 @@ dependencies:
     path: ../
 
   package_info_plus: ^4.0.0
-  video_player: ^2.3.0
+  video_player: ^2.7.0
 
 flutter:
   uses-material-design: true

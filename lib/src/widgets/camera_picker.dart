@@ -2,7 +2,6 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
-// ignore_for_file: deprecated_member_use
 import 'dart:async';
 
 import 'package:camera/camera.dart';
@@ -72,10 +71,8 @@ class CameraPicker extends StatefulWidget {
       primaryColorDark: Colors.grey[900],
       canvasColor: Colors.grey[850],
       scaffoldBackgroundColor: Colors.grey[900],
-      bottomAppBarColor: Colors.grey[900],
       cardColor: Colors.grey[900],
       highlightColor: Colors.transparent,
-      toggleableActiveColor: themeColor,
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: themeColor,
         selectionColor: themeColor.withAlpha(100),
@@ -92,9 +89,9 @@ class CameraPicker extends StatefulWidget {
       buttonTheme: ButtonThemeData(buttonColor: themeColor),
       colorScheme: ColorScheme(
         primary: Colors.grey[900]!,
-        primaryVariant: Colors.grey[900],
+        primaryContainer: Colors.grey[900],
         secondary: themeColor,
-        secondaryVariant: themeColor,
+        secondaryContainer: themeColor,
         background: Colors.grey[900]!,
         surface: Colors.grey[900]!,
         brightness: Brightness.dark,
