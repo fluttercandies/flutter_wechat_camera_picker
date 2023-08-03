@@ -99,7 +99,10 @@ before you have any questions.
 The package only guarantees to be working on **the stable version of Flutter**.
 We won't update it in real-time to align with other channels of Flutter.
 
-Flutter SDK: `>=2.8.0` .
+|        | 2.8.0 | 3.3.0 |
+|--------|:-----:|:-----:|
+| 4.0.0+ |   ❌   |   ✅   |
+| 3.0.0+ |   ✅   |   ❌   |
 
 If you got a `resolve conflict` error when running `flutter pub get`,
 please use `dependency_overrides` to fix it.
@@ -138,9 +141,7 @@ If you don't need to take photos or videos,
 consider removing relevant permission in your apps, more specifically:
 
 ```xml
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.your.app">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Add this if you need to take photos. -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <!-- Add this if you need to take videos. -->
@@ -263,4 +264,5 @@ Thank goes to these wonderful people ([emoji key](https://allcontributors.org/do
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
+[photo_manager pub]: https://pub.dev/packages/photo_manager
 [Migration Guide]: https://github.com/fluttercandies/flutter_wechat_camera_picker/blob/main/guides/migration_guide.md

@@ -6,6 +6,12 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
 
+## 4.0.0-dev.2
+
+### New features
+
+- Migrate to Flutter 3.3, and drop supports for previous Flutter versions.
+
 ## 4.0.0-dev.1
 
 To know more about breaking changes, see [Migration Guide][].

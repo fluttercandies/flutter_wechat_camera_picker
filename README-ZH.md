@@ -31,11 +31,13 @@ Language: [English](README.md) | 中文简体
 * [Flutter WeChat Camera Picker](#flutter-wechat-camera-picker)
   * [特性 ✨](#特性-)
   * [截图 📸](#截图-)
+  * [开始前的注意事项 ‼️](#开始前的注意事项-)
   * [准备工作 🍭](#准备工作-)
-    * [版本限制](#版本限制)
+    * [版本兼容](#版本兼容)
     * [配置](#配置)
       * [Android 13 (API 33) 权限配置](#android-13-api-33-权限配置)
   * [使用方法 📖](#使用方法-)
+    * [国际化](#国际化)
     * [简单的使用方法](#简单的使用方法)
     * [使用配置](#使用配置)
     * [简单的使用方法](#简单的使用方法-1)
@@ -94,7 +96,10 @@ Language: [English](README.md) | 中文简体
 该插件仅保证能与 **stable 渠道的 Flutter SDK** 配合使用。
 我们不会为其他渠道的 Flutter SDK 做实时支持。
 
-Flutter SDK：`>=2.8.0` 。
+|        | 2.8.0 | 3.3.0 |
+|--------|:-----:|:-----:|
+| 4.0.0+ |   ❌   |   ✅   |
+| 3.0.0+ |   ✅   |   ❌   |
 
 如果在 `flutter pub get` 时遇到了 `resolve conflict` 失败问题，
 请使用 `dependency_overrides` 解决。
@@ -134,9 +139,7 @@ import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 如果你不需要拍照或录像，你可以考虑将对应权限移除：
 
 ```xml
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.your.app">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 如果需要拍照，添加该权限 -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <!-- 如果需要录像，添加该权限 -->

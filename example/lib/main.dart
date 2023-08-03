@@ -2,8 +2,6 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -31,7 +29,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       onGenerateTitle: (BuildContext context) => context.l10n.appTitle,
       theme: ThemeData(
-        brightness: MediaQueryData.fromWindow(ui.window).platformBrightness,
+        brightness: Brightness.light,
+        primarySwatch: themeColor.swatch,
+        textSelectionTheme: const TextSelectionThemeData(
+          cursorColor: themeColor,
+        ),
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
         primarySwatch: themeColor.swatch,
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: themeColor,
