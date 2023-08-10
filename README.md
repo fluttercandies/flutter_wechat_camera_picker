@@ -16,7 +16,7 @@ that can be found in the LICENSE file. -->
 Language: English | [中文简体](README-ZH.md)
 
 A **camera picker** based on WeChat's UI which is a separate runnable extension to
-[wechat_assets_picker](https://pub.dev/packages/wechat_assets_picker).
+[wechat_assets_picker][wechat_assets_picker pub].
 The package based on `camera` for camera functions
 and `photo_manager` for asset implementation.
 
@@ -264,5 +264,7 @@ Thank goes to these wonderful people ([emoji key](https://allcontributors.org/do
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
+[wechat_assets_picker pub]: https://pub.dev/packages/wechat_assets_picker
 [photo_manager pub]: https://pub.dev/packages/photo_manager
 [Migration Guide]: https://github.com/fluttercandies/flutter_wechat_camera_picker/blob/main/guides/migration_guide.md
+[photo_manager's API docs]: https://pub.dev/documentation/photo_manager/latest/

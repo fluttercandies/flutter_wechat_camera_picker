@@ -16,7 +16,7 @@ that can be found in the LICENSE file. -->
 Language: [English](README.md) | 中文简体
 
 基于微信界面的相机选择器，可单独运行，是
-[**仿微信资源选择器**](https://pub.flutter-io.cn/packages/wechat_assets_picker) 的扩展。
+[wechat_assets_picker][wechat_assets_picker pub] 的扩展。
 选择器基于 `camera` 实现相机相关功能，`photo_manager` 实现资源相关内容。
 
 当前的界面设计基于的微信版本：**8.3.x**
@@ -25,7 +25,7 @@ Language: [English](README.md) | 中文简体
 查看 [迁移指南][] 了解如何从破坏性改动中迁移为可用代码。
 
 <details>
-  <summary>Table of content</summary>
+  <summary>目录列表</summary>
 
 <!-- TOC -->
 * [Flutter WeChat Camera Picker](#flutter-wechat-camera-picker)
@@ -228,5 +228,7 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 https://github.com/flutter/flutter/issues/89216 。
 除此之外的问题，你可以提交 issue 进行提问。
 
+[wechat_assets_picker pub]: https://pub.flutter-io.cn/packages/wechat_assets_picker
 [photo_manager pub]: https://pub.flutter-io.cn/packages/photo_manager
 [迁移指南]: https://github.com/fluttercandies/flutter_wechat_camera_picker/blob/main/guides/migration_guide.md
+[photo_manager API 文档]: https://pub.flutter-io.cn/documentation/photo_manager/latest/
