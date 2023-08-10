@@ -40,7 +40,6 @@ Language: [English](README.md) | 中文简体
     * [国际化](#国际化)
     * [简单的使用方法](#简单的使用方法)
     * [使用配置](#使用配置)
-    * [简单的使用方法](#简单的使用方法-1)
     * [使用自定义的 `State`](#使用自定义的-state)
   * [常见问题 💭](#常见问题-)
     * [iOS 上的预览在旋转时行为诡异](#ios-上的预览在旋转时行为诡异)
@@ -170,23 +169,6 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
 ```
 
 ### 使用配置
-
-你可以使用 `CameraPickerConfig` 来调整选择时的行为。
-
-```dart
-final AssetEntity? entity = await CameraPicker.pickFromCamera(
-  context,
-  pickerConfig: const CameraPickerConfig(),
-);
-```
-
-`CameraPickerConfig` 的成员说明：
-
-### 简单的使用方法
-
-```dart
-final AssetEntity? entity = await CameraPicker.pickFromCamera(context);
-```
 
 你可以使用 `CameraPickerConfig` 来调整选择时的行为。
 
