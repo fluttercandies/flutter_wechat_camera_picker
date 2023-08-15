@@ -1448,7 +1448,12 @@ class CameraPickerState extends State<CameraPicker>
               child: RotatedBox(
                 quarterTurns: cameraQuarterTurns,
                 child: Align(
-                  alignment: Alignment.bottomCenter,
+                  alignment: {
+                    DeviceOrientation.portraitUp: Alignment.bottomCenter,
+                    DeviceOrientation.portraitDown: Alignment.topCenter,
+                    DeviceOrientation.landscapeLeft: Alignment.centerRight,
+                    DeviceOrientation.landscapeRight: Alignment.centerLeft,
+                  }[cameraValue.deviceOrientation]!,
                   child: buildCaptureTips(innerController),
                 ),
               ),
