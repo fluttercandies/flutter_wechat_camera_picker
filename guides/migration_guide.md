@@ -24,6 +24,7 @@ few naming or signatures of methods are changed. including:
 - `buildCameraPreview`
 - `buildCaptureButton`
 - `buildFocusingPoint`
+- `buildForegroundBody`
 
 ### Details
 
@@ -52,4 +53,14 @@ few naming or signatures of methods are changed. including:
     required BoxConstraints constraints,
     int quarterTurns = 0,
   })
+  ```
+- `buildForegroundBody` now adds `DeviceOrientation? deviceOrientation`
+  to make responsive layouts according to the device orientation.
+  So the signature becomes:
+  ```dart
+  Widget buildForegroundBody(
+    BuildContext context,
+    BoxConstraints constraints,
+    DeviceOrientation? deviceOrientation,
+  )
   ```
