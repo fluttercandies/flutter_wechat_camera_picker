@@ -211,11 +211,6 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   @override
-  void didChangeMetrics() {
-    safeSetState(() {});
-  }
-
-  @override
   void dispose() {
     ambiguate(WidgetsBinding.instance)?.removeObserver(this);
     innerController?.dispose();
@@ -1490,7 +1485,7 @@ class CameraPickerState extends State<CameraPicker>
         );
       }
     }
-    return preview;
+    return RepaintBoundary(child: preview);
   }
 
   Widget buildInitializeWrapper({
