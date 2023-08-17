@@ -6,28 +6,18 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
 
-## 4.0.0-dev.3
-
-### Improvements
-
-- Adapt layouts according to the device orientation.
-
-## 4.0.0-dev.2
-
-### New features
-
-- Migrate to Flutter 3.3, and drop supports for previous Flutter versions.
-
-## 4.0.0-dev.1
+## 4.0.0
 
 To know more about breaking changes, see [Migration Guide][].
 
 ### New features
 
+- Migrate to Flutter 3.3, and drop supports for previous Flutter versions.
 - Sync all UI details from WeChat 8.3.x. (#181)
 
 ### Improvements
 
+- Adapt layouts according to the device orientation.
 - Improve the performance when taking photos.
 - Improve the experience when using the exposure slider.
 - Prefer `FlashMode.off` for better performance.
