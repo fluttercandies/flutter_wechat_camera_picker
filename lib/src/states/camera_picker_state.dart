@@ -956,11 +956,13 @@ class CameraPickerState extends State<CameraPicker>
             child: flashModeSwitch,
           );
         }
+        final isPortrait = v.deviceOrientation.toString().contains('portrait');
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
+          child: Flex(
+            direction: isPortrait ? Axis.horizontal : Axis.vertical,
             children: <Widget>[
-              if (innerController?.value.isRecordingVideo != true) backButton,
+              if (!v.isRecordingVideo) backButton,
               const Spacer(),
               flashModeSwitch,
             ],
@@ -1055,9 +1057,17 @@ class CameraPickerState extends State<CameraPicker>
     required BoxConstraints constraints,
     CameraController? controller,
   }) {
+    final orientation = controller?.value.deviceOrientation ??
+        MediaQuery.of(context).orientation;
+    final isPortrait = orientation.toString().contains('portrait');
     return SizedBox(
-      height: 118,
-      child: Row(
+      width: isPortrait ? null : 118,
+      height: isPortrait ? 118 : null,
+      child: Flex(
+        direction: isPortrait ? Axis.horizontal : Axis.vertical,
+        verticalDirection: orientation == DeviceOrientation.landscapeLeft
+            ? VerticalDirection.up
+            : VerticalDirection.down,
         children: <Widget>[
           const Spacer(),
           Expanded(
@@ -1268,7 +1278,8 @@ class CameraPickerState extends State<CameraPicker>
 
     Widget buildFromPoint(Offset point) {
       const double controllerWidth = 20;
-      final double pointWidth = constraints.maxWidth / 5;
+      final double pointWidth =
+          math.min(constraints.maxWidth, constraints.maxHeight) / 5;
       final double lineHeight = pointWidth * 2.5;
       final double exposureControlWidth =
           pickerConfig.enableExposureControlOnPoint ? controllerWidth : 0;
@@ -1437,7 +1448,12 @@ class CameraPickerState extends State<CameraPicker>
               child: RotatedBox(
                 quarterTurns: cameraQuarterTurns,
                 child: Align(
-                  alignment: Alignment.bottomCenter,
+                  alignment: {
+                    DeviceOrientation.portraitUp: Alignment.bottomCenter,
+                    DeviceOrientation.portraitDown: Alignment.topCenter,
+                    DeviceOrientation.landscapeLeft: Alignment.centerRight,
+                    DeviceOrientation.landscapeRight: Alignment.centerLeft,
+                  }[cameraValue.deviceOrientation]!,
                   child: buildCaptureTips(innerController),
                 ),
               ),
@@ -1497,11 +1513,24 @@ class CameraPickerState extends State<CameraPicker>
     );
   }
 
-  Widget buildForegroundBody(BuildContext context, BoxConstraints constraints) {
+  Widget buildForegroundBody(
+    BuildContext context,
+    BoxConstraints constraints,
+    DeviceOrientation? deviceOrientation,
+  ) {
+    final orientation = deviceOrientation ?? MediaQuery.of(context).orientation;
+    final isPortrait = orientation.toString().contains('portrait');
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(bottom: 20),
-        child: Column(
+        child: Flex(
+          direction: isPortrait ? Axis.vertical : Axis.horizontal,
+          textDirection: orientation == DeviceOrientation.landscapeRight
+              ? TextDirection.rtl
+              : TextDirection.ltr,
+          verticalDirection: orientation == DeviceOrientation.portraitDown
+              ? VerticalDirection.up
+              : VerticalDirection.down,
           children: <Widget>[
             Semantics(
               sortKey: const OrdinalSortKey(0),
@@ -1540,9 +1569,17 @@ class CameraPickerState extends State<CameraPicker>
                 );
               }
               return Align(
-                alignment: AlignmentDirectional.topCenter,
+                alignment: {
+                  DeviceOrientation.portraitUp: Alignment.topCenter,
+                  DeviceOrientation.portraitDown: Alignment.bottomCenter,
+                  DeviceOrientation.landscapeLeft: Alignment.centerLeft,
+                  DeviceOrientation.landscapeRight: Alignment.centerRight,
+                }[v.deviceOrientation]!,
                 child: AspectRatio(
-                  aspectRatio: 1 / v.aspectRatio,
+                  aspectRatio:
+                      v.deviceOrientation.toString().contains('portrait')
+                          ? 1 / v.aspectRatio
+                          : v.aspectRatio,
                   child: LayoutBuilder(
                     builder: (BuildContext c, BoxConstraints constraints) {
                       return buildCameraPreview(
@@ -1602,7 +1639,16 @@ class CameraPickerState extends State<CameraPicker>
                       pickerConfig.foregroundBuilder!(context, innerController),
                 ),
             ],
-            buildForegroundBody(context, constraints),
+            if (innerController == null)
+              buildForegroundBody(context, constraints, null)
+            else
+              buildInitializeWrapper(
+                builder: (CameraValue v, _) => buildForegroundBody(
+                  context,
+                  constraints,
+                  v.deviceOrientation,
+                ),
+              ),
           ],
         );
       },
