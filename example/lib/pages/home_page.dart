@@ -115,7 +115,7 @@ class _MyHomePageState extends State<HomePage> {
                     onRemoveAsset: () => selectedAsset.value = null,
                   );
                 },
-              )
+              ),
             ],
           ),
         ),

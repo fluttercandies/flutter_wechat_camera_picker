@@ -77,7 +77,7 @@ class SelectedAssetView extends StatelessWidget {
                 child: child!,
               ),
               child: _selectedAssetDeleteButton(context),
-            )
+            ),
           ],
         ),
       ),
