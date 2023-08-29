@@ -6,6 +6,12 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
 
+## 4.0.1
+
+### Fixes
+
+- Fix uncaught exceptions for controller methods.
+
 ## 4.0.0
 
 To know more about breaking changes, see [Migration Guide][].

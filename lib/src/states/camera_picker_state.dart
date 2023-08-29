@@ -352,28 +352,38 @@ class CameraPickerState extends State<CameraPicker>
           ..start();
         await Future.wait(
           <Future<void>>[
-            if (pickerConfig.lockCaptureOrientation != null)
-              newController
-                  .lockCaptureOrientation(pickerConfig.lockCaptureOrientation),
             newController
                 .getExposureOffsetStepSize()
-                .then((double value) => exposureStep = value),
+                .then((double value) => exposureStep = value)
+                .catchError((_) => exposureStep),
             newController
                 .getMaxExposureOffset()
-                .then((double value) => maxAvailableExposureOffset = value),
+                .then((double value) => maxAvailableExposureOffset = value)
+                .catchError((_) => maxAvailableExposureOffset),
             newController
                 .getMinExposureOffset()
-                .then((double value) => minAvailableExposureOffset = value),
+                .then((double value) => minAvailableExposureOffset = value)
+                .catchError((_) => minAvailableExposureOffset),
             newController
                 .getMaxZoomLevel()
-                .then((double value) => maxAvailableZoom = value),
+                .then((double value) => maxAvailableZoom = value)
+                .catchError((_) => maxAvailableZoom),
             newController
                 .getMinZoomLevel()
-                .then((double value) => minAvailableZoom = value),
+                .then((double value) => minAvailableZoom = value)
+                .catchError((_) => minAvailableZoom),
+            if (pickerConfig.lockCaptureOrientation != null)
+              newController
+                  .lockCaptureOrientation(pickerConfig.lockCaptureOrientation)
+                  .catchError((_) {}),
             if (pickerConfig.preferredFlashMode != FlashMode.auto)
-              newController.setFlashMode(pickerConfig.preferredFlashMode),
+              newController
+                  .setFlashMode(pickerConfig.preferredFlashMode)
+                  .catchError((_) {
+                validFlashModes[currentCamera]
+                    ?.remove(pickerConfig.preferredFlashMode);
+              }),
           ],
-          eagerError: true,
         );
         stopwatch.stop();
         realDebugPrint("${stopwatch.elapsed} for config's update.");
@@ -747,7 +757,7 @@ class CameraPickerState extends State<CameraPicker>
         isShootingButtonAnimate = false;
       });
     }
-    if (controller.value.isRecordingVideo) {
+    if (innerController?.value.isRecordingVideo == true) {
       lastShootingButtonPressedPosition = null;
       safeSetState(() {});
       stopRecordingVideo();
@@ -869,20 +879,23 @@ class CameraPickerState extends State<CameraPicker>
   ////////////////////////////////////////////////////////////////////////////
 
   PointerUpEventListener? get onPointerUp {
-    if (enableRecording && !enableTapRecording) {
+    if (innerController != null && enableRecording && !enableTapRecording) {
       return recordDetectionCancel;
     }
     return null;
   }
 
   PointerMoveEventListener? onPointerMove(BoxConstraints c) {
-    if (enablePullToZoomInRecord) {
+    if (innerController != null && enablePullToZoomInRecord) {
       return (PointerMoveEvent e) => onShootingButtonMove(e, c);
     }
     return null;
   }
 
   GestureTapCallback? get onTap {
+    if (innerController == null) {
+      return null;
+    }
     if (enableTapRecording) {
       if (innerController?.value.isRecordingVideo ?? false) {
         return stopRecordingVideo;
@@ -901,6 +914,9 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   String? get onTapHint {
+    if (innerController == null) {
+      return null;
+    }
     if (enableTapRecording) {
       if (innerController?.value.isRecordingVideo ?? false) {
         return textDelegate.sActionStopRecordingHint;
@@ -914,6 +930,9 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   GestureLongPressCallback? get onLongPress {
+    if (innerController == null) {
+      return null;
+    }
     if (enableRecording && !enableTapRecording) {
       return recordDetection;
     }
@@ -921,6 +940,9 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   String? get onLongPressHint {
+    if (innerController == null) {
+      return null;
+    }
     if (enableRecording && !enableTapRecording) {
       return textDelegate.sActionRecordHint;
     }
