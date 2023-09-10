@@ -722,7 +722,7 @@ class CameraPickerState extends State<CameraPicker>
           controller.setExposureMode(previousExposureMode),
       ]);
       await controller.resumePreview();
-    } catch (e, ) {
+    } catch (e, s) {
       realDebugPrint('Error when preview the captured file: $e');
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     } finally {
