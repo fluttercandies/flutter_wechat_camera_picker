@@ -693,12 +693,18 @@ class CameraPickerState extends State<CameraPicker>
     final ExposureMode previousExposureMode = controller.value.exposureMode;
     try {
       await Future.wait(<Future<void>>[
-        controller.setFocusMode(FocusMode.locked),
+        controller
+            .setFocusMode(FocusMode.locked)
+            .catchError((e, s) {
+              handleErrorWithHandler(e, pickerConfig.onError, s: s);
+            }),
         if (previousExposureMode != ExposureMode.locked)
-          controller.setExposureMode(ExposureMode.locked),
-      ]).catchError((e, s) {
-        handleErrorWithHandler(e, pickerConfig.onError, s: s);
-      });
+          controller
+              .setExposureMode(ExposureMode.locked)
+              .catchError((e, s) {
+                handleErrorWithHandler(e, pickerConfig.onError, s: s);
+              }),
+      ]);
       final XFile file = await controller.takePicture();
       await controller.pausePreview();
       final bool? isCapturedFileHandled = pickerConfig.onXFileCaptured?.call(
