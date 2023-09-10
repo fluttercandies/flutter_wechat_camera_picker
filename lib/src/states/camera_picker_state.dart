@@ -693,17 +693,13 @@ class CameraPickerState extends State<CameraPicker>
     final ExposureMode previousExposureMode = controller.value.exposureMode;
     try {
       await Future.wait(<Future<void>>[
-        controller
-            .setFocusMode(FocusMode.locked)
-            .catchError((e, s) {
-              handleErrorWithHandler(e, pickerConfig.onError, s: s);
-            }),
+        controller.setFocusMode(FocusMode.locked).catchError((e, s) {
+          handleErrorWithHandler(e, pickerConfig.onError, s: s);
+        }),
         if (previousExposureMode != ExposureMode.locked)
-          controller
-              .setExposureMode(ExposureMode.locked)
-              .catchError((e, s) {
-                handleErrorWithHandler(e, pickerConfig.onError, s: s);
-              }),
+          controller.setExposureMode(ExposureMode.locked).catchError((e, s) {
+            handleErrorWithHandler(e, pickerConfig.onError, s: s);
+          }),
       ]);
       final XFile file = await controller.takePicture();
       await controller.pausePreview();
@@ -729,7 +725,6 @@ class CameraPickerState extends State<CameraPicker>
       ]);
       await controller.resumePreview();
     } catch (e, s) {
-      realDebugPrint('Error when preview the captured file: $e');
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
     } finally {
       isControllerBusy = false;
@@ -792,7 +787,6 @@ class CameraPickerState extends State<CameraPicker>
         ..start();
     } catch (e, s) {
       isControllerBusy = false;
-      realDebugPrint('Error when start recording video: $e');
       if (!controller.value.isRecordingVideo) {
         handleErrorWithHandler(e, pickerConfig.onError, s: s);
         return;
@@ -800,9 +794,6 @@ class CameraPickerState extends State<CameraPicker>
       try {
         await controller.stopVideoRecording();
       } catch (e, s) {
-        realDebugPrint(
-          'Error when stop recording video after an error start: $e',
-        );
         recordCountdownTimer?.cancel();
         isShootingButtonAnimate = false;
         handleErrorWithHandler(e, pickerConfig.onError, s: s);
@@ -854,11 +845,9 @@ class CameraPickerState extends State<CameraPicker>
         await controller.resumePreview();
       }
     } catch (e, s) {
-      realDebugPrint('Error when stop recording video: $e');
-      realDebugPrint('Try to initialize a new CameraController...');
-      initCameras();
-      handleError();
       handleErrorWithHandler(e, pickerConfig.onError, s: s);
+      handleError();
+      initCameras();
     } finally {
       isControllerBusy = false;
       safeSetState(() {});
