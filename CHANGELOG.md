@@ -6,6 +6,12 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
 
+## 4.0.2
+
+### Fixes
+
+- Handles exceptions if locking methods are failed.
+
 ## 4.0.1
 
 ### Fixes
