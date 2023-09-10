@@ -696,7 +696,9 @@ class CameraPickerState extends State<CameraPicker>
         controller.setFocusMode(FocusMode.locked),
         if (previousExposureMode != ExposureMode.locked)
           controller.setExposureMode(ExposureMode.locked),
-      ]);
+      ]).catchError((e, s) {
+        handleErrorWithHandler(e, pickerConfig.onError, s: s);
+      });
       final XFile file = await controller.takePicture();
       await controller.pausePreview();
       final bool? isCapturedFileHandled = pickerConfig.onXFileCaptured?.call(
@@ -720,9 +722,9 @@ class CameraPickerState extends State<CameraPicker>
           controller.setExposureMode(previousExposureMode),
       ]);
       await controller.resumePreview();
-    } catch (e) {
+    } catch (e, ) {
       realDebugPrint('Error when preview the captured file: $e');
-      handleErrorWithHandler(e, pickerConfig.onError);
+      handleErrorWithHandler(e, pickerConfig.onError, s: s);
     } finally {
       isControllerBusy = false;
       safeSetState(() {});
