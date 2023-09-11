@@ -6,36 +6,51 @@ that can be found in the LICENSE file. -->
 
 [![pub package](https://img.shields.io/pub/v/wechat_camera_picker?logo=dart&label=%E7%A8%B3%E5%AE%9A%E7%89%88&style=flat-square)](https://pub.flutter-io.cn/packages/wechat_camera_picker)
 [![pub package](https://img.shields.io/pub/v/wechat_camera_picker?color=42a012&include_prereleases&label=%E5%BC%80%E5%8F%91%E7%89%88&logo=dart&style=flat-square)](https://pub.flutter-io.cn/packages/wechat_camera_picker)
+[![CodeFactor](https://img.shields.io/codefactor/grade/github/fluttercandies/flutter_wechat_camera_picker?logo=codefactor&label=%E4%BB%A3%E7%A0%81%E8%B4%A8%E9%87%8F&logoColor=%23ffffff&style=flat-square)](https://www.codefactor.io/repository/github/fluttercandies/flutter_wechat_camera_picker)
+
+[![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_wechat_camera_picker/runnable.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_camera_picker/actions/workflows/runnable.yml)
+[![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_wechat_camera_picker?style=flat-square&label=%E5%8D%8F%E8%AE%AE)](https://github.com/fluttercandies/flutter_wechat_camera_picker/blob/master/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_camera_picker?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_camera_picker/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/fluttercandies/flutter_wechat_camera_picker?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_camera_picker/network)
-[![Build status](https://img.shields.io/github/actions/workflow/status/fluttercandies/flutter_wechat_camera_picker/runnable.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_camera_picker/actions/workflows/runnable.yml)
-[![CodeFactor](https://img.shields.io/codefactor/grade/github/fluttercandies/flutter_wechat_camera_picker?logo=codefactor&label=%E4%BB%A3%E7%A0%81%E8%B4%A8%E9%87%8F&logoColor=%23ffffff&style=flat-square)](https://www.codefactor.io/repository/github/fluttercandies/flutter_wechat_camera_picker)
-[![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_wechat_camera_picker?style=flat-square&label=%E5%8D%8F%E8%AE%AE)](https://github.com/fluttercandies/flutter_wechat_camera_picker/blob/master/LICENSE)
-<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5bcc0gy"><img border="0" src="https://pub.idqqimg.com/wpa/images/group.png" alt="FlutterCandies" title="FlutterCandies"></a>
 
-Language: [English](README.md) | 中文简体
+[![Flutter Candies QQ群](https://pub.idqqimg.com/wpa/images/group.png)](https://jq.qq.com/?_wv=1027&k=5bcc0gy)
 
-基于微信界面的相机选择器，可单独运行，是
-[wechat_assets_picker][wechat_assets_picker pub] 的扩展。
-选择器基于 `camera` 实现相机相关功能，`photo_manager` 实现资源相关内容。
+Language: [English](README.md) | 中文
+
+基于 **微信 UI** 的 Flutter 相机选择器，可以单独运行，
+同时是 [wechat_assets_picker][wechat_assets_picker pub] 的扩展。
 
 当前的界面设计基于的微信版本：**8.3.x**
 界面更新将在微信版本更新后随时进行跟进。
 
 查看 [迁移指南][] 了解如何从破坏性改动中迁移为可用代码。
 
+## 主要使用的 package
+
+该插件基于这些优秀的 package 构建：
+
+| Name                               | Features    |
+|:-----------------------------------|:------------|
+| [photo_manager][photo_manager pub] | 资源的基础抽象和管理。 |
+| [camera][camera pub]               | 拍摄图片和视频。    |
+| [video_player][video_player pub]   | 播放对应的视频和音频。 |
+
+这些 package 在该插件中的实现已相对稳定。
+如果你在使用中发现于它们相关的问题，
+请先在本插件的问题跟踪中报告相关问题。
+
 <details>
   <summary>目录列表</summary>
 
 <!-- TOC -->
 * [Flutter WeChat Camera Picker](#flutter-wechat-camera-picker)
+  * [主要使用的 package](#主要使用的-package)
   * [特性 ✨](#特性-)
   * [截图 📸](#截图-)
   * [开始前的注意事项 ‼️](#开始前的注意事项-)
   * [准备工作 🍭](#准备工作-)
     * [版本兼容](#版本兼容)
     * [配置](#配置)
-      * [Android 13 (API 33) 权限配置](#android-13-api-33-权限配置)
   * [使用方法 📖](#使用方法-)
     * [国际化](#国际化)
     * [简单的使用方法](#简单的使用方法)
@@ -107,7 +122,6 @@ Language: [English](README.md) | 中文简体
 
 执行 `flutter pub add wechat_camera_picker`，
 或者将 `wechat_camera_picker` 手动添加至 `pubspec.yaml` 引用。
-
 ```yaml
 dependencies:
   wechat_camera_picker: ^latest_version
@@ -119,31 +133,14 @@ dependencies:
 最新的 **开发** 版本是:
 [![pub package](https://img.shields.io/pub/v/wechat_camera_picker?color=9d00ff&include_prereleases&label=dev&logo=dart&style=flat-square)](https://pub.flutter-io.cn/packages/wechat_camera_picker)
 
+运行前，按照这些步骤逐一配置：
+- [wechat_assets_picker#准备工作](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/README-ZH.md#preparing-for-use-)
+- [camera#installation](https://pub.flutter-io.cn/packages/camera#installation)
+
 在你的代码中导入：
 
 ```dart
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
-```
-
-更多配置步骤：
-- [wechat_assets_picker#准备工作](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/README-ZH.md#preparing-for-use-)
-- [camera#installation](https://pub.flutter-io.cn/packages/camera#installation)
-
-#### Android 13 (API 33) 权限配置
-
-在使用这个 package 时，请确保
-`compileSdkVersion` 和 `targetSdkVersion` 升级到 `33`。
-否则，在 Android 13 设备上将有可能无法加载任何资源。
-
-如果你不需要拍照或录像，你可以考虑将对应权限移除：
-
-```xml
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- 如果需要拍照，添加该权限 -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <!-- 如果需要录像，添加该权限 -->
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-</manifest>
 ```
 
 ## 使用方法 📖
@@ -230,5 +227,7 @@ https://github.com/flutter/flutter/issues/89216 。
 
 [wechat_assets_picker pub]: https://pub.flutter-io.cn/packages/wechat_assets_picker
 [photo_manager pub]: https://pub.flutter-io.cn/packages/photo_manager
+[camera pub]: https://pub.flutter-io.cn/packages/camera
+[video_player pub]: https://pub.flutter-io.cn/packages/video_player
 [迁移指南]: https://github.com/fluttercandies/flutter_wechat_camera_picker/blob/main/guides/migration_guide.md
 [photo_manager API 文档]: https://pub.flutter-io.cn/documentation/photo_manager/latest/
