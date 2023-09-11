@@ -1,11 +1,22 @@
 name: wechat_camera_picker
-description: A camera picker based on WeChat's UI which is a separate runnable extension to wechat_assets_picker.
-repository: https://github.com/fluttercandies/flutter_wechat_camera_picker
 version: 4.0.2
+description: |
+  A camera picker for Flutter projects based on WeChat's UI,
+  which is also a separate runnable extension to the
+  wechat_assets_picker.
+topics:
+  - picker
+  - camera
+  - image
+  - video
+  - wechat
+
+repository: https://github.com/fluttercandies/flutter_wechat_camera_picker
+issue_tracker: https://github.com/fluttercandies/flutter_wechat_camera_picker/issues
 
 environment:
-  sdk: ">=2.18.0 <3.0.0"
-  flutter: ">=3.3.0"
+  sdk: '>=2.18.0 <4.0.0'
+  flutter: '>=3.3.0'
 
 dependencies:
   flutter:
@@ -18,4 +29,4 @@ dependencies:
   video_player: ^2.7.0
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
+  flutter_lints: any
