@@ -6,6 +6,12 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
 
+## Unreleased
+
+### Fixes
+
+- Prevent duplicate shooting actions.
+
 ## 4.0.2
 
 ### Fixes
