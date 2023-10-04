@@ -980,18 +980,20 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   PointerMoveEventListener? onPointerMove(BoxConstraints c) {
-    if (innerController != null && enablePullToZoomInRecord) {
+    if (innerController != null &&
+        enablePullToZoomInRecord &&
+        controller.value.isRecordingVideo) {
       return (PointerMoveEvent e) => onShootingButtonMove(e, c);
     }
     return null;
   }
 
   GestureTapCallback? get onTap {
-    if (innerController == null) {
+    if (innerController == null || isControllerBusy) {
       return null;
     }
     if (enableTapRecording) {
-      if (innerController?.value.isRecordingVideo ?? false) {
+      if (controller.value.isRecordingVideo) {
         return stopRecordingVideo;
       }
       return () {
@@ -1008,7 +1010,7 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   String? get onTapHint {
-    if (innerController == null) {
+    if (innerController == null || isControllerBusy) {
       return null;
     }
     if (enableTapRecording) {
@@ -1024,7 +1026,7 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   GestureLongPressCallback? get onLongPress {
-    if (innerController == null) {
+    if (innerController == null || isControllerBusy) {
       return null;
     }
     if (enableRecording && !enableTapRecording) {
@@ -1034,7 +1036,7 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   String? get onLongPressHint {
-    if (innerController == null) {
+    if (innerController == null || isControllerBusy) {
       return null;
     }
     if (enableRecording && !enableTapRecording) {

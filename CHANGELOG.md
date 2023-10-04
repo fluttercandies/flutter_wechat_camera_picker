@@ -8,6 +8,10 @@ See the [Migration Guide](guides/migration_guide.md) for the details of breaking
 
 ## 4.0.3
 
+### Fixes
+
+- Prevent duplicate shooting actions.
+
 ### Improvements
 
 - Provide overall invalid wrapping for controller methods.
