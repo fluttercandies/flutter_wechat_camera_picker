@@ -81,7 +81,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
     } catch (e, s) {
       hasErrorWhenInitializing = true;
       realDebugPrint('Error when initializing video controller: $e');
-      handleErrorWithHandler(e, onError, s: s);
+      handleErrorWithHandler(e, s, onError);
     } finally {
       if (mounted) {
         setState(() {});
@@ -117,7 +117,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
         }
       }
     } catch (e, s) {
-      handleErrorWithHandler(e, onError, s: s);
+      handleErrorWithHandler(e, s, onError);
     }
   }
 
@@ -140,7 +140,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
           File(widget.previewXFile.path),
         );
       } catch (e, s) {
-        handleErrorWithHandler(e, widget.pickerConfig.onError, s: s);
+        handleErrorWithHandler(e, s, onError);
       }
       isSavingEntity = false;
       if (mounted) {
@@ -177,11 +177,12 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
         StateError(
           'Permission is not fully granted to save the captured file.',
         ),
-        widget.pickerConfig.onError,
+        StackTrace.current,
+        onError,
       );
     } catch (e, s) {
       realDebugPrint('Saving entity failed: $e');
-      handleErrorWithHandler(e, widget.pickerConfig.onError, s: s);
+      handleErrorWithHandler(e, s, onError);
     } finally {
       isSavingEntity = false;
       if (mounted) {

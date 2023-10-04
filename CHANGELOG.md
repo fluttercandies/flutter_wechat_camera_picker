@@ -15,6 +15,7 @@ See the [Migration Guide](guides/migration_guide.md) for the details of breaking
 ### Improvements
 
 - Provide overall invalid wrapping for controller methods.
+- Throw exceptions with more accurate stack traces.
 
 ## 4.0.2
 
