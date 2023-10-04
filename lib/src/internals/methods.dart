@@ -18,14 +18,14 @@ void realDebugPrint(dynamic message) {
 
 void handleErrorWithHandler(
   Object e,
-  CameraErrorHandler? handler, {
-  StackTrace? s,
-}) {
+  StackTrace s,
+  CameraErrorHandler? handler,
+) {
   if (handler != null) {
     handler(e, s);
     return;
   }
-  throw e;
+  Error.throwWithStackTrace(e, s);
 }
 
 T? ambiguate<T>(T value) => value;

@@ -6,11 +6,16 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
 
-## Unreleased
+## 4.0.3
 
 ### Fixes
 
 - Prevent duplicate shooting actions.
+
+### Improvements
+
+- Provide overall invalid wrapping for controller methods.
+- Throw exceptions with more accurate stack traces.
 
 ## 4.0.2
 

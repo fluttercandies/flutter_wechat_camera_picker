@@ -201,6 +201,13 @@ class CameraPickerState extends State<CameraPicker>
 
   CameraPickerTextDelegate get textDelegate => Constants.textDelegate;
 
+  /// If controller methods were failed to called for camera descriptions,
+  /// it will be recorded as invalid and never gets called again.
+  ///
+  /// 如果相机实例的某个方法调用失败，该方法会被记录并且不会再被调用。
+  final invalidControllerMethods = <CameraDescription, Set<String>>{};
+  bool retriedAfterInvalidInitialize = false;
+
   @override
   void initState() {
     super.initState();
@@ -265,6 +272,31 @@ class CameraPickerState extends State<CameraPicker>
     return scale;
   }
 
+  /// Wraps [CameraController] methods with invalid controls.
+  /// Returns the [fallback] value if invalid and [T] is non-void.
+  ///
+  /// 对于 [CameraController] 的方法增加是否无效的控制。
+  /// 如果 [T] 是非 void 且方法无效，返回 [fallback]。
+  Future<T> wrapControllerMethod<T>(
+    String key,
+    Future<T> Function() method, {
+    CameraDescription? description,
+    VoidCallback? onError,
+    T? fallback,
+  }) async {
+    description ??= currentCamera;
+    if (invalidControllerMethods[description]!.contains(key)) {
+      return fallback!;
+    }
+    try {
+      return await method();
+    } catch (e) {
+      invalidControllerMethods[description]!.add(key);
+      onError?.call();
+      rethrow;
+    }
+  }
+
   /// Initialize cameras instances.
   /// 初始化相机实例
   Future<void> initCameras([CameraDescription? cameraDescription]) async {
@@ -308,6 +340,7 @@ class CameraPickerState extends State<CameraPicker>
             'No CameraDescription found.',
             'No cameras are available in the controller.',
           ),
+          StackTrace.current,
           pickerConfig.onError,
         );
       }
@@ -325,8 +358,10 @@ class CameraPickerState extends State<CameraPicker>
         index = currentCameraIndex;
       }
       // Initialize the controller with the given resolution preset.
+      final description = cameraDescription ?? cameras[index];
+      invalidControllerMethods[description] ??= <String>{};
       final CameraController newController = CameraController(
-        cameraDescription ?? cameras[index],
+        description,
         pickerConfig.resolutionPreset,
         enableAudio: enableAudio,
         imageFormatGroup: pickerConfig.imageFormatGroup,
@@ -352,44 +387,79 @@ class CameraPickerState extends State<CameraPicker>
           ..start();
         await Future.wait(
           <Future<void>>[
-            newController
-                .getExposureOffsetStepSize()
-                .then((double value) => exposureStep = value)
-                .catchError((_) => exposureStep),
-            newController
-                .getMaxExposureOffset()
-                .then((double value) => maxAvailableExposureOffset = value)
-                .catchError((_) => maxAvailableExposureOffset),
-            newController
-                .getMinExposureOffset()
-                .then((double value) => minAvailableExposureOffset = value)
-                .catchError((_) => minAvailableExposureOffset),
-            newController
-                .getMaxZoomLevel()
-                .then((double value) => maxAvailableZoom = value)
-                .catchError((_) => maxAvailableZoom),
-            newController
-                .getMinZoomLevel()
-                .then((double value) => minAvailableZoom = value)
-                .catchError((_) => minAvailableZoom),
+            wrapControllerMethod(
+              'getExposureOffsetStepSize',
+              () => newController.getExposureOffsetStepSize(),
+              description: description,
+              fallback: exposureStep,
+            ).then((value) => exposureStep = value),
+            wrapControllerMethod(
+              'getMaxExposureOffset',
+              () => newController.getMaxExposureOffset(),
+              description: description,
+              fallback: maxAvailableExposureOffset,
+            ).then((value) => maxAvailableExposureOffset = value),
+            wrapControllerMethod(
+              'getMinExposureOffset',
+              () => newController.getMinExposureOffset(),
+              description: description,
+              fallback: minAvailableExposureOffset,
+            ).then((value) => minAvailableExposureOffset = value),
+            wrapControllerMethod(
+              'getMaxZoomLevel',
+              () => newController.getMaxZoomLevel(),
+              description: description,
+              fallback: maxAvailableZoom,
+            ).then((value) => maxAvailableZoom = value),
+            wrapControllerMethod(
+              'getMinZoomLevel',
+              () => newController.getMinZoomLevel(),
+              description: description,
+              fallback: minAvailableZoom,
+            ).then((value) => minAvailableZoom = value),
+            wrapControllerMethod(
+              'getMinZoomLevel',
+              () => newController.getMinZoomLevel(),
+              description: description,
+              fallback: minAvailableZoom,
+            ).then((value) => minAvailableZoom = value),
             if (pickerConfig.lockCaptureOrientation != null)
-              newController
-                  .lockCaptureOrientation(pickerConfig.lockCaptureOrientation)
-                  .catchError((_) {}),
-            if (pickerConfig.preferredFlashMode != FlashMode.auto)
-              newController
-                  .setFlashMode(pickerConfig.preferredFlashMode)
-                  .catchError((_) {
-                validFlashModes[currentCamera]
-                    ?.remove(pickerConfig.preferredFlashMode);
-              }),
+              wrapControllerMethod<void>(
+                'lockCaptureOrientation',
+                () => newController.lockCaptureOrientation(
+                  pickerConfig.lockCaptureOrientation,
+                ),
+                description: description,
+              ),
+            // Do not set flash modes for the front camera.
+            if (description.lensDirection != CameraLensDirection.front &&
+                pickerConfig.preferredFlashMode != FlashMode.auto)
+              wrapControllerMethod<void>(
+                'setFlashMode',
+                () => newController.setFlashMode(
+                  pickerConfig.preferredFlashMode,
+                ),
+                description: description,
+                onError: () {
+                  validFlashModes[description]?.remove(
+                    pickerConfig.preferredFlashMode,
+                  );
+                },
+              ),
           ],
+          eagerError: false,
         );
         stopwatch.stop();
         realDebugPrint("${stopwatch.elapsed} for config's update.");
         innerController = newController;
       } catch (e, s) {
-        handleErrorWithHandler(e, pickerConfig.onError, s: s);
+        handleErrorWithHandler(e, s, pickerConfig.onError);
+        if (!retriedAfterInvalidInitialize) {
+          retriedAfterInvalidInitialize = true;
+          Future.delayed(Duration.zero, initCameras);
+        } else {
+          retriedAfterInvalidInitialize = false;
+        }
       } finally {
         safeSetState(() {});
       }
@@ -449,6 +519,7 @@ class CameraPickerState extends State<CameraPicker>
           'No FlashMode found.',
           'No flash modes are available with the camera.',
         ),
+        StackTrace.current,
         pickerConfig.onError,
       );
       return;
@@ -467,7 +538,7 @@ class CameraPickerState extends State<CameraPicker>
       // Remove the flash mode that throws an exception.
       validFlashModes[currentCamera]!.remove(nextFlashMode);
       switchFlashesMode(value);
-      handleErrorWithHandler(e, pickerConfig.onError, s: s);
+      handleErrorWithHandler(e, s, pickerConfig.onError);
     }
   }
 
@@ -489,7 +560,7 @@ class CameraPickerState extends State<CameraPicker>
     try {
       await controller.setZoomLevel(currentZoom);
     } catch (e, s) {
-      handleErrorWithHandler(e, pickerConfig.onError, s: s);
+      handleErrorWithHandler(e, s, pickerConfig.onError);
     }
   }
 
@@ -550,7 +621,7 @@ class CameraPickerState extends State<CameraPicker>
     try {
       await controller.setExposureMode(newMode);
     } catch (e, s) {
-      handleErrorWithHandler(e, pickerConfig.onError, s: s);
+      handleErrorWithHandler(e, s, pickerConfig.onError);
     }
     restartExposureModeDisplayTimer();
     restartExposureFadeOutTimer();
@@ -582,9 +653,16 @@ class CameraPickerState extends State<CameraPicker>
     isFocusPointFadeOut.value = false;
     try {
       await Future.wait(<Future<void>>[
+        wrapControllerMethod<void>(
+          'setExposureOffset',
+          () => controller.setExposureOffset(0),
+        ),
         controller.setExposureOffset(0),
         if (controller.value.exposureMode == ExposureMode.locked)
-          controller.setExposureMode(ExposureMode.auto),
+          wrapControllerMethod<void>(
+            'setExposureMode',
+            () => controller.setExposureMode(ExposureMode.auto),
+          ),
       ]);
       final Offset newPoint = lastExposurePoint.value!.scale(
         1 / constraints.maxWidth,
@@ -597,13 +675,14 @@ class CameraPickerState extends State<CameraPicker>
           controller.setFocusPoint(newPoint),
       ]);
     } catch (e, s) {
-      handleErrorWithHandler(e, pickerConfig.onError, s: s);
+      handleErrorWithHandler(e, s, pickerConfig.onError);
     }
   }
 
   /// Update the exposure offset using the exposure controller.
   /// 使用曝光控制器更新曝光值
   Future<void> updateExposureOffset(double value) async {
+    final previousSliderOffsetValue = currentExposureSliderOffset.value;
     currentExposureSliderOffset.value = value;
     // Normalize the new exposure value if exposures have steps.
     if (exposureStep > 0) {
@@ -621,18 +700,26 @@ class CameraPickerState extends State<CameraPicker>
         value > maxAvailableExposureOffset) {
       return;
     }
+    final previousOffsetValue = currentExposureOffset.value;
     currentExposureOffset.value = value;
+    bool hasError = false;
     try {
       realDebugPrint('Updating the exposure offset value: $value');
       // Use [CameraPlatform] explicitly to reduce channel calls.
-      await CameraPlatform.instance.setExposureOffset(
-        controller.cameraId,
-        value,
+      await wrapControllerMethod(
+        'setExposureOffset',
+        () => CameraPlatform.instance.setExposureOffset(
+          controller.cameraId,
+          value,
+        ),
       );
     } catch (e, s) {
-      handleErrorWithHandler(e, pickerConfig.onError, s: s);
+      handleErrorWithHandler(e, s, pickerConfig.onError);
+      hasError = true;
+      currentExposureSliderOffset.value = previousSliderOffsetValue;
+      currentExposureOffset.value = previousOffsetValue;
     }
-    if (!isFocusPointDisplays.value) {
+    if (!hasError && !isFocusPointDisplays.value) {
       isFocusPointDisplays.value = true;
     }
     restartExposurePointDisplayTimer();
@@ -683,6 +770,7 @@ class CameraPickerState extends State<CameraPicker>
     if (!controller.value.isInitialized) {
       handleErrorWithHandler(
         StateError('Camera has not initialized.'),
+        StackTrace.current,
         pickerConfig.onError,
       );
     }
@@ -693,12 +781,18 @@ class CameraPickerState extends State<CameraPicker>
     final ExposureMode previousExposureMode = controller.value.exposureMode;
     try {
       await Future.wait(<Future<void>>[
-        controller.setFocusMode(FocusMode.locked).catchError((e, s) {
-          handleErrorWithHandler(e, pickerConfig.onError, s: s);
+        wrapControllerMethod<void>(
+          'setFocusMode',
+          () => controller.setFocusMode(FocusMode.locked),
+        ).catchError((e, s) {
+          handleErrorWithHandler(e, s, pickerConfig.onError);
         }),
         if (previousExposureMode != ExposureMode.locked)
-          controller.setExposureMode(ExposureMode.locked).catchError((e, s) {
-            handleErrorWithHandler(e, pickerConfig.onError, s: s);
+          wrapControllerMethod<void>(
+            'setExposureMode',
+            () => controller.setExposureMode(ExposureMode.locked),
+          ).catchError((e, s) {
+            handleErrorWithHandler(e, s, pickerConfig.onError);
           }),
       ]);
       final XFile file = await controller.takePicture();
@@ -719,13 +813,19 @@ class CameraPickerState extends State<CameraPicker>
         return;
       }
       await Future.wait(<Future<void>>[
-        controller.setFocusMode(FocusMode.auto),
+        wrapControllerMethod<void>(
+          'setFocusMode',
+          () => controller.setFocusMode(FocusMode.auto),
+        ),
         if (previousExposureMode != ExposureMode.locked)
-          controller.setExposureMode(previousExposureMode),
+          wrapControllerMethod<void>(
+            'setExposureMode',
+            () => controller.setExposureMode(previousExposureMode),
+          ),
       ]);
       await controller.resumePreview();
     } catch (e, s) {
-      handleErrorWithHandler(e, pickerConfig.onError, s: s);
+      handleErrorWithHandler(e, s, pickerConfig.onError);
     } finally {
       isControllerBusy = false;
       safeSetState(() {});
@@ -788,7 +888,7 @@ class CameraPickerState extends State<CameraPicker>
     } catch (e, s) {
       isControllerBusy = false;
       if (!controller.value.isRecordingVideo) {
-        handleErrorWithHandler(e, pickerConfig.onError, s: s);
+        handleErrorWithHandler(e, s, pickerConfig.onError);
         return;
       }
       try {
@@ -796,7 +896,7 @@ class CameraPickerState extends State<CameraPicker>
       } catch (e, s) {
         recordCountdownTimer?.cancel();
         isShootingButtonAnimate = false;
-        handleErrorWithHandler(e, pickerConfig.onError, s: s);
+        handleErrorWithHandler(e, s, pickerConfig.onError);
       }
       recordStopwatch.stop();
     } finally {
@@ -845,7 +945,7 @@ class CameraPickerState extends State<CameraPicker>
         await controller.resumePreview();
       }
     } catch (e, s) {
-      handleErrorWithHandler(e, pickerConfig.onError, s: s);
+      handleErrorWithHandler(e, s, pickerConfig.onError);
       handleError();
       initCameras();
     } finally {
@@ -1464,6 +1564,7 @@ class CameraPickerState extends State<CameraPicker>
       preview = Stack(
         children: <Widget>[
           preview,
+          // Image.asset('assets/1.jpg', fit: BoxFit.cover),
           Positioned.fill(
             child: ExcludeSemantics(
               child: RotatedBox(
