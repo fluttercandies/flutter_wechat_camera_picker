@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../delegates/camera_picker_text_delegate.dart';
+import 'enums.dart';
 import 'type_defs.dart';
 
 /// {@template wechat_camera_picker.CameraPickerConfig}
@@ -35,6 +36,7 @@ class CameraPickerConfig {
     this.imageFormatGroup = ImageFormatGroup.unknown,
     this.preferredLensDirection = CameraLensDirection.back,
     this.preferredFlashMode = FlashMode.off,
+    this.dominantHand = DominantHand.left,
     this.lockCaptureOrientation,
     this.foregroundBuilder,
     this.previewTransformBuilder,
@@ -152,6 +154,10 @@ class CameraPickerConfig {
   /// typically with the auto mode.
   /// 首次使用相机时首选的闪光灯，通常是自动模式。
   final FlashMode preferredFlashMode;
+
+  /// Influences placement of camera control widgets in horizontal mode.
+  /// 影响水平模式下相机控制部件的放置。
+  final DominantHand dominantHand;
 
   /// {@macro wechat_camera_picker.EntitySaveCallback}
   final EntitySaveCallback? onEntitySaving;

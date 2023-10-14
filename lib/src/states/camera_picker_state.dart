@@ -1635,6 +1635,14 @@ class CameraPickerState extends State<CameraPicker>
     );
   }
 
+  TextDirection determineTextDirection(Enum orientation, DominantHand hand) {
+    if (orientation == DeviceOrientation.landscapeRight) {
+      return hand == DominantHand.left ? TextDirection.rtl : TextDirection.ltr;
+    } else {
+      return hand == DominantHand.right ? TextDirection.ltr : TextDirection.rtl;
+    }
+  }
+
   Widget buildForegroundBody(
     BuildContext context,
     BoxConstraints constraints,
@@ -1647,9 +1655,8 @@ class CameraPickerState extends State<CameraPicker>
         padding: const EdgeInsets.only(bottom: 20),
         child: Flex(
           direction: isPortrait ? Axis.vertical : Axis.horizontal,
-          textDirection: orientation == DeviceOrientation.landscapeRight
-              ? TextDirection.rtl
-              : TextDirection.ltr,
+          textDirection:
+              determineTextDirection(orientation, pickerConfig.dominantHand),
           verticalDirection: orientation == DeviceOrientation.portraitDown
               ? VerticalDirection.up
               : VerticalDirection.down,
