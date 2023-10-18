@@ -83,9 +83,8 @@ submit issues to our issue tracker first.
 
 ## Screenshots 📸
 
-| ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yrdqej30u01t017w.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6yh3x4j30u01t0wuo.jpg) |
-|-------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6z1h7xj30u01t01kx.jpg) | ![](https://tva1.sinaimg.cn/large/007S8ZIlgy1ggtt6zarvhj30u01t0x5f.jpg) |
+| ![](https://pic.alexv525.com/202310181547760.jpg) | ![](https://pic.alexv525.com/202310181547670.jpg) | ![](https://pic.alexv525.com/202310181547132.jpg) | ![](https://pic.alexv525.com/202310181547726.jpg) | ![](https://pic.alexv525.com/202310181548711.jpg) |
+|---------------------------------------------------|---------------------------------------------------|---------------------------------------------------|---------------------------------------------------|---------------------------------------------------|
 
 ## READ THIS FIRST ‼️
 

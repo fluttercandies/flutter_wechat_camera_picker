@@ -30,3 +30,15 @@ dependencies:
 
 dev_dependencies:
   flutter_lints: any
+
+screenshots:
+  - description: 'Screenshot 1'
+    path: screenshots/README_1.jpg
+  - description: 'Screenshot 2'
+    path: screenshots/README_2.jpg
+  - description: 'Screenshot 3'
+    path: screenshots/README_3.jpg
+  - description: 'Screenshot 4'
+    path: screenshots/README_4.jpg
+  - description: 'Screenshot 5'
+    path: screenshots/README_5.jpg
