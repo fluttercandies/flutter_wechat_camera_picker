@@ -14,7 +14,7 @@ import '../widgets/method_list_view.dart';
 import '../widgets/selected_assets_view.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _MyHomePageState();

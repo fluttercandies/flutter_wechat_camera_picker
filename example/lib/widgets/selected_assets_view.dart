@@ -11,11 +11,11 @@ import 'preview_asset_widget.dart';
 
 class SelectedAssetView extends StatelessWidget {
   const SelectedAssetView({
-    Key? key,
+    super.key,
     required this.asset,
     required this.isDisplayingDetail,
     required this.onRemoveAsset,
-  }) : super(key: key);
+  });
 
   final AssetEntity asset;
   final ValueNotifier<bool> isDisplayingDetail;
