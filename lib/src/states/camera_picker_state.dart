@@ -227,7 +227,9 @@ class CameraPickerState extends State<CameraPicker>
   @override
   void dispose() {
     ambiguate(WidgetsBinding.instance)?.removeObserver(this);
-    innerController?.dispose();
+    final c = innerController;
+    innerController = null;
+    c?.dispose();
     currentExposureOffset.dispose();
     currentExposureSliderOffset.dispose();
     lastExposurePoint.dispose();
@@ -493,20 +495,26 @@ class CameraPickerState extends State<CameraPicker>
     if (!mounted) {
       return;
     }
+    final DeviceOrientation newOrientation;
     if (z < 9) {
       if (y > 5) {
         realDebugPrint('Accelerometer portrait');
-        controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
+        newOrientation = DeviceOrientation.portraitUp;
       } else if (y < 5) {
         realDebugPrint('Accelerometer landscape');
-        controller.lockCaptureOrientation(
-          isLeft
-              ? DeviceOrientation.landscapeLeft
-              : DeviceOrientation.landscapeRight,
-        );
+        newOrientation = isLeft
+            ? DeviceOrientation.landscapeLeft
+            : DeviceOrientation.landscapeRight;
+      } else {
+        newOrientation = DeviceOrientation.portraitUp;
       }
     } else {
-      controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
+      // Fallback.
+      newOrientation = DeviceOrientation.portraitUp;
+    }
+    // Throttle.
+    if (controller.value.lockedCaptureOrientation != newOrientation) {
+      controller.lockCaptureOrientation(newOrientation);
     }
   }
 
