@@ -12,6 +12,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 
 import '../constants/config.dart';
 import '../constants/constants.dart';
@@ -208,6 +209,9 @@ class CameraPickerState extends State<CameraPicker>
   final invalidControllerMethods = <CameraDescription, Set<String>>{};
   bool retriedAfterInvalidInitialize = false;
 
+  /// Subscribe to the accelerometer.
+  late final StreamSubscription<AccelerometerEvent> accelerometerSubscription;
+
   @override
   void initState() {
     super.initState();
@@ -215,6 +219,9 @@ class CameraPickerState extends State<CameraPicker>
     Constants.textDelegate = widget.pickerConfig.textDelegate ??
         cameraPickerTextDelegateFromLocale(widget.locale);
     initCameras();
+    accelerometerSubscription = accelerometerEvents.listen(
+      handleAccelerometerEvent,
+    );
   }
 
   @override
@@ -231,6 +238,7 @@ class CameraPickerState extends State<CameraPicker>
     exposureFadeOutTimer?.cancel();
     recordDetectTimer?.cancel();
     recordCountdownTimer?.cancel();
+    accelerometerSubscription.cancel();
     super.dispose();
   }
 
@@ -464,6 +472,40 @@ class CameraPickerState extends State<CameraPicker>
         safeSetState(() {});
       }
     });
+  }
+
+  /// Lock capture orientation according to the current status of the device,
+  /// which enables the captured file stored the correct orientation.
+  void handleAccelerometerEvent(AccelerometerEvent event) {
+    if (innerController == null || isControllerBusy) {
+      return;
+    }
+    final x = event.x, y = event.y, z = event.z;
+    realDebugPrint('X:$x Y:$y Z:$z');
+    final bool isLeft;
+    if (x > 0) {
+      isLeft = Platform.isAndroid ? true : false;
+    } else {
+      isLeft = Platform.isAndroid ? false : true;
+    }
+    if (!mounted) {
+      return;
+    }
+    if (z < 9) {
+      if (y > 5) {
+        realDebugPrint('Accelerometer portrait');
+        controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
+      } else if (y < 5) {
+        realDebugPrint('Accelerometer landscape');
+        controller.lockCaptureOrientation(
+          isLeft
+              ? DeviceOrientation.landscapeLeft
+              : DeviceOrientation.landscapeRight,
+        );
+      }
+    } else {
+      controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
+    }
   }
 
   /// Initializes the flash modes in [validFlashModes] for each
@@ -1538,7 +1580,29 @@ class CameraPickerState extends State<CameraPicker>
     required CameraValue cameraValue,
     required BoxConstraints constraints,
   }) {
-    Widget preview = Listener(
+    Widget preview = const SizedBox.shrink();
+    if (innerController != null) {
+      preview = CameraPreview(controller);
+      preview = ValueListenableBuilder<CameraValue>(
+        valueListenable: controller,
+        builder: (_, CameraValue value, Widget? child) {
+          final lockedOrientation = value.lockedCaptureOrientation;
+          int? quarterTurns = lockedOrientation?.index;
+          if (quarterTurns == null) {
+            return child!;
+          }
+          if (value.deviceOrientation == DeviceOrientation.landscapeLeft) {
+            quarterTurns--;
+          } else if (value.deviceOrientation ==
+              DeviceOrientation.landscapeRight) {
+            quarterTurns++;
+          }
+          return RotatedBox(quarterTurns: quarterTurns, child: child);
+        },
+        child: preview,
+      );
+    }
+    preview = Listener(
       onPointerDown: (_) => pointers++,
       onPointerUp: (_) => pointers--,
       child: GestureDetector(
@@ -1547,9 +1611,7 @@ class CameraPickerState extends State<CameraPicker>
             pickerConfig.enablePinchToZoom ? handleScaleUpdate : null,
         // Enabled cameras switching by default if we have multiple cameras.
         onDoubleTap: cameras.length > 1 ? switchCameras : null,
-        child: innerController != null
-            ? CameraPreview(controller)
-            : const SizedBox.shrink(),
+        child: preview,
       ),
     );
 
@@ -1564,7 +1626,6 @@ class CameraPickerState extends State<CameraPicker>
       preview = Stack(
         children: <Widget>[
           preview,
-          // Image.asset('assets/1.jpg', fit: BoxFit.cover),
           Positioned.fill(
             child: ExcludeSemantics(
               child: RotatedBox(
