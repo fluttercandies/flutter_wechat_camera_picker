@@ -477,7 +477,9 @@ class CameraPickerState extends State<CameraPicker>
   /// Lock capture orientation according to the current status of the device,
   /// which enables the captured file stored the correct orientation.
   void handleAccelerometerEvent(AccelerometerEvent event) {
-    if (innerController == null || isControllerBusy) {
+    if (pickerConfig.lockCaptureOrientation != null ||
+        innerController == null ||
+        isControllerBusy) {
       return;
     }
     final x = event.x, y = event.y, z = event.z;
