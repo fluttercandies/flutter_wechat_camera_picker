@@ -8,10 +8,10 @@ import 'builder/tween_animation_builder_2.dart';
 
 class CameraFocusPoint extends StatelessWidget {
   const CameraFocusPoint({
-    Key? key,
+    super.key,
     required this.size,
     required this.color,
-  }) : super(key: key);
+  });
 
   final double size;
   final Color color;

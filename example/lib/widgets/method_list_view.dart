@@ -8,10 +8,10 @@ import '../models/picker_method.dart';
 
 class MethodListView extends StatefulWidget {
   const MethodListView({
-    Key? key,
+    super.key,
     required this.pickMethods,
     required this.onSelectMethod,
-  }) : super(key: key);
+  });
 
   final List<PickMethod> pickMethods;
   final void Function(PickMethod method) onSelectMethod;

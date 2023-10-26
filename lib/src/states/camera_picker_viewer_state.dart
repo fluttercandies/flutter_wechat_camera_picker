@@ -379,7 +379,8 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
 }
 
 class _WechatLoading extends StatefulWidget {
-  const _WechatLoading({Key? key, required this.tip}) : super(key: key);
+  // ignore: unused_element
+  const _WechatLoading({super.key, required this.tip});
 
   final String tip;
 

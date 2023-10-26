@@ -21,11 +21,11 @@ import 'camera_picker_page_route.dart';
 /// 该选择器可以通过 [CameraController] 创建 [AssetEntity]。
 class CameraPicker extends StatefulWidget {
   const CameraPicker({
-    Key? key,
+    super.key,
     this.pickerConfig = const CameraPickerConfig(),
     this.createPickerState,
     this.locale,
-  }) : super(key: key);
+  });
 
   /// {@macro wechat_camera_picker.CameraPickerConfig}
   final CameraPickerConfig pickerConfig;

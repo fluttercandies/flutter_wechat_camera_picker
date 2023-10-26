@@ -11,14 +11,14 @@ import '../internals/methods.dart';
 
 class CameraProgressButton extends StatefulWidget {
   const CameraProgressButton({
-    Key? key,
+    super.key,
     required this.isAnimating,
     required this.outerRadius,
     required this.ringsWidth,
     this.ringsColor = wechatThemeColor,
     this.progress = 0.0,
     this.duration = const Duration(seconds: 15),
-  }) : super(key: key);
+  });
 
   final bool isAnimating;
   final double outerRadius;

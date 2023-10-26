@@ -7,10 +7,10 @@ import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 class AssetWidgetBuilder extends StatelessWidget {
   const AssetWidgetBuilder({
-    Key? key,
+    super.key,
     required this.entity,
     required this.isDisplayingDetail,
-  }) : super(key: key);
+  });
 
   final AssetEntity entity;
   final bool isDisplayingDetail;

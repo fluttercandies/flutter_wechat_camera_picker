@@ -9,7 +9,7 @@ import 'package:video_player/video_player.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 class PreviewAssetWidget extends StatefulWidget {
-  const PreviewAssetWidget(this.asset, {Key? key}) : super(key: key);
+  const PreviewAssetWidget(this.asset, {super.key});
 
   final AssetEntity asset;
 
