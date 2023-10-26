@@ -250,6 +250,7 @@ Thank goes to these wonderful people ([emoji key](https://allcontributors.org/do
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/luomo-pro"><img src="https://avatars.githubusercontent.com/u/41097395?v=4?s=50" width="50px;" alt="luomo-pro"/><br /><sub><b>luomo-pro</b></sub></a><br /><a href="#a11y-luomo-pro" title="Accessibility">️️️️♿️</a> <a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/issues?q=author%3Aluomo-pro" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ZhuBoao"><img src="https://avatars.githubusercontent.com/u/17305573?v=4?s=50" width="50px;" alt="LeonardoZhu"/><br /><sub><b>LeonardoZhu</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/commits?author=ZhuBoao" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/loinp"><img src="https://avatars.githubusercontent.com/u/34020090?v=4?s=50" width="50px;" alt="Nguyen Phuc Loi"/><br /><sub><b>Nguyen Phuc Loi</b></sub></a><br /><a href="#translation-nploi" title="Translation">🌍</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://amoshk.top"><img src="https://avatars.githubusercontent.com/u/32262985?v=4?s=50" width="50px;" alt="Amos"/><br /><sub><b>Amos</b></sub></a><br /><a href="https://github.com/fluttercandies/flutter_wechat_camera_picker/issues?q=author%3AAmosHuKe" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
 </table>
