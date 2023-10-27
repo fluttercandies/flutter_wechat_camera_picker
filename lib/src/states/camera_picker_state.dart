@@ -483,7 +483,8 @@ class CameraPickerState extends State<CameraPicker>
   /// Lock capture orientation according to the current status of the device,
   /// which enables the captured file stored the correct orientation.
   void handleAccelerometerEvent(AccelerometerEvent event) {
-    if (pickerConfig.lockCaptureOrientation != null ||
+    if (!mounted ||
+        pickerConfig.lockCaptureOrientation != null ||
         innerController == null ||
         !controller.value.isInitialized ||
         controller.value.isPreviewPaused ||
@@ -492,36 +493,26 @@ class CameraPickerState extends State<CameraPicker>
       return;
     }
     final x = event.x, y = event.y, z = event.z;
-    // realDebugPrint('X:$x Y:$y Z:$z');
-    final bool isLeft;
-    if (x > 0) {
-      isLeft = Platform.isAndroid ? true : false;
-    } else {
-      isLeft = Platform.isAndroid ? false : true;
-    }
-    if (!mounted) {
-      return;
-    }
-    final DeviceOrientation newOrientation;
-    if (z < 9) {
-      if (y > 5) {
-        // realDebugPrint('Accelerometer portrait');
-        newOrientation = DeviceOrientation.portraitUp;
-      } else if (y < 5) {
-        // realDebugPrint('Accelerometer landscape');
-        newOrientation = isLeft
-            ? DeviceOrientation.landscapeLeft
-            : DeviceOrientation.landscapeRight;
+    final DeviceOrientation? newOrientation;
+    if (x.abs() > y.abs() && x.abs() > z.abs()) {
+      if (x > 0) {
+        newOrientation = DeviceOrientation.landscapeLeft;
       } else {
+        newOrientation = DeviceOrientation.landscapeRight;
+      }
+    } else if (y.abs() > x.abs() && y.abs() > z.abs()) {
+      if (y > 0) {
         newOrientation = DeviceOrientation.portraitUp;
+      } else {
+        newOrientation = DeviceOrientation.portraitDown;
       }
     } else {
-      // Fallback.
-      newOrientation = DeviceOrientation.portraitUp;
+      newOrientation = null;
     }
     // Throttle.
-    if (lockedCaptureOrientation != newOrientation) {
+    if (newOrientation != null && lockedCaptureOrientation != newOrientation) {
       lockedCaptureOrientation = newOrientation;
+      realDebugPrint('Locking new capture orientation: $newOrientation');
       controller.lockCaptureOrientation(newOrientation);
     }
   }
