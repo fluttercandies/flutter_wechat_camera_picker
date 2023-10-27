@@ -212,6 +212,9 @@ class CameraPickerState extends State<CameraPicker>
   /// Subscribe to the accelerometer.
   late final StreamSubscription<AccelerometerEvent> accelerometerSubscription;
 
+  /// The locked capture orientation of the current camera instance.
+  DeviceOrientation? lockedCaptureOrientation;
+
   @override
   void initState() {
     super.initState();
@@ -332,6 +335,7 @@ class CameraPickerState extends State<CameraPicker>
       lastExposurePoint.value = null;
       currentExposureOffset.value = 0;
       currentExposureSliderOffset.value = 0;
+      lockedCaptureOrientation = pickerConfig.lockCaptureOrientation;
     });
     // **IMPORTANT**: Push methods into a post frame callback, which ensures the
     // controller has already unbind from widgets.
@@ -481,11 +485,14 @@ class CameraPickerState extends State<CameraPicker>
   void handleAccelerometerEvent(AccelerometerEvent event) {
     if (pickerConfig.lockCaptureOrientation != null ||
         innerController == null ||
-        isControllerBusy) {
+        !controller.value.isInitialized ||
+        controller.value.isPreviewPaused ||
+        controller.value.isRecordingVideo ||
+        controller.value.isTakingPicture) {
       return;
     }
     final x = event.x, y = event.y, z = event.z;
-    realDebugPrint('X:$x Y:$y Z:$z');
+    // realDebugPrint('X:$x Y:$y Z:$z');
     final bool isLeft;
     if (x > 0) {
       isLeft = Platform.isAndroid ? true : false;
@@ -498,10 +505,10 @@ class CameraPickerState extends State<CameraPicker>
     final DeviceOrientation newOrientation;
     if (z < 9) {
       if (y > 5) {
-        realDebugPrint('Accelerometer portrait');
+        // realDebugPrint('Accelerometer portrait');
         newOrientation = DeviceOrientation.portraitUp;
       } else if (y < 5) {
-        realDebugPrint('Accelerometer landscape');
+        // realDebugPrint('Accelerometer landscape');
         newOrientation = isLeft
             ? DeviceOrientation.landscapeLeft
             : DeviceOrientation.landscapeRight;
@@ -513,7 +520,8 @@ class CameraPickerState extends State<CameraPicker>
       newOrientation = DeviceOrientation.portraitUp;
     }
     // Throttle.
-    if (controller.value.lockedCaptureOrientation != newOrientation) {
+    if (lockedCaptureOrientation != newOrientation) {
+      lockedCaptureOrientation = newOrientation;
       controller.lockCaptureOrientation(newOrientation);
     }
   }
