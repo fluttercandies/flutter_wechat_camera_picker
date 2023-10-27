@@ -1600,6 +1600,9 @@ class CameraPickerState extends State<CameraPicker>
           if (quarterTurns == null) {
             return child!;
           }
+          if (Platform.isIOS) {
+            quarterTurns = DeviceOrientation.values.length - quarterTurns;
+          }
           if (value.deviceOrientation == DeviceOrientation.landscapeLeft) {
             quarterTurns--;
           } else if (value.deviceOrientation ==
