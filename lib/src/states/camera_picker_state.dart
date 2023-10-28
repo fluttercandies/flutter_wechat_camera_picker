@@ -939,7 +939,7 @@ class CameraPickerState extends State<CameraPicker>
         pickerConfig.onMinimumRecordDurationNotMet?.call();
         return;
       }
-      await controller.pausePreview();
+      controller.pausePreview();
       final bool? isCapturedFileHandled = pickerConfig.onXFileCaptured?.call(
         file,
         CameraPickerViewType.video,
