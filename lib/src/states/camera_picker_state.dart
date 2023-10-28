@@ -343,6 +343,7 @@ class CameraPickerState extends State<CameraPicker>
           StackTrace.current,
           pickerConfig.onError,
         );
+        return;
       }
 
       initFlashModesForCameras();
@@ -622,9 +623,10 @@ class CameraPickerState extends State<CameraPicker>
       await controller.setExposureMode(newMode);
     } catch (e, s) {
       handleErrorWithHandler(e, s, pickerConfig.onError);
+    } finally {
+      restartExposureModeDisplayTimer();
+      restartExposureFadeOutTimer();
     }
-    restartExposureModeDisplayTimer();
-    restartExposureFadeOutTimer();
   }
 
   /// Use the [position] to set exposure and focus.
@@ -714,17 +716,18 @@ class CameraPickerState extends State<CameraPicker>
         ),
       );
     } catch (e, s) {
-      handleErrorWithHandler(e, s, pickerConfig.onError);
       hasError = true;
       currentExposureSliderOffset.value = previousSliderOffsetValue;
       currentExposureOffset.value = previousOffsetValue;
+      handleErrorWithHandler(e, s, pickerConfig.onError);
+    } finally {
+      if (!hasError && !isFocusPointDisplays.value) {
+        isFocusPointDisplays.value = true;
+      }
+      restartExposurePointDisplayTimer();
+      restartExposureModeDisplayTimer();
+      restartExposureFadeOutTimer();
     }
-    if (!hasError && !isFocusPointDisplays.value) {
-      isFocusPointDisplays.value = true;
-    }
-    restartExposurePointDisplayTimer();
-    restartExposureModeDisplayTimer();
-    restartExposureFadeOutTimer();
   }
 
   /// Request to set the focus and the exposure point on the [localPosition],
@@ -897,8 +900,9 @@ class CameraPickerState extends State<CameraPicker>
         recordCountdownTimer?.cancel();
         isShootingButtonAnimate = false;
         handleErrorWithHandler(e, s, pickerConfig.onError);
+      } finally {
+        recordStopwatch.stop();
       }
-      recordStopwatch.stop();
     } finally {
       safeSetState(() {});
     }
@@ -945,9 +949,9 @@ class CameraPickerState extends State<CameraPicker>
         await controller.resumePreview();
       }
     } catch (e, s) {
-      handleErrorWithHandler(e, s, pickerConfig.onError);
       handleError();
       initCameras();
+      handleErrorWithHandler(e, s, pickerConfig.onError);
     } finally {
       isControllerBusy = false;
       safeSetState(() {});
