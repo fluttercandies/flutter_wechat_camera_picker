@@ -1284,10 +1284,11 @@ class CameraPickerState extends State<CameraPicker>
                           !enableScaledPreview ? cameraQuarterTurns : 0,
                       child: CameraProgressButton(
                         isAnimating: isShootingButtonAnimate,
+                        isBusy: isControllerBusy,
                         duration: pickerConfig.maximumRecordingDuration!,
-                        outerRadius: outerSize.width,
+                        size: outerSize,
                         ringsColor: theme.indicatorColor,
-                        ringsWidth: 2,
+                        ringsWidth: 3,
                       ),
                     ),
                 ],
