@@ -259,8 +259,11 @@ class CameraPickerState extends State<CameraPicker>
   /// 根据 [constraints] 获取相机预览适用的缩放。
   double effectiveCameraScale(
     BoxConstraints constraints,
-    CameraController controller,
+    CameraController? controller,
   ) {
+    if (controller == null) {
+      return 1;
+    }
     final int turns = cameraQuarterTurns;
     final String orientation = controller.value.deviceOrientation.toString();
     // Fetch the biggest size from the constraints.
@@ -1611,7 +1614,7 @@ class CameraPickerState extends State<CameraPicker>
     // Scale the preview if the config is enabled.
     if (enableScaledPreview) {
       preview = Transform.scale(
-        scale: effectiveCameraScale(constraints, controller),
+        scale: effectiveCameraScale(constraints, innerController),
         child: Center(child: transformedWidget ?? preview),
       );
       // Rotated the preview if the turns is valid.
