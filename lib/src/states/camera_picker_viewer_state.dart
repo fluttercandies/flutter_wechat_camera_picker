@@ -15,6 +15,7 @@ import '../constants/constants.dart';
 import '../constants/enums.dart';
 import '../constants/styles.dart';
 import '../constants/type_defs.dart';
+import '../internals/extensions.dart';
 import '../internals/methods.dart';
 import '../widgets/camera_picker.dart';
 import '../widgets/camera_picker_viewer.dart';
@@ -83,9 +84,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
       realDebugPrint('Error when initializing video controller: $e');
       handleErrorWithHandler(e, s, onError);
     } finally {
-      if (mounted) {
-        setState(() {});
-      }
+      safeSetState(() {});
     }
   }
 
@@ -141,12 +140,11 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
         );
       } catch (e, s) {
         handleErrorWithHandler(e, s, onError);
+      } finally {
+        safeSetState(() {
+          isSavingEntity = false;
+        });
       }
-      isSavingEntity = false;
-      if (mounted) {
-        setState(() {});
-      }
-      return;
     }
     AssetEntity? entity;
     try {
@@ -184,7 +182,9 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
       realDebugPrint('Saving entity failed: $e');
       handleErrorWithHandler(e, s, onError);
     } finally {
-      isSavingEntity = false;
+      safeSetState(() {
+        isSavingEntity = false;
+      });
       if (mounted) {
         Navigator.of(context).pop(entity);
       }
