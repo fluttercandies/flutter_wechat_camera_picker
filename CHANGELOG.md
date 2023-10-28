@@ -6,7 +6,11 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
 
-## 4.0.4
+## 4.1.0
+
+### New features
+
+- Automatically determine the capture orientation and lock accordingly.
 
 ### Fixes
 
