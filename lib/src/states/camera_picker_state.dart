@@ -976,8 +976,12 @@ class CameraPickerState extends State<CameraPicker>
     }
 
     recordStopwatch.stop();
-    if (!controller.value.isRecordingVideo) {
+    if (innerController == null || !controller.value.isRecordingVideo) {
       recordCountdownTimer?.cancel();
+      safeSetState(() {
+        isControllerBusy = false;
+        isShootingButtonAnimate = false;
+      });
       return;
     }
     safeSetState(() {
