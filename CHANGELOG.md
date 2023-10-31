@@ -15,6 +15,7 @@ See the [Migration Guide](guides/migration_guide.md) for the details of breaking
 ### Fixes
 
 - Handle exceptions after all flows.
+- Fix various of problems with the capture button.
 
 ## 4.0.3
 

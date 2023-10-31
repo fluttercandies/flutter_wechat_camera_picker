@@ -20,4 +20,3 @@ export 'src/widgets/camera_focus_point.dart';
 export 'src/widgets/camera_picker.dart';
 export 'src/widgets/camera_picker_page_route.dart';
 export 'src/widgets/camera_picker_viewer.dart';
-export 'src/widgets/camera_progress_button.dart';
