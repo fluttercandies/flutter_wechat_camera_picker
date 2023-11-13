@@ -9,7 +9,6 @@ See the [Migration Guide](guides/migration_guide.md) for the details of breaking
 ## Unchanged
 
 - Bump photo_manager to 3.x version.
-- Include photo_manager_image_provider.
 
 ## 4.1.0
 
