@@ -6,9 +6,10 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
 
-## Unchanged
+## 4.2.0-dev.1
 
 - Bump photo_manager to 3.x version.
+- Include photo_manager_image_provider.Include photo_manager_image_provider.
 
 ## 4.1.0
 
