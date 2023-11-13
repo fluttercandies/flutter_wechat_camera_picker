@@ -19,6 +19,7 @@ dependencies:
 
   package_info_plus: ^4.0.0
   video_player: ^2.7.0
+  photo_manager_image_provider: ^1.1.0
 
 dev_dependencies:
   flutter_lints: any
