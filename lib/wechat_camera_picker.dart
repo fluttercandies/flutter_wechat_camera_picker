@@ -6,6 +6,7 @@ library wechat_camera_picker;
 
 export 'package:camera/camera.dart';
 export 'package:photo_manager/photo_manager.dart';
+export 'package:photo_manager_image_provider/photo_manager_image_provider.dart';
 
 export 'src/constants/config.dart';
 export 'src/constants/enums.dart';

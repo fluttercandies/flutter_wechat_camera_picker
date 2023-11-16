@@ -4,7 +4,12 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
-See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
+See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
+
+## 4.2.0-dev.1
+
+- Bump `photo_manager` to v3.x.
+- Export `photo_manager_image_provider`.
 
 ## 4.1.0
 
@@ -15,7 +20,7 @@ See the [Migration Guide](guides/migration_guide.md) for the details of breaking
 ### Fixes
 
 - Handle exceptions after all flows.
-- Fix various of problems with the capture button.
+- Fix various problems with the capture button.
 
 ## 4.0.3
 
