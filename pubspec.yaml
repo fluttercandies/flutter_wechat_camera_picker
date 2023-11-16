@@ -26,7 +26,7 @@ dependencies:
   camera_platform_interface: ^2.1.5
   path: ^1.8.0
   photo_manager: ^3.0.0-dev.1
-  photo_manager_image_provider: ^1.1.0
+  photo_manager_image_provider: ^2.0.0
   sensors_plus: ^3.1.0
   video_player: ^2.7.0
 
