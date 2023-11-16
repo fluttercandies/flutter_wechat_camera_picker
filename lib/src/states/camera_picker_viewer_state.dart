@@ -430,7 +430,6 @@ class _WechatLoadingState extends State<_WechatLoading>
         Text(
           widget.tip,
           style: const TextStyle(fontSize: 14),
-          textScaleFactor: 1,
         ),
       ],
     );
