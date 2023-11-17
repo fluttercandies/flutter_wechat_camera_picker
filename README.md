@@ -26,6 +26,17 @@ UI designs will be updated following the WeChat update in anytime.
 
 See the [Migration Guide][] to learn how to migrate between breaking changes.
 
+## Versions compatibility
+
+The package only guarantees to be working on **the stable version of Flutter**.
+We won't update it in real-time to align with other channels of Flutter.
+
+|        | 2.8.0 | 3.3.0 | 3.16.0 |
+|--------|:-----:|:-----:|:------:|
+| 4.2.0+ |   ❌   |   ❌   |   ✅    |
+| 4.0.0+ |   ❌   |   ✅   |   ❌    |
+| 3.0.0+ |   ✅   |   ❌   |   ❌    |
+
 ## Package credits
 
 The package is built from these wonderful packages.
@@ -45,12 +56,12 @@ submit issues to our issue tracker first.
 
 <!-- TOC -->
 * [Flutter WeChat Camera Picker](#flutter-wechat-camera-picker)
+  * [Versions compatibility](#versions-compatibility)
   * [Package credits](#package-credits)
   * [Features ✨](#features-)
   * [Screenshots 📸](#screenshots-)
   * [READ THIS FIRST ‼️](#read-this-first-)
   * [Preparing for use 🍭](#preparing-for-use-)
-    * [Versions compatibility](#versions-compatibility)
     * [Setup](#setup)
   * [Usage 📖](#usage-)
     * [Localizations](#localizations)
@@ -107,16 +118,6 @@ Please walk through the [example](example) carefully
 before you have any questions.
 
 ## Preparing for use 🍭
-
-### Versions compatibility
-
-The package only guarantees to be working on **the stable version of Flutter**.
-We won't update it in real-time to align with other channels of Flutter.
-
-|        | 2.8.0 | 3.3.0 |
-|--------|:-----:|:-----:|
-| 4.0.0+ |   ❌   |   ✅   |
-| 3.0.0+ |   ✅   |   ❌   |
 
 If you got a `resolve conflict` error when running `flutter pub get`,
 please use `dependency_overrides` to fix it.
