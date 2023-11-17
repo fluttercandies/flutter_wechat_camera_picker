@@ -130,7 +130,8 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
     setState(() {
       isSavingEntity = true;
     });
-    final CameraPickerViewType viewType = widget.viewType;
+
+    // Handle the explicitly entity saving method.
     if (widget.pickerConfig.onEntitySaving != null) {
       try {
         await widget.pickerConfig.onEntitySaving!(
@@ -145,12 +146,14 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
           isSavingEntity = false;
         });
       }
+      return;
     }
+
     AssetEntity? entity;
     try {
       final PermissionState ps = await PhotoManager.requestPermissionExtend();
       if (ps == PermissionState.authorized || ps == PermissionState.limited) {
-        switch (viewType) {
+        switch (widget.viewType) {
           case CameraPickerViewType.image:
             final String filePath = previewFile.path;
             entity = await PhotoManager.editor.saveImageWithPath(
@@ -167,7 +170,10 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
         }
         if (widget.pickerConfig.shouldDeletePreviewFile &&
             previewFile.existsSync()) {
-          previewFile.delete();
+          previewFile.delete().catchError((e, s) {
+            handleErrorWithHandler(e, s, onError);
+            return previewFile;
+          });
         }
         return;
       }
