@@ -6,7 +6,19 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
 
+## 4.2.0-dev.2
+
+### Breaking changes
+
+- Migrate to Flutter 3.16, and drop supports for previous Flutter versions.
+
+### Fixes
+
+- Fix `onEntitySaving` not returned after called. (#223)
+
 ## 4.2.0-dev.1
+
+### New features
 
 - Bump `photo_manager` to v3.x.
 - Export `photo_manager_image_provider`.
