@@ -6,6 +6,12 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
 
+## 4.1.1
+
+### Fixes
+
+- Fix `onEntitySaving` not returned after called. (#223)
+
 ## 4.1.0
 
 ### New features
