@@ -4,7 +4,12 @@ that can be found in the LICENSE file. -->
 
 # Changelog
 
-See the [Migration Guide](guides/migration_guide.md) for the details of breaking changes between versions.
+See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
+
+## 4.1.2
+
+- Roll `sensors_plus`.
+- Catch exceptions when obtain/subscribe to the accelerometer stream.
 
 ## 4.1.1
 
@@ -21,7 +26,7 @@ See the [Migration Guide](guides/migration_guide.md) for the details of breaking
 ### Fixes
 
 - Handle exceptions after all flows.
-- Fix various of problems with the capture button.
+- Fix various problems with the capture button.
 
 ## 4.0.3
 
