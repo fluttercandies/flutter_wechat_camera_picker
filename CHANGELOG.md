@@ -6,6 +6,13 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
 
+## 4.2.0-dev.3
+
+### Improvements
+
+- Roll `sensors_plus`.
+- Catch exceptions when obtain/subscribe to the accelerometer stream.
+
 ## 4.2.0-dev.2
 
 ### Breaking changes

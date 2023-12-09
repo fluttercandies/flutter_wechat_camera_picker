@@ -216,7 +216,7 @@ class CameraPickerState extends State<CameraPicker>
   bool retriedAfterInvalidInitialize = false;
 
   /// Subscribe to the accelerometer.
-  late final StreamSubscription<AccelerometerEvent> accelerometerSubscription;
+  StreamSubscription<AccelerometerEvent>? accelerometerSubscription;
 
   /// The locked capture orientation of the current camera instance.
   DeviceOrientation? lockedCaptureOrientation;
@@ -228,9 +228,7 @@ class CameraPickerState extends State<CameraPicker>
     Constants.textDelegate = widget.pickerConfig.textDelegate ??
         cameraPickerTextDelegateFromLocale(widget.locale);
     initCameras();
-    accelerometerSubscription = accelerometerEvents.listen(
-      handleAccelerometerEvent,
-    );
+    initAccelerometerSubscription();
   }
 
   @override
@@ -249,7 +247,7 @@ class CameraPickerState extends State<CameraPicker>
     exposureFadeOutTimer?.cancel();
     recordDetectTimer?.cancel();
     recordCountdownTimer?.cancel();
-    accelerometerSubscription.cancel();
+    accelerometerSubscription?.cancel();
     super.dispose();
   }
 
@@ -489,6 +487,20 @@ class CameraPickerState extends State<CameraPicker>
         safeSetState(() {});
       }
     });
+  }
+
+  /// Starts to listen on accelerometer events.
+  void initAccelerometerSubscription() {
+    try {
+      final stream = accelerometerEventStream();
+      accelerometerSubscription = stream.listen(handleAccelerometerEvent);
+    } catch (e, s) {
+      realDebugPrint(
+        'The device does not seem to support accelerometer. '
+        'The captured files orientation might be incorrect.',
+      );
+      handleErrorWithHandler(e, s, pickerConfig.onError);
+    }
   }
 
   /// Lock capture orientation according to the current status of the device,
