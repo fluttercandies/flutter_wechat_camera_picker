@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import '../constants/styles.dart';
 import '../internals/methods.dart';
 
-class CameraProgressButton extends StatefulWidget {
+final class CameraProgressButton extends StatefulWidget {
   const CameraProgressButton({
     super.key,
     required this.isAnimating,

@@ -13,7 +13,7 @@ import 'type_defs.dart';
 /// Configurations for the [CameraPicker].
 /// [CameraPicker] 的配置项
 /// {@endtemplate}
-class CameraPickerConfig {
+final class CameraPickerConfig {
   const CameraPickerConfig({
     this.enableRecording = false,
     this.onlyEnableRecording = false,

@@ -182,7 +182,7 @@ List<PickMethod> pickMethods(BuildContext context) {
 }
 
 /// Define a regular pick method.
-class PickMethod {
+final class PickMethod {
   const PickMethod({
     required this.icon,
     required this.name,

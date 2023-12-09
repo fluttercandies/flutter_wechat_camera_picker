@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 
-class TweenAnimationBuilder2<A, B> extends StatelessWidget {
+final class TweenAnimationBuilder2<A, B> extends StatelessWidget {
   const TweenAnimationBuilder2({
     super.key,
     required this.firstTween,

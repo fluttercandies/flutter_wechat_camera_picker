@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'builder/tween_animation_builder_2.dart';
 
-class CameraFocusPoint extends StatelessWidget {
+final class CameraFocusPoint extends StatelessWidget {
   const CameraFocusPoint({
     super.key,
     required this.size,
@@ -41,7 +41,7 @@ class CameraFocusPoint extends StatelessWidget {
 
 /// A [CustomPaint] that draws the exposure point with four arcs and one circle.
 /// 包含了四条弧及一个圆的曝光点绘制。
-class CameraFocusPointPainter extends CustomPainter {
+final class CameraFocusPointPainter extends CustomPainter {
   const CameraFocusPointPainter({
     required this.size,
     required this.color,
