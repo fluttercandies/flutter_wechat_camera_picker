@@ -3,8 +3,7 @@
 // in the LICENSE file.
 
 import 'package:flutter/material.dart';
-
-import 'builder/tween_animation_builder_2.dart';
+import 'package:wechat_picker_library/wechat_picker_library.dart';
 
 final class CameraFocusPoint extends StatelessWidget {
   const CameraFocusPoint({
