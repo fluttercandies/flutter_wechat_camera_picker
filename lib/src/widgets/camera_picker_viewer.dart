@@ -8,7 +8,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/config.dart';
-import '../constants/constants.dart';
+import '../internals/singleton.dart';
 import '../constants/enums.dart';
 import '../states/camera_picker_viewer_state.dart';
 

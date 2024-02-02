@@ -10,12 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:path/path.dart' as path;
 import 'package:video_player/video_player.dart';
+import 'package:wechat_picker_library/wechat_picker_library.dart';
 
-import '../constants/constants.dart';
+import '../internals/singleton.dart';
 import '../constants/enums.dart';
-import '../constants/styles.dart';
 import '../constants/type_defs.dart';
-import '../internals/extensions.dart';
 import '../internals/methods.dart';
 import '../widgets/camera_picker.dart';
 import '../widgets/camera_picker_viewer.dart';
@@ -25,8 +24,8 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   /// 播放器是否在播放
   final ValueNotifier<bool> isPlaying = ValueNotifier<bool>(false);
 
-  late final ThemeData theme =
-      widget.pickerConfig.theme ?? CameraPicker.themeData(wechatThemeColor);
+  late final ThemeData theme = widget.pickerConfig.theme ??
+      CameraPicker.themeData(defaultThemeColorWeChat);
 
   /// Construct an [File] instance through [previewXFile].
   /// 通过 [previewXFile] 构建 [File] 实例。
@@ -253,9 +252,9 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
     }
     return MergeSemantics(
       child: Semantics(
-        label: Constants.textDelegate.sActionPreviewHint,
+        label: Singleton.textDelegate.sActionPreviewHint,
         image: true,
-        onTapHint: Constants.textDelegate.sActionPreviewHint,
+        onTapHint: Singleton.textDelegate.sActionPreviewHint,
         sortKey: const OrdinalSortKey(1),
         child: builder,
       ),
@@ -276,7 +275,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
       onPressed: createAssetEntityAndPop,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       child: Text(
-        Constants.textDelegate.confirm,
+        Singleton.textDelegate.confirm,
         style: TextStyle(
           color: theme.textTheme.bodyLarge?.color,
           fontSize: 17,
@@ -352,7 +351,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
       child: AnimatedOpacity(
         duration: kThemeAnimationDuration,
         opacity: isSavingEntity ? 1 : 0,
-        child: _WechatLoading(tip: Constants.textDelegate.saving),
+        child: _WechatLoading(tip: Singleton.textDelegate.saving),
       ),
     );
   }
@@ -362,7 +361,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
     if (hasErrorWhenInitializing) {
       return Center(
         child: Text(
-          Constants.textDelegate.loadFailed,
+          Singleton.textDelegate.loadFailed,
           style: const TextStyle(inherit: false),
         ),
       );

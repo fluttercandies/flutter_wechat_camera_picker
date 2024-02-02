@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../constants/config.dart';
-import '../constants/constants.dart';
+import '../internals/singleton.dart';
 import '../states/camera_picker_state.dart';
 
 import 'camera_picker_page_route.dart';

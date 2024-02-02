@@ -13,13 +13,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:wechat_picker_library/wechat_picker_library.dart';
 
 import '../constants/config.dart';
-import '../constants/constants.dart';
+import '../internals/singleton.dart';
 import '../constants/enums.dart';
-import '../constants/styles.dart';
 import '../delegates/camera_picker_text_delegate.dart';
-import '../internals/extensions.dart';
 import '../internals/methods.dart';
 import '../widgets/camera_focus_point.dart';
 import '../widgets/camera_picker.dart';
@@ -204,9 +203,9 @@ class CameraPickerState extends State<CameraPicker>
   /// If there's no theme provided from the user, use [CameraPicker.themeData] .
   /// 如果用户未提供主题，通过 [CameraPicker.themeData] 创建。
   late final ThemeData theme =
-      pickerConfig.theme ?? CameraPicker.themeData(wechatThemeColor);
+      pickerConfig.theme ?? CameraPicker.themeData(defaultThemeColorWeChat);
 
-  CameraPickerTextDelegate get textDelegate => Constants.textDelegate;
+  CameraPickerTextDelegate get textDelegate => Singleton.textDelegate;
 
   /// If controller methods were failed to called for camera descriptions,
   /// it will be recorded as invalid and never gets called again.
@@ -225,7 +224,7 @@ class CameraPickerState extends State<CameraPicker>
   void initState() {
     super.initState();
     ambiguate(WidgetsBinding.instance)?.addObserver(this);
-    Constants.textDelegate = widget.pickerConfig.textDelegate ??
+    Singleton.textDelegate = widget.pickerConfig.textDelegate ??
         cameraPickerTextDelegateFromLocale(widget.locale);
     initCameras();
     initAccelerometerSubscription();
