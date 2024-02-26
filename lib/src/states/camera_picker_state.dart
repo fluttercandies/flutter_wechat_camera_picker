@@ -30,6 +30,26 @@ const Duration _kDuration = Duration(milliseconds: 300);
 
 class CameraPickerState extends State<CameraPicker>
     with WidgetsBindingObserver {
+  /// The controller for the current camera.
+  /// 当前相机实例的控制器
+  CameraController get controller => innerController!;
+  CameraController? innerController;
+
+  /// Whether the access to the camera or the audio session
+  /// has been denied by the platform.
+  bool accessDenied = false;
+
+  /// Available cameras.
+  /// 可用的相机实例
+  late List<CameraDescription> cameras;
+
+  /// Whether the controller is handling method calls.
+  /// 相机控制器是否在处理方法调用
+  bool isControllerBusy = false;
+
+  /// A [Completer] lock to keep the initialization only runs once at a time.
+  Completer<void>? initializeLock;
+
   /// The [Duration] for record detection. (200ms)
   /// 检测是否开始录制的时长 (200毫秒)
   final Duration recordDetectDuration = const Duration(milliseconds: 200);
@@ -46,19 +66,6 @@ class CameraPickerState extends State<CameraPicker>
   /// 是否正在展示当前的聚焦点
   final ValueNotifier<bool> isFocusPointDisplays = ValueNotifier<bool>(false);
   final ValueNotifier<bool> isFocusPointFadeOut = ValueNotifier<bool>(false);
-
-  /// The controller for the current camera.
-  /// 当前相机实例的控制器
-  CameraController get controller => innerController!;
-  CameraController? innerController;
-
-  /// Available cameras.
-  /// 可用的相机实例
-  late List<CameraDescription> cameras;
-
-  /// Whether the controller is handling method calls.
-  /// 相机控制器是否在处理方法调用
-  bool isControllerBusy = false;
 
   /// Current exposure offset.
   /// 当前曝光值
@@ -253,8 +260,8 @@ class CameraPickerState extends State<CameraPicker>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final CameraController? c = innerController;
-    if (state == AppLifecycleState.resumed) {
-      initCameras(currentCamera);
+    if (state == AppLifecycleState.resumed && !accessDenied) {
+      initCameras(cameraDescription: currentCamera);
     } else if (c == null || !c.value.isInitialized) {
       // App state changed before we got the chance to initialize.
       return;
@@ -319,34 +326,43 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Initialize cameras instances.
   /// 初始化相机实例
-  Future<void> initCameras([CameraDescription? cameraDescription]) async {
-    // Save the current controller to a local variable.
-    final CameraController? c = innerController;
-    // Dispose at last to avoid disposed usage with assertions.
-    if (c != null) {
-      innerController = null;
-      await c.dispose();
+  Future<void> initCameras({
+    CameraDescription? cameraDescription,
+    bool ignoreLocks = false,
+  }) {
+    if (initializeLock != null && !ignoreLocks) {
+      return initializeLock!.future;
     }
-    // Then request a new frame to unbind the controller from elements.
-    safeSetState(() {
-      maxAvailableZoom = 1;
-      minAvailableZoom = 1;
-      currentZoom = 1;
-      baseZoom = 1;
-      // Meanwhile, cancel the existed exposure point and mode display.
-      exposurePointDisplayTimer?.cancel();
-      exposureModeDisplayTimer?.cancel();
-      exposureFadeOutTimer?.cancel();
-      isFocusPointDisplays.value = false;
-      isFocusPointFadeOut.value = false;
-      lastExposurePoint.value = null;
-      currentExposureOffset.value = 0;
-      currentExposureSliderOffset.value = 0;
-      lockedCaptureOrientation = pickerConfig.lockCaptureOrientation;
-    });
-    // **IMPORTANT**: Push methods into a post frame callback, which ensures the
-    // controller has already unbind from widgets.
-    ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) async {
+    final lock = ignoreLocks ? initializeLock! : Completer<void>();
+    if (ignoreLocks) {
+      initializeLock = lock;
+    }
+    Future(() async {
+      // Save the current controller to a local variable.
+      final CameraController? c = innerController;
+      // Dispose at last to avoid disposed usage with assertions.
+      if (c != null) {
+        innerController = null;
+        await c.dispose();
+      }
+      // Then request a new frame to unbind the controller from elements.
+      safeSetState(() {
+        maxAvailableZoom = 1;
+        minAvailableZoom = 1;
+        currentZoom = 1;
+        baseZoom = 1;
+        // Meanwhile, cancel the existed exposure point and mode display.
+        exposurePointDisplayTimer?.cancel();
+        exposureModeDisplayTimer?.cancel();
+        exposureFadeOutTimer?.cancel();
+        isFocusPointDisplays.value = false;
+        isFocusPointFadeOut.value = false;
+        lastExposurePoint.value = null;
+        currentExposureOffset.value = 0;
+        currentExposureSliderOffset.value = 0;
+        lockedCaptureOrientation = pickerConfig.lockCaptureOrientation;
+      });
+      await Future.microtask(() {});
       // When the [cameraDescription] is null, which means this is the first
       // time initializing cameras, so available cameras should be fetched.
       if (cameraDescription == null) {
@@ -388,12 +404,13 @@ class CameraPickerState extends State<CameraPicker>
         enableAudio: enableAudio,
         imageFormatGroup: pickerConfig.imageFormatGroup,
       );
-
       try {
         final Stopwatch stopwatch = Stopwatch()..start();
         await newController.initialize();
         stopwatch.stop();
-        realDebugPrint("${stopwatch.elapsed} for controller's initialization.");
+        realDebugPrint(
+          "${stopwatch.elapsed} for controller's initialization.",
+        );
         // Call recording preparation first.
         if (shouldPrepareForVideoRecording) {
           stopwatch
@@ -474,17 +491,32 @@ class CameraPickerState extends State<CameraPicker>
         stopwatch.stop();
         realDebugPrint("${stopwatch.elapsed} for config's update.");
         innerController = newController;
+        lock.complete();
       } catch (e, s) {
-        handleErrorWithHandler(e, s, pickerConfig.onError);
-        if (!retriedAfterInvalidInitialize) {
-          retriedAfterInvalidInitialize = true;
-          Future.delayed(Duration.zero, initCameras);
+        accessDenied = e is CameraException && e.code.endsWith('AccessDenied');
+        if (!accessDenied) {
+          if (!retriedAfterInvalidInitialize) {
+            retriedAfterInvalidInitialize = true;
+            Future.delayed(Duration.zero, () {
+              initCameras(
+                cameraDescription: cameraDescription,
+                ignoreLocks: true,
+              );
+            });
+          } else {
+            retriedAfterInvalidInitialize = false;
+            lock.completeError(e, s);
+          }
         } else {
-          retriedAfterInvalidInitialize = false;
+          lock.completeError(e, s);
         }
-      } finally {
-        safeSetState(() {});
       }
+    });
+    return lock.future.catchError((e, s) {
+      handleErrorWithHandler(e, s, pickerConfig.onError);
+    }).whenComplete(() {
+      initializeLock = null;
+      safeSetState(() {});
     });
   }
 
@@ -569,7 +601,7 @@ class CameraPickerState extends State<CameraPicker>
     if (currentCameraIndex == cameras.length) {
       currentCameraIndex = 0;
     }
-    initCameras(currentCamera);
+    initCameras(cameraDescription: currentCamera);
   }
 
   /// Obtain the next camera description for semantics.
