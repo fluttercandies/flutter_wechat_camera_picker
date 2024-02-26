@@ -493,7 +493,7 @@ class CameraPickerState extends State<CameraPicker>
         innerController = newController;
         lock.complete();
       } catch (e, s) {
-        accessDenied = e is CameraException && e.code.endsWith('AccessDenied');
+        accessDenied = e is CameraException && e.code.contains('Access');
         if (!accessDenied) {
           if (!retriedAfterInvalidInitialize) {
             retriedAfterInvalidInitialize = true;
