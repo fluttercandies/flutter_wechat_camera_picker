@@ -50,27 +50,31 @@ class _MyHomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(width: 10),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Semantics(
-                sortKey: const OrdinalSortKey(0),
-                child: Text(
-                  context.l10n.appTitle,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              Semantics(
-                sortKey: const OrdinalSortKey(0.1),
-                child: Text(
-                  context.l10n.appVersion(
-                    packageVersion ?? context.l10n.appVersionUnknown,
+          Flexible(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Semantics(
+                  sortKey: const OrdinalSortKey(0),
+                  child: Text(
+                    context.l10n.appTitle,
+                    style: Theme.of(context).textTheme.titleLarge,
+                    overflow: TextOverflow.fade,
+                    maxLines: 1,
                   ),
-                  style: Theme.of(context).textTheme.bodySmall,
                 ),
-              ),
-            ],
+                Semantics(
+                  sortKey: const OrdinalSortKey(0.1),
+                  child: Text(
+                    context.l10n.appVersion(
+                      packageVersion ?? context.l10n.appVersionUnknown,
+                    ),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(width: 20),
         ],
