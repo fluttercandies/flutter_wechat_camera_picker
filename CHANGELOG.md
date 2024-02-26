@@ -12,6 +12,10 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 - Use `wechat_picker_library`.
 
+### Fixes
+
+- Predicate access denied to avoid deadlocks.
+
 ## 4.2.0-dev.3
 
 ### Improvements
