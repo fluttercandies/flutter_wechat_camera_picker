@@ -6,6 +6,12 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
 
+## 4.2.1
+
+### Fixes
+
+- Fix ignore locks when exception throws.
+
 ## 4.2.0
 
 ### Breaking changes

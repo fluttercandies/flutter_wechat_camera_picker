@@ -334,7 +334,7 @@ class CameraPickerState extends State<CameraPicker>
       return initializeLock!.future;
     }
     final lock = ignoreLocks ? initializeLock! : Completer<void>();
-    if (ignoreLocks) {
+    if (lock != initializeLock) {
       initializeLock = lock;
     }
     Future(() async {
