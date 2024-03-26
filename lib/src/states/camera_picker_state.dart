@@ -1172,6 +1172,13 @@ class CameraPickerState extends State<CameraPicker>
   /// This displayed at the top of the screen.
   /// 该区域显示在屏幕上方。
   Widget buildSettingActions(BuildContext context) {
+    if (innerController == null) {
+      return Container(
+        alignment: AlignmentDirectional.topStart,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: buildBackButton(context),
+      );
+    }
     return buildInitializeWrapper(
       builder: (CameraValue v, __) {
         if (v.isRecordingVideo) {
@@ -1787,7 +1794,6 @@ class CameraPickerState extends State<CameraPicker>
           children: <Widget>[
             Semantics(
               sortKey: const OrdinalSortKey(0),
-              hidden: innerController == null,
               child: buildSettingActions(context),
             ),
             const Spacer(),
