@@ -6,6 +6,16 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
 
+## 4.2.2
+
+### Fixes
+
+- Allows `wrapControllerMethod` to return nullable result
+
+### Improvements
+
+- Provide the back button when no controller has been initialized.
+
 ## 4.2.1
 
 ### Fixes
