@@ -304,7 +304,7 @@ class CameraPickerState extends State<CameraPicker>
   ///
   /// 对于 [CameraController] 的方法增加是否无效的控制。
   /// 如果 [T] 是非 void 且方法无效，返回 [fallback]。
-  Future<T> wrapControllerMethod<T>(
+  Future<T?> wrapControllerMethod<T>(
     String key,
     Future<T> Function() method, {
     CameraDescription? description,
@@ -313,7 +313,7 @@ class CameraPickerState extends State<CameraPicker>
   }) async {
     description ??= currentCamera;
     if (invalidControllerMethods[description]!.contains(key)) {
-      return fallback!;
+      return fallback;
     }
     try {
       return await method();
@@ -431,37 +431,37 @@ class CameraPickerState extends State<CameraPicker>
               () => newController.getExposureOffsetStepSize(),
               description: description,
               fallback: exposureStep,
-            ).then((value) => exposureStep = value),
+            ).then((value) => exposureStep = value!),
             wrapControllerMethod(
               'getMaxExposureOffset',
               () => newController.getMaxExposureOffset(),
               description: description,
               fallback: maxAvailableExposureOffset,
-            ).then((value) => maxAvailableExposureOffset = value),
+            ).then((value) => maxAvailableExposureOffset = value!),
             wrapControllerMethod(
               'getMinExposureOffset',
               () => newController.getMinExposureOffset(),
               description: description,
               fallback: minAvailableExposureOffset,
-            ).then((value) => minAvailableExposureOffset = value),
+            ).then((value) => minAvailableExposureOffset = value!),
             wrapControllerMethod(
               'getMaxZoomLevel',
               () => newController.getMaxZoomLevel(),
               description: description,
               fallback: maxAvailableZoom,
-            ).then((value) => maxAvailableZoom = value),
+            ).then((value) => maxAvailableZoom = value!),
             wrapControllerMethod(
               'getMinZoomLevel',
               () => newController.getMinZoomLevel(),
               description: description,
               fallback: minAvailableZoom,
-            ).then((value) => minAvailableZoom = value),
+            ).then((value) => minAvailableZoom = value!),
             wrapControllerMethod(
               'getMinZoomLevel',
               () => newController.getMinZoomLevel(),
               description: description,
               fallback: minAvailableZoom,
-            ).then((value) => minAvailableZoom = value),
+            ).then((value) => minAvailableZoom = value!),
             if (pickerConfig.lockCaptureOrientation != null)
               wrapControllerMethod<void>(
                 'lockCaptureOrientation',
