@@ -10,7 +10,8 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ### Fixes
 
-- Allows `wrapControllerMethod` to return nullable result
+- Allows `wrapControllerMethod` to return nullable result.
+- Evict the captured image cache once returned from the viewer.
 
 ### Improvements
 
