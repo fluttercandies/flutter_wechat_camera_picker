@@ -4,8 +4,8 @@ version: 4.2.2+34
 publish_to: none
 
 environment:
-  sdk: ^3.2.0
-  flutter: '>=3.16.0'
+  sdk: ^3.3.0
+  flutter: '>=3.19.0'
 
 dependencies:
   flutter:
@@ -17,7 +17,7 @@ dependencies:
   wechat_camera_picker:
     path: ../
 
-  package_info_plus: ^5.0.0
+  package_info_plus: ^8.0.0
   video_player: ^2.7.0
 
 dev_dependencies:

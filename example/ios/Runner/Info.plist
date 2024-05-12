@@ -13,7 +13,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>Wechat Camera Picker Example</string>
 	<key>CFBundleName</key>
-	<string>wechat_camera_picker_demo</string>
+	<string>com.fluttercandies.wechatCameraPickerExample</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -47,8 +47,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
