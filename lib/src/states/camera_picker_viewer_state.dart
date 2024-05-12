@@ -201,32 +201,29 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   Widget buildBackButton(BuildContext context) {
     return Semantics(
       sortKey: const OrdinalSortKey(0),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: IconButton(
-          onPressed: () {
-            if (isSavingEntity) {
-              return;
-            }
-            if (previewFile.existsSync()) {
-              previewFile.delete();
-            }
-            Navigator.of(context).pop();
-          },
-          padding: EdgeInsets.zero,
-          constraints: BoxConstraints.tight(const Size.square(28)),
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          iconSize: 18,
-          icon: Container(
-            padding: const EdgeInsets.all(5),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.keyboard_return_rounded,
-              color: Colors.black,
-            ),
+      child: IconButton(
+        onPressed: () {
+          if (isSavingEntity) {
+            return;
+          }
+          if (previewFile.existsSync()) {
+            previewFile.delete();
+          }
+          Navigator.of(context).pop();
+        },
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints.tight(const Size.square(28)),
+        tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+        iconSize: 18,
+        icon: Container(
+          padding: const EdgeInsets.all(5),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.keyboard_return_rounded,
+            color: Colors.black,
           ),
         ),
       ),
@@ -322,7 +319,11 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   Widget buildForeground(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 20),
+        padding: const EdgeInsetsDirectional.only(
+          start: 12.0,
+          end: 12.0,
+          bottom: 12.0,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
