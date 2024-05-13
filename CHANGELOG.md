@@ -10,11 +10,13 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ### Fixes
 
-- Allows `wrapControllerMethod` to return nullable result
+- Allows `wrapControllerMethod` to return nullable result.
+- Allows newer versions of `sensors_plus`.
 
 ### Improvements
 
 - Provide the back button when no controller has been initialized.
+- Improves paddings of the heading actions in the viewer.
 
 ## 4.2.1
 
