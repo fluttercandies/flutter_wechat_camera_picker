@@ -161,9 +161,12 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
             );
             break;
           case CameraPickerViewType.video:
+            // camerax默认保存的文件后缀名为.temp，替换为.mp4保存
+            String title = path.basename(previewFile.path);
+            title = title.replaceFirst(RegExp('.temp', caseSensitive: false), '.mp4');
             entity = await PhotoManager.editor.saveVideo(
               previewFile,
-              title: path.basename(previewFile.path),
+              title: title,
             );
             break;
         }
