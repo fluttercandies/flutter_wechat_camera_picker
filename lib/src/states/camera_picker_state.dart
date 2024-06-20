@@ -1304,12 +1304,41 @@ class CameraPickerState extends State<CameraPicker>
     required BoxConstraints constraints,
     CameraController? controller,
   }) {
+    const fallbackSize = 184.0;
+    final previewSize = controller?.value.previewSize;
     final orientation = controller?.value.deviceOrientation ??
-        MediaQuery.of(context).orientation;
+        MediaQuery.orientationOf(context);
     final isPortrait = orientation.toString().contains('portrait');
+    double effectiveSize;
+    if (previewSize != null) {
+      Size constraintSize = Size(constraints.maxWidth, constraints.maxHeight);
+      if (isPortrait && constraintSize.aspectRatio > 1 ||
+          !isPortrait && constraintSize.aspectRatio < 1) {
+        constraintSize = constraintSize.flipped;
+      }
+      if (isPortrait) {
+        effectiveSize = constraintSize.height -
+            constraintSize.width * previewSize.aspectRatio;
+      } else {
+        effectiveSize = constraintSize.width -
+            constraintSize.height * previewSize.aspectRatio;
+      }
+    } else {
+      // Fallback to a reasonable height.
+      effectiveSize = 184.0;
+    }
+    if (effectiveSize <= 0) {
+      realDebugPrint(
+        'Unexpected layout size calculation: $effectiveSize, '
+        'portrait: $isPortrait, '
+        'orientation: $orientation',
+      );
+      effectiveSize = fallbackSize;
+    }
+
     return SizedBox(
-      width: isPortrait ? null : 118,
-      height: isPortrait ? 118 : null,
+      width: isPortrait ? null : effectiveSize,
+      height: isPortrait ? effectiveSize : null,
       child: Flex(
         direction: isPortrait ? Axis.horizontal : Axis.vertical,
         verticalDirection: orientation == DeviceOrientation.landscapeLeft
@@ -1801,35 +1830,32 @@ class CameraPickerState extends State<CameraPicker>
     final orientation = deviceOrientation ?? MediaQuery.of(context).orientation;
     final isPortrait = orientation.toString().contains('portrait');
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 20),
-        child: Flex(
-          direction: isPortrait ? Axis.vertical : Axis.horizontal,
-          textDirection: orientation == DeviceOrientation.landscapeRight
-              ? TextDirection.rtl
-              : TextDirection.ltr,
-          verticalDirection: orientation == DeviceOrientation.portraitDown
-              ? VerticalDirection.up
-              : VerticalDirection.down,
-          children: <Widget>[
-            Semantics(
-              sortKey: const OrdinalSortKey(0),
-              child: buildSettingActions(context),
+      child: Flex(
+        direction: isPortrait ? Axis.vertical : Axis.horizontal,
+        textDirection: orientation == DeviceOrientation.landscapeRight
+            ? TextDirection.rtl
+            : TextDirection.ltr,
+        verticalDirection: orientation == DeviceOrientation.portraitDown
+            ? VerticalDirection.up
+            : VerticalDirection.down,
+        children: <Widget>[
+          Semantics(
+            sortKey: const OrdinalSortKey(0),
+            child: buildSettingActions(context),
+          ),
+          const Spacer(),
+          if (enableScaledPreview)
+            ExcludeSemantics(child: buildCaptureTips(innerController)),
+          Semantics(
+            sortKey: const OrdinalSortKey(2),
+            hidden: innerController == null,
+            child: buildCaptureActions(
+              context: context,
+              constraints: constraints,
+              controller: innerController,
             ),
-            const Spacer(),
-            if (enableScaledPreview)
-              ExcludeSemantics(child: buildCaptureTips(innerController)),
-            Semantics(
-              sortKey: const OrdinalSortKey(2),
-              hidden: innerController == null,
-              child: buildCaptureActions(
-                context: context,
-                constraints: constraints,
-                controller: innerController,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
