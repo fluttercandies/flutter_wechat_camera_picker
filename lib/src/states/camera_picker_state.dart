@@ -8,6 +8,7 @@ import 'dart:math' as math;
 
 import 'package:camera/camera.dart';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
@@ -102,6 +103,10 @@ class CameraPickerState extends State<CameraPicker>
   /// 当长按拍照按钮时，会进入准备录制视频的状态，此时需要执行动画。
   bool isShootingButtonAnimate = false;
 
+  /// Whether the [buildCaptureButton] is being tapped down.
+  /// 拍照按钮是否已经按下
+  bool isCaptureButtonTapDown = false;
+
   /// The [Timer] for keep the [lastExposurePoint] displays.
   /// 用于控制上次手动聚焦点显示的计时器
   Timer? exposurePointDisplayTimer;
@@ -194,9 +199,9 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Whether the capture button is displaying.
   bool get shouldCaptureButtonDisplay =>
-      isControllerBusy ||
+      isCaptureButtonTapDown &&
       (innerController?.value.isRecordingVideo ?? false) &&
-          isRecordingRestricted;
+      isRecordingRestricted;
 
   /// Whether the camera preview should be rotated.
   bool get isCameraRotated => pickerConfig.cameraQuarterTurns % 4 != 0;
@@ -859,7 +864,7 @@ class CameraPickerState extends State<CameraPicker>
     BoxConstraints constraints,
   ) {
     lastShootingButtonPressedPosition ??= event.position;
-    if (controller.value.isRecordingVideo) {
+    if (innerController?.value.isRecordingVideo == true) {
       // First calculate relative offset.
       final Offset offset = event.position - lastShootingButtonPressedPosition!;
       // Then turn negative,
@@ -886,7 +891,6 @@ class CameraPickerState extends State<CameraPicker>
     }
     setState(() {
       isControllerBusy = true;
-      isShootingButtonAnimate = true;
     });
     final ExposureMode previousExposureMode = controller.value.exposureMode;
     try {
@@ -1222,9 +1226,12 @@ class CameraPickerState extends State<CameraPicker>
         ),
         onPressed: () => switchCameras(),
         icon: Icon(
-          Platform.isIOS
-              ? Icons.flip_camera_ios_outlined
-              : Icons.flip_camera_android_outlined,
+          switch (defaultTargetPlatform) {
+            TargetPlatform.iOS ||
+            TargetPlatform.macOS =>
+              Icons.flip_camera_ios_outlined,
+            _ => Icons.flip_camera_android_outlined,
+          },
           size: 24,
         ),
       ),
@@ -1315,7 +1322,9 @@ class CameraPickerState extends State<CameraPicker>
               child: buildCaptureButton(context, constraints),
             ),
           ),
-          if (innerController != null && cameras.length > 1)
+          if (controller != null &&
+              !controller.value.isRecordingVideo &&
+              cameras.length > 1)
             Expanded(
               child: RotatedBox(
                 quarterTurns: !enableScaledPreview ? cameraQuarterTurns : 0,
@@ -1342,8 +1351,11 @@ class CameraPickerState extends State<CameraPicker>
   /// The shooting button.
   /// 拍照按钮
   Widget buildCaptureButton(BuildContext context, BoxConstraints constraints) {
-    const Size outerSize = Size.square(115);
-    const Size innerSize = Size.square(82);
+    if (!isCaptureButtonTapDown &&
+        (innerController?.value.isRecordingVideo ?? false)) {
+      return const SizedBox.shrink();
+    }
+    const size = Size.square(82.0);
     return MergeSemantics(
       child: Semantics(
         label: textDelegate.sActionShootingButtonTooltip,
@@ -1358,22 +1370,30 @@ class CameraPickerState extends State<CameraPicker>
           child: GestureDetector(
             onTap: onTap,
             onLongPress: onLongPress,
+            onTapDown: (_) => safeSetState(() => isCaptureButtonTapDown = true),
+            onTapUp: (_) => safeSetState(() => isCaptureButtonTapDown = false),
+            onTapCancel: () =>
+                safeSetState(() => isCaptureButtonTapDown = false),
+            onLongPressStart: (_) =>
+                safeSetState(() => isCaptureButtonTapDown = true),
+            onLongPressEnd: (_) =>
+                safeSetState(() => isCaptureButtonTapDown = false),
+            onLongPressCancel: () =>
+                safeSetState(() => isCaptureButtonTapDown = false),
             child: SizedBox.fromSize(
-              size: outerSize,
+              size: size,
               child: Stack(
-                alignment: Alignment.center,
-                children: <Widget>[
+                fit: StackFit.expand,
+                children: [
                   AnimatedContainer(
-                    duration: kThemeChangeDuration,
-                    width: isShootingButtonAnimate
-                        ? outerSize.width
-                        : innerSize.width,
-                    height: isShootingButtonAnimate
-                        ? outerSize.height
-                        : innerSize.height,
-                    padding: EdgeInsets.all(isShootingButtonAnimate ? 41 : 11),
+                    duration: const Duration(microseconds: 100),
+                    padding: EdgeInsets.all(isCaptureButtonTapDown ? 16 : 8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).canvasColor.withOpacity(0.85),
+                      border: Border.all(
+                        color: Colors.white,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        width: 2,
+                      ),
                       shape: BoxShape.circle,
                     ),
                     child: const DecoratedBox(
@@ -1388,10 +1408,10 @@ class CameraPickerState extends State<CameraPicker>
                       quarterTurns:
                           !enableScaledPreview ? cameraQuarterTurns : 0,
                       child: CameraProgressButton(
-                        isAnimating: isShootingButtonAnimate,
-                        isBusy: isControllerBusy,
+                        isAnimating:
+                            isCaptureButtonTapDown && isShootingButtonAnimate,
                         duration: pickerConfig.maximumRecordingDuration!,
-                        size: outerSize,
+                        size: size,
                         ringsColor: theme.indicatorColor,
                         ringsWidth: 3,
                       ),
