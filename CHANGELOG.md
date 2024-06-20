@@ -6,6 +6,12 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
 
+## 4.3.0
+
+### Fixes
+
+- Constraints `camera_android` version to resolves https://github.com/flutter/flutter/issues/150549.
+
 ## 4.2.2
 
 ### Fixes
