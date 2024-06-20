@@ -21,7 +21,7 @@ A **camera picker** for Flutter projects based on WeChat's UI,
 which is also a separate runnable extension to the
 [wechat_assets_picker][wechat_assets_picker pub].
 
-Current WeChat version that UI based on: **8.3.x**
+Current WeChat version that UI based on: **8.0.49**
 UI designs will be updated following the WeChat update in anytime.
 
 See the [Migration Guide][] to learn how to migrate between breaking changes.
@@ -193,8 +193,9 @@ Fields in `CameraPickerConfig`:
 | enableExposureControlOnPoint  | `bool`                      | Whether users can adjust exposure according to the set point.                                         | `true`                                     |
 | enablePinchToZoom             | `bool`                      | Whether users can zoom the camera by pinch.                                                           | `true`                                     |
 | enablePullToZoomInRecord      | `bool`                      | Whether users can zoom by pulling up when recording video.                                            | `true`                                     |
+| enableScaledPreview           | `bool`                      | Whether the camera preview should be scaled during captures.                                          | `false`                                    |
 | shouldDeletePreviewFile       | `bool`                      | Whether the preview file will be delete when pop.                                                     | `false`                                    |
-| shouldAutoPreviewVideo        | `bool`                      | Whether the video should be played instantly in the preview.                                          | `false`                                    |
+| shouldAutoPreviewVideo        | `bool`                      | Whether the video should be played instantly in the preview.                                          | `true`                                     |
 | maximumRecordingDuration      | `Duration?`                 | The maximum duration of the video recording process.                                                  | `const Duration(seconds: 15)`              |
 | minimumRecordingDuration      | `Duration`                  | The minimum duration of the video recording process.                                                  | `const Duration(seconds: 1)`               |
 | theme                         | `ThemeData?`                | Theme data for the picker.                                                                            | `CameraPicker.themeData(wechatThemeColor)` |

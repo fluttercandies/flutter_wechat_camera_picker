@@ -8,6 +8,10 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## 4.3.0
 
+### Improvements
+
+- Adapt the latest interface of WeChat.
+
 ### Fixes
 
 - Constraints `camera_android` version to resolves https://github.com/flutter/flutter/issues/150549.

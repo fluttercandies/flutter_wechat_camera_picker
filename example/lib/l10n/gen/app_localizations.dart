@@ -183,18 +183,6 @@ abstract class AppLocalizations {
   /// **'Make recordings silent.'**
   String get pickMethodSilenceRecordingDescription;
 
-  /// No description provided for @pickMethodAutoPreviewVideosName.
-  ///
-  /// In en, this message translates to:
-  /// **'Auto preview videos'**
-  String get pickMethodAutoPreviewVideosName;
-
-  /// No description provided for @pickMethodAutoPreviewVideosDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Play videos automatically in the preview after captured.'**
-  String get pickMethodAutoPreviewVideosDescription;
-
   /// No description provided for @pickMethodNoDurationLimitName.
   ///
   /// In en, this message translates to:
@@ -231,17 +219,17 @@ abstract class AppLocalizations {
   /// **'Rotate the picker layout in quarter turns, without the camera preview.'**
   String get pickMethodRotateInTurnsDescription;
 
-  /// No description provided for @pickMethodPreventScalingName.
+  /// No description provided for @pickMethodScalingPreviewName.
   ///
   /// In en, this message translates to:
-  /// **'Prevent scaling for camera preview'**
-  String get pickMethodPreventScalingName;
+  /// **'Scaling for camera preview'**
+  String get pickMethodScalingPreviewName;
 
-  /// No description provided for @pickMethodPreventScalingDescription.
+  /// No description provided for @pickMethodScalingPreviewDescription.
   ///
   /// In en, this message translates to:
-  /// **'Camera preview will not be scaled to cover the whole screen of the device, only fit for the raw aspect ratio.'**
-  String get pickMethodPreventScalingDescription;
+  /// **'Camera preview will be scaled to cover the whole screen of the device with the original aspect ratio.'**
+  String get pickMethodScalingPreviewDescription;
 
   /// No description provided for @pickMethodLowerResolutionName.
   ///
