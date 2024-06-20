@@ -20,7 +20,7 @@ Language: [English](README.md) | 中文
 基于 **微信 UI** 的 Flutter 相机选择器，可以单独运行，
 同时是 [wechat_assets_picker][wechat_assets_picker pub] 的扩展。
 
-当前的界面设计基于的微信版本：**8.3.x**
+当前的界面设计基于的微信版本：**8.0.49**
 界面更新将在微信版本更新后随时进行跟进。
 
 查看 [迁移指南][] 了解如何从破坏性改动中迁移为可用代码。

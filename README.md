@@ -21,7 +21,7 @@ A **camera picker** for Flutter projects based on WeChat's UI,
 which is also a separate runnable extension to the
 [wechat_assets_picker][wechat_assets_picker pub].
 
-Current WeChat version that UI based on: **8.3.x**
+Current WeChat version that UI based on: **8.0.49**
 UI designs will be updated following the WeChat update in anytime.
 
 See the [Migration Guide][] to learn how to migrate between breaking changes.
