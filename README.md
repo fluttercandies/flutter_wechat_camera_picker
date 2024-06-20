@@ -193,6 +193,7 @@ Fields in `CameraPickerConfig`:
 | enableExposureControlOnPoint  | `bool`                      | Whether users can adjust exposure according to the set point.                                         | `true`                                     |
 | enablePinchToZoom             | `bool`                      | Whether users can zoom the camera by pinch.                                                           | `true`                                     |
 | enablePullToZoomInRecord      | `bool`                      | Whether users can zoom by pulling up when recording video.                                            | `true`                                     |
+| enableScaledPreview           | `bool`                      | Whether the camera preview should be scaled during captures.                                          | `false`                                    |
 | shouldDeletePreviewFile       | `bool`                      | Whether the preview file will be delete when pop.                                                     | `false`                                    |
 | shouldAutoPreviewVideo        | `bool`                      | Whether the video should be played instantly in the preview.                                          | `true`                                     |
 | maximumRecordingDuration      | `Duration?`                 | The maximum duration of the video recording process.                                                  | `const Duration(seconds: 15)`              |

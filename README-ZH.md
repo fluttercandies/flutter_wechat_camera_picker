@@ -188,6 +188,7 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 | enableExposureControlOnPoint  | `bool`                      | 用户是否可以根据已经设置的曝光点调节曝光度                              | `true`                                     |
 | enablePinchToZoom             | `bool`                      | 用户是否可以在界面上双指缩放相机对焦                                 | `true`                                     |
 | enablePullToZoomInRecord      | `bool`                      | 用户是否可以在录制视频时上拉缩放                                   | `true`                                     |
+| enableScaledPreview           | `bool`                      | 拍摄过程中相机预览是否需要缩放                                    | `false`                                    |
 | shouldDeletePreviewFile       | `bool`                      | 返回页面时是否删除预览文件                                      | `false`                                    |
 | shouldAutoPreviewVideo        | `bool`                      | 在预览时是否直接播放视频                                       | `true`                                     |
 | maximumRecordingDuration      | `Duration?`                 | 录制视频最长时长                                           | `const Duration(seconds: 15)`              |

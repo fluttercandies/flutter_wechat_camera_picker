@@ -66,20 +66,6 @@ List<PickMethod> pickMethods(BuildContext context) {
       ),
     ),
     PickMethod(
-      icon: '▶️',
-      name: context.l10n.pickMethodAutoPreviewVideosName,
-      description: context.l10n.pickMethodAutoPreviewVideosDescription,
-      method: (BuildContext context) => CameraPicker.pickFromCamera(
-        context,
-        pickerConfig: const CameraPickerConfig(
-          enableRecording: true,
-          onlyEnableRecording: true,
-          enableTapRecording: true,
-          shouldAutoPreviewVideo: true,
-        ),
-      ),
-    ),
-    PickMethod(
       icon: '⏳',
       name: context.l10n.pickMethodNoDurationLimitName,
       description: context.l10n.pickMethodNoDurationLimitDescription,
@@ -115,11 +101,11 @@ List<PickMethod> pickMethods(BuildContext context) {
     ),
     PickMethod(
       icon: '🔍',
-      name: context.l10n.pickMethodPreventScalingName,
-      description: context.l10n.pickMethodPreventScalingDescription,
+      name: context.l10n.pickMethodScalingPreviewName,
+      description: context.l10n.pickMethodScalingPreviewDescription,
       method: (BuildContext context) => CameraPicker.pickFromCamera(
         context,
-        pickerConfig: const CameraPickerConfig(enableScaledPreview: false),
+        pickerConfig: const CameraPickerConfig(enableScaledPreview: true),
       ),
     ),
     PickMethod(

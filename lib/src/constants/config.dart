@@ -23,7 +23,7 @@ final class CameraPickerConfig {
     this.enableExposureControlOnPoint = true,
     this.enablePinchToZoom = true,
     this.enablePullToZoomInRecord = true,
-    this.enableScaledPreview = true,
+    this.enableScaledPreview = false,
     this.shouldDeletePreviewFile = false,
     this.shouldAutoPreviewVideo = true,
     this.maximumRecordingDuration = const Duration(seconds: 15),
