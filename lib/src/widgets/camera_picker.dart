@@ -1,6 +1,7 @@
 // Copyright 2019 The FlutterCandies author. All rights reserved.
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
+// ignore_for_file: deprecated_member_use
 
 import 'dart:async';
 
@@ -92,12 +93,14 @@ class CameraPicker extends StatefulWidget {
         primaryContainer: Colors.grey[900],
         secondary: themeColor,
         secondaryContainer: themeColor,
+        background: Colors.grey[900]!,
         surface: Colors.grey[900]!,
         brightness: Brightness.dark,
         error: const Color(0xffcf6679),
         onPrimary: Colors.black,
         onSecondary: Colors.black,
         onSurface: Colors.white,
+        onBackground: Colors.white,
         onError: Colors.black,
       ),
     );

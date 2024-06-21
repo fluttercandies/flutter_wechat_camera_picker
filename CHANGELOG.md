@@ -6,6 +6,12 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
 
+## 4.3.0+1
+
+### Fixes
+
+- Fixes the breaking `ColorScheme.background` implementation on older Flutter SDKs.
+
 ## 4.3.0
 
 ### Improvements
