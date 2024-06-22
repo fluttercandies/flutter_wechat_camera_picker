@@ -195,7 +195,7 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 | minimumRecordingDuration      | `Duration`                  | 录制视频最短时长                                           | `const Duration(seconds: 1)`               |
 | theme                         | `ThemeData?`                | 选择器的主题                                             | `CameraPicker.themeData(wechatThemeColor)` |
 | textDelegate                  | `CameraPickerTextDelegate?` | 控制部件中的文字实现                                         | `CameraPickerTextDelegate`                 |
-| resolutionPreset              | `ResolutionPreset`          | 相机的分辨率预设                                           | `ResolutionPreset.max`                     |
+| resolutionPreset              | `ResolutionPreset`          | 相机的分辨率预设                                           | `ResolutionPreset.ultraHigh`               |
 | cameraQuarterTurns            | `int`                       | 摄像机视图顺时针旋转次数，每次 90 度                               | `0`                                        |
 | imageFormatGroup              | `ImageFormatGroup`          | 输出图像的格式描述                                          | `ImageFormatGroup.unknown`                 |
 | preferredLensDirection        | `CameraLensDirection`       | 首次使用相机时首选的镜头方向                                     | `CameraLensDirection.back`                 |
