@@ -926,17 +926,16 @@ class CameraPickerState extends State<CameraPicker>
         Navigator.of(context).pop(entity);
         return;
       }
-      await Future.wait(<Future<void>>[
+      wrapControllerMethod<void>(
+        'setFocusMode',
+        () => controller.setFocusMode(FocusMode.auto),
+      );
+      if (previousExposureMode != ExposureMode.locked) {
         wrapControllerMethod<void>(
-          'setFocusMode',
-          () => controller.setFocusMode(FocusMode.auto),
-        ),
-        if (previousExposureMode != ExposureMode.locked)
-          wrapControllerMethod<void>(
-            'setExposureMode',
-            () => controller.setExposureMode(previousExposureMode),
-          ),
-      ]);
+          'setExposureMode',
+          () => controller.setExposureMode(previousExposureMode),
+        );
+      }
       await controller.resumePreview();
     } catch (e, s) {
       handleErrorWithHandler(e, s, pickerConfig.onError);
