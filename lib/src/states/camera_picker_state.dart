@@ -1282,8 +1282,9 @@ class CameraPickerState extends State<CameraPicker>
     return AnimatedOpacity(
       duration: recordDetectDuration,
       opacity: controller?.value.isRecordingVideo ?? false ? 0 : 1,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
+      child: Container(
+        height: 48.0,
+        alignment: Alignment.center,
         child: Text(
           tips,
           style: const TextStyle(fontSize: 15),
@@ -1333,6 +1334,8 @@ class CameraPickerState extends State<CameraPicker>
         'orientation: $orientation',
       );
       effectiveSize = fallbackSize;
+    } else if (effectiveSize < 124.0) {
+      effectiveSize = 124.0;
     }
 
     return SizedBox(
@@ -1751,22 +1754,6 @@ class CameraPickerState extends State<CameraPicker>
       preview = Stack(
         children: <Widget>[
           preview,
-          Positioned.fill(
-            child: ExcludeSemantics(
-              child: RotatedBox(
-                quarterTurns: cameraQuarterTurns,
-                child: Align(
-                  alignment: {
-                    DeviceOrientation.portraitUp: Alignment.bottomCenter,
-                    DeviceOrientation.portraitDown: Alignment.topCenter,
-                    DeviceOrientation.landscapeLeft: Alignment.centerRight,
-                    DeviceOrientation.landscapeRight: Alignment.centerLeft,
-                  }[cameraValue.deviceOrientation]!,
-                  child: buildCaptureTips(innerController),
-                ),
-              ),
-            ),
-          ),
           if (pickerConfig.enableSetExposure)
             buildExposureDetector(context, constraints),
           buildFocusingPoint(
@@ -1843,8 +1830,7 @@ class CameraPickerState extends State<CameraPicker>
             child: buildSettingActions(context),
           ),
           const Spacer(),
-          if (enableScaledPreview)
-            ExcludeSemantics(child: buildCaptureTips(innerController)),
+          ExcludeSemantics(child: buildCaptureTips(innerController)),
           Semantics(
             sortKey: const OrdinalSortKey(2),
             hidden: innerController == null,
