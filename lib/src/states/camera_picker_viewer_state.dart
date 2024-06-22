@@ -150,18 +150,18 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
     try {
       final PermissionState ps = await PhotoManager.requestPermissionExtend();
       if (ps == PermissionState.authorized || ps == PermissionState.limited) {
+        final filePath = previewFile.path;
         switch (widget.viewType) {
           case CameraPickerViewType.image:
-            final String filePath = previewFile.path;
             entity = await PhotoManager.editor.saveImageWithPath(
               filePath,
-              title: path.basename(previewFile.path),
+              title: path.basename(filePath),
             );
             break;
           case CameraPickerViewType.video:
             entity = await PhotoManager.editor.saveVideo(
               previewFile,
-              title: path.basename(previewFile.path),
+              title: path.basename(filePath),
             );
             break;
         }
