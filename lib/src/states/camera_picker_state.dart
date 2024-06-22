@@ -684,10 +684,10 @@ class CameraPickerState extends State<CameraPicker>
   /// 处理双指缩放更新
   Future<void> handleScaleUpdate(ScaleUpdateDetails details) async {
     // When there are not exactly two fingers on screen don't scale
-    if (pointers != 2) {
+    if (innerController == null || pointers != 2) {
       return;
     }
-    zoom(details.scale);
+    zoom(details.scale * 2 - 1);
   }
 
   void restartExposurePointDisplayTimer() {
