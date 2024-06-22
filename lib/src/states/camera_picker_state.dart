@@ -909,6 +909,7 @@ class CameraPickerState extends State<CameraPicker>
             handleErrorWithHandler(e, s, pickerConfig.onError);
           }),
       ]);
+      final lockedDeviceOrientation = controller.value.lockedCaptureOrientation;
       final XFile file = await controller.takePicture();
       await controller.pausePreview();
       final bool? isCapturedFileHandled = pickerConfig.onXFileCaptured?.call(
@@ -921,6 +922,7 @@ class CameraPickerState extends State<CameraPicker>
       final AssetEntity? entity = await pushToViewer(
         file: file,
         viewType: CameraPickerViewType.image,
+        lockedDeviceOrientation: lockedDeviceOrientation,
       );
       if (entity != null) {
         Navigator.of(context).pop(entity);
@@ -1036,6 +1038,7 @@ class CameraPickerState extends State<CameraPicker>
       lastShootingButtonPressedPosition = null;
     });
     try {
+      final lockedDeviceOrientation = controller.value.lockedCaptureOrientation;
       final XFile file = await controller.stopVideoRecording();
       if (recordStopwatch.elapsed < minimumRecordingDuration) {
         pickerConfig.onMinimumRecordDurationNotMet?.call();
@@ -1052,6 +1055,7 @@ class CameraPickerState extends State<CameraPicker>
       final AssetEntity? entity = await pushToViewer(
         file: file,
         viewType: CameraPickerViewType.video,
+        lockedDeviceOrientation: lockedDeviceOrientation,
       );
       if (entity != null) {
         Navigator.of(context).pop(entity);
@@ -1073,6 +1077,7 @@ class CameraPickerState extends State<CameraPicker>
   Future<AssetEntity?> pushToViewer({
     required XFile file,
     required CameraPickerViewType viewType,
+    DeviceOrientation? lockedDeviceOrientation,
   }) async {
     if (viewType == CameraPickerViewType.image) {
       await precacheImage(FileImage(File(file.path)), context);
@@ -1082,6 +1087,7 @@ class CameraPickerState extends State<CameraPicker>
       pickerConfig: pickerConfig,
       viewType: viewType,
       previewXFile: file,
+      deviceOrientation: lockedDeviceOrientation,
     );
   }
 

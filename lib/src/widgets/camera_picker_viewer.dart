@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../constants/config.dart';
 import '../internals/singleton.dart';
@@ -19,6 +20,7 @@ class CameraPickerViewer extends StatefulWidget {
     required this.viewType,
     required this.previewXFile,
     required this.pickerConfig,
+    this.deviceOrientation,
     this.createViewerState,
   });
 
@@ -33,6 +35,8 @@ class CameraPickerViewer extends StatefulWidget {
   /// {@macro wechat_camera_picker.CameraPickerConfig}
   final CameraPickerConfig pickerConfig;
 
+  final DeviceOrientation? deviceOrientation;
+
   /// Creates a customized [CameraPickerViewerState].
   /// 构建一个自定义的 [CameraPickerViewerState]。
   final CameraPickerViewerState Function()? createViewerState;
@@ -41,9 +45,11 @@ class CameraPickerViewer extends StatefulWidget {
   /// 跳转至选择预览的静态方法
   static Future<AssetEntity?> pushToViewer(
     BuildContext context, {
+    Key? key,
     required CameraPickerConfig pickerConfig,
     required CameraPickerViewType viewType,
     required XFile previewXFile,
+    DeviceOrientation? deviceOrientation,
     CameraPickerViewerState Function()? createViewerState,
     bool useRootNavigator = true,
   }) {
@@ -53,9 +59,11 @@ class CameraPickerViewer extends StatefulWidget {
     ).push<AssetEntity?>(
       PageRouteBuilder<AssetEntity?>(
         pageBuilder: (_, __, ___) => CameraPickerViewer._(
+          key: key,
           viewType: viewType,
           previewXFile: previewXFile,
           pickerConfig: pickerConfig,
+          deviceOrientation: deviceOrientation,
           createViewerState: createViewerState,
         ),
         transitionsBuilder: (

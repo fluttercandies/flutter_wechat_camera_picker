@@ -37,6 +37,12 @@ dependencies:
 dev_dependencies:
   flutter_lints: any
 
+dependency_overrides:
+  photo_manager:
+    git:
+      url: https://github.com/fluttercandies/flutter_photo_manager
+      ref: 'de0acf6'
+
 screenshots:
   - description: 'Screenshot 1'
     path: screenshots/README_1.jpg
