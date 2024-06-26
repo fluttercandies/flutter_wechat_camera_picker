@@ -232,6 +232,9 @@ class CameraPickerState extends State<CameraPicker>
   /// The locked capture orientation of the current camera instance.
   DeviceOrientation? lockedCaptureOrientation;
 
+  /// The calculated capture actions section height.
+  double? lastCaptureActionsEffectiveHeight;
+
   @override
   void initState() {
     super.initState();
@@ -684,10 +687,10 @@ class CameraPickerState extends State<CameraPicker>
   /// 处理双指缩放更新
   Future<void> handleScaleUpdate(ScaleUpdateDetails details) async {
     // When there are not exactly two fingers on screen don't scale
-    if (pointers != 2) {
+    if (innerController == null || pointers != 2) {
       return;
     }
-    zoom(details.scale);
+    zoom(details.scale * 2 - 1);
   }
 
   void restartExposurePointDisplayTimer() {
@@ -926,17 +929,16 @@ class CameraPickerState extends State<CameraPicker>
         Navigator.of(context).pop(entity);
         return;
       }
-      await Future.wait(<Future<void>>[
+      wrapControllerMethod<void>(
+        'setFocusMode',
+        () => controller.setFocusMode(FocusMode.auto),
+      );
+      if (previousExposureMode != ExposureMode.locked) {
         wrapControllerMethod<void>(
-          'setFocusMode',
-          () => controller.setFocusMode(FocusMode.auto),
-        ),
-        if (previousExposureMode != ExposureMode.locked)
-          wrapControllerMethod<void>(
-            'setExposureMode',
-            () => controller.setExposureMode(previousExposureMode),
-          ),
-      ]);
+          'setExposureMode',
+          () => controller.setExposureMode(previousExposureMode),
+        );
+      }
       await controller.resumePreview();
     } catch (e, s) {
       handleErrorWithHandler(e, s, pickerConfig.onError);
@@ -1283,8 +1285,9 @@ class CameraPickerState extends State<CameraPicker>
     return AnimatedOpacity(
       duration: recordDetectDuration,
       opacity: controller?.value.isRecordingVideo ?? false ? 0 : 1,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
+      child: Container(
+        height: 48.0,
+        alignment: Alignment.center,
         child: Text(
           tips,
           style: const TextStyle(fontSize: 15),
@@ -1304,13 +1307,15 @@ class CameraPickerState extends State<CameraPicker>
     required BoxConstraints constraints,
     CameraController? controller,
   }) {
-    const fallbackSize = 184.0;
+    const fallbackSize = 150.0;
     final previewSize = controller?.value.previewSize;
     final orientation = controller?.value.deviceOrientation ??
         MediaQuery.orientationOf(context);
     final isPortrait = orientation.toString().contains('portrait');
     double effectiveSize;
-    if (previewSize != null) {
+    if (controller == null || pickerConfig.enableScaledPreview) {
+      effectiveSize = lastCaptureActionsEffectiveHeight ?? fallbackSize;
+    } else if (previewSize != null) {
       Size constraintSize = Size(constraints.maxWidth, constraints.maxHeight);
       if (isPortrait && constraintSize.aspectRatio > 1 ||
           !isPortrait && constraintSize.aspectRatio < 1) {
@@ -1323,9 +1328,11 @@ class CameraPickerState extends State<CameraPicker>
         effectiveSize = constraintSize.width -
             constraintSize.height * previewSize.aspectRatio;
       }
+    } else if (lastCaptureActionsEffectiveHeight != null) {
+      effectiveSize = lastCaptureActionsEffectiveHeight!;
     } else {
       // Fallback to a reasonable height.
-      effectiveSize = 184.0;
+      effectiveSize = fallbackSize;
     }
     if (effectiveSize <= 0) {
       realDebugPrint(
@@ -1334,11 +1341,14 @@ class CameraPickerState extends State<CameraPicker>
         'orientation: $orientation',
       );
       effectiveSize = fallbackSize;
+    } else if (effectiveSize < fallbackSize) {
+      effectiveSize = fallbackSize;
     }
-
-    return SizedBox(
+    lastCaptureActionsEffectiveHeight = effectiveSize;
+    return Container(
       width: isPortrait ? null : effectiveSize,
       height: isPortrait ? effectiveSize : null,
+      padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
       child: Flex(
         direction: isPortrait ? Axis.horizontal : Axis.vertical,
         verticalDirection: orientation == DeviceOrientation.landscapeLeft
@@ -1670,8 +1680,8 @@ class CameraPickerState extends State<CameraPicker>
       image: true,
       onTap: () {
         // Focus on the center point when using semantics tap.
-        final Size size = MediaQuery.of(context).size;
-        final TapUpDetails details = TapUpDetails(
+        final size = MediaQuery.sizeOf(context);
+        final details = TapUpDetails(
           kind: PointerDeviceKind.touch,
           globalPosition: Offset(size.width / 2, size.height / 2),
         );
@@ -1752,22 +1762,6 @@ class CameraPickerState extends State<CameraPicker>
       preview = Stack(
         children: <Widget>[
           preview,
-          Positioned.fill(
-            child: ExcludeSemantics(
-              child: RotatedBox(
-                quarterTurns: cameraQuarterTurns,
-                child: Align(
-                  alignment: {
-                    DeviceOrientation.portraitUp: Alignment.bottomCenter,
-                    DeviceOrientation.portraitDown: Alignment.topCenter,
-                    DeviceOrientation.landscapeLeft: Alignment.centerRight,
-                    DeviceOrientation.landscapeRight: Alignment.centerLeft,
-                  }[cameraValue.deviceOrientation]!,
-                  child: buildCaptureTips(innerController),
-                ),
-              ),
-            ),
-          ),
           if (pickerConfig.enableSetExposure)
             buildExposureDetector(context, constraints),
           buildFocusingPoint(
@@ -1827,9 +1821,10 @@ class CameraPickerState extends State<CameraPicker>
     BoxConstraints constraints,
     DeviceOrientation? deviceOrientation,
   ) {
-    final orientation = deviceOrientation ?? MediaQuery.of(context).orientation;
+    final orientation = deviceOrientation ?? MediaQuery.orientationOf(context);
     final isPortrait = orientation.toString().contains('portrait');
     return SafeArea(
+      bottom: false,
       child: Flex(
         direction: isPortrait ? Axis.vertical : Axis.horizontal,
         textDirection: orientation == DeviceOrientation.landscapeRight
@@ -1844,8 +1839,7 @@ class CameraPickerState extends State<CameraPicker>
             child: buildSettingActions(context),
           ),
           const Spacer(),
-          if (enableScaledPreview)
-            ExcludeSemantics(child: buildCaptureTips(innerController)),
+          ExcludeSemantics(child: buildCaptureTips(innerController)),
           Semantics(
             sortKey: const OrdinalSortKey(2),
             hidden: innerController == null,
@@ -1907,8 +1901,8 @@ class CameraPickerState extends State<CameraPicker>
             image: true,
             onTap: () {
               // Focus on the center point when using semantics tap.
-              final Size size = MediaQuery.of(context).size;
-              final TapUpDetails details = TapUpDetails(
+              final size = MediaQuery.sizeOf(context);
+              final details = TapUpDetails(
                 kind: PointerDeviceKind.touch,
                 globalPosition: Offset(size.width / 2, size.height / 2),
               );

@@ -31,7 +31,7 @@ final class CameraPickerConfig {
     this.theme,
     this.textDelegate,
     this.cameraQuarterTurns = 0,
-    this.resolutionPreset = ResolutionPreset.max,
+    this.resolutionPreset = ResolutionPreset.ultraHigh,
     this.imageFormatGroup = ImageFormatGroup.unknown,
     this.preferredLensDirection = CameraLensDirection.back,
     this.preferredFlashMode = FlashMode.off,

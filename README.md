@@ -200,7 +200,7 @@ Fields in `CameraPickerConfig`:
 | minimumRecordingDuration      | `Duration`                  | The minimum duration of the video recording process.                                                  | `const Duration(seconds: 1)`               |
 | theme                         | `ThemeData?`                | Theme data for the picker.                                                                            | `CameraPicker.themeData(wechatThemeColor)` |
 | textDelegate                  | `CameraPickerTextDelegate?` | Text delegate that controls text in widgets.                                                          | `CameraPickerTextDelegate`                 |
-| resolutionPreset              | `ResolutionPreset`          | Present resolution for the camera.                                                                    | `ResolutionPreset.max`                     |
+| resolutionPreset              | `ResolutionPreset`          | Present resolution for the camera.                                                                    | `ResolutionPreset.ultraHigh`               |
 | cameraQuarterTurns            | `int`                       | The number of clockwise quarter turns the camera view should be rotated.                              | `0`                                        |
 | imageFormatGroup              | `ImageFormatGroup`          | Describes the output of the raw image format.                                                         | `ImageFormatGroup.unknown`                 |
 | preferredLensDirection        | `CameraLensDirection`       | Which lens direction is preferred when first using the camera.                                        | `CameraLensDirection.back`                 |
