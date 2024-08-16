@@ -5,6 +5,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:photo_manager/photo_manager.dart';
 
 import '../delegates/camera_picker_text_delegate.dart';
 import 'type_defs.dart';
@@ -42,6 +43,7 @@ final class CameraPickerConfig {
     this.onError,
     this.onXFileCaptured,
     this.onMinimumRecordDurationNotMet,
+    this.onPicked,
   }) : assert(
           enableRecording == true || onlyEnableRecording != true,
           'Recording mode error.',
@@ -165,4 +167,8 @@ final class CameraPickerConfig {
   /// The callback when the recording is not met the minimum recording duration.
   /// 录制时长未达到最小时长时的回调方法。
   final VoidCallback? onMinimumRecordDurationNotMet;
+
+  /// The callback when picture is taken or video is recorded.
+  /// 拍照或录像完成时的回调方法。
+  final Function(AssetEntity)? onPicked;
 }
