@@ -206,6 +206,7 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 | onError                       | `CameraErrorHandler?`       | 拍摄照片过程中的自定义错误处理                                    | null                                       |
 | onXFileCaptured               | `XFileCapturedCallback?`    | 拍摄文件生成后的回调                                         | null                                       |
 | onMinimumRecordDurationNotMet | `VoidCallback?`             | 录制时长未达到最小时长时的回调方法                                  | null                                       |
+| onPicked                      | `Function(AssetEntity)?`    | 拍照或录像确认时的回调方法。                                       | null                                       |
 
 ### 使用自定义的 `State`
 
