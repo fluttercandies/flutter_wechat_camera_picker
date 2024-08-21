@@ -8,6 +8,7 @@ import 'dart:math' as math;
 
 import 'package:camera/camera.dart';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -605,10 +606,17 @@ class CameraPickerState extends State<CameraPicker>
     if (controller.value.isTakingPicture || controller.value.isRecordingVideo) {
       return;
     }
-    ++currentCameraIndex;
-    if (currentCameraIndex == cameras.length) {
-      currentCameraIndex = 0;
+    final preferredCameras = CameraLensDirection.values
+        .map((e) => cameras.firstWhereOrNull((c) => c.lensDirection == e))
+        .whereType<CameraDescription>()
+        .map((e) => cameras.indexOf(e))
+        .toList();
+    int index = preferredCameras.indexOf(currentCameraIndex);
+    ++index;
+    if (index == preferredCameras.length) {
+      index = 0;
     }
+    currentCameraIndex = preferredCameras[index];
     initCameras(cameraDescription: currentCamera);
   }
 
