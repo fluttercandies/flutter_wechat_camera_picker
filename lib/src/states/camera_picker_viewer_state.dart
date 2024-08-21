@@ -204,9 +204,6 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
           if (isSavingEntity) {
             return;
           }
-          if (previewFile.existsSync()) {
-            previewFile.delete();
-          }
           Navigator.of(context).pop();
         },
         padding: EdgeInsets.zero,
@@ -368,15 +365,27 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
     if (!hasLoaded) {
       return const SizedBox.shrink();
     }
-    return Material(
-      color: Colors.black,
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          buildPreview(context),
-          buildForeground(context),
-          if (isSavingEntity) buildLoading(context),
-        ],
+    return PopScope(
+      canPop: true,
+      // ignore: deprecated_member_use
+      onPopInvoked: (didPop) {
+        if (didPop && previewFile.existsSync()) {
+          previewFile.delete().catchError((e, s) {
+            handleErrorWithHandler(e, s, onError);
+            return previewFile;
+          });
+        }
+      },
+      child: Material(
+        color: Colors.black,
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            buildPreview(context),
+            buildForeground(context),
+            if (isSavingEntity) buildLoading(context),
+          ],
+        ),
       ),
     );
   }
