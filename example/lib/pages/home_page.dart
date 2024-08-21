@@ -38,6 +38,7 @@ class _MyHomePageState extends State<HomePage> {
   Widget header(BuildContext context) {
     return Container(
       margin: const EdgeInsetsDirectional.only(top: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       height: 60,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -57,11 +58,13 @@ class _MyHomePageState extends State<HomePage> {
               children: <Widget>[
                 Semantics(
                   sortKey: const OrdinalSortKey(0),
-                  child: Text(
-                    context.l10n.appTitle,
-                    style: Theme.of(context).textTheme.titleLarge,
-                    overflow: TextOverflow.fade,
-                    maxLines: 1,
+                  child: FittedBox(
+                    child: Text(
+                      context.l10n.appTitle,
+                      style: Theme.of(context).textTheme.titleLarge,
+                      overflow: TextOverflow.fade,
+                      maxLines: 1,
+                    ),
                   ),
                 ),
                 Semantics(
