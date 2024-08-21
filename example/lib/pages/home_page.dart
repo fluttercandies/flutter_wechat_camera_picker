@@ -11,7 +11,7 @@ import '../extensions/l10n_extensions.dart';
 import '../main.dart';
 import '../models/picker_method.dart';
 import '../widgets/method_list_view.dart';
-import '../widgets/selected_assets_view.dart';
+import '../widgets/selected_assets_list_view.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,13 +22,12 @@ class HomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<HomePage> {
   final ValueNotifier<bool> isDisplayingDetail = ValueNotifier<bool>(true);
-  final ValueNotifier<AssetEntity?> selectedAsset =
-      ValueNotifier<AssetEntity?>(null);
+  List<AssetEntity> assets = <AssetEntity>[];
 
   Future<void> selectAssets(PickMethod model) async {
-    final AssetEntity? result = await model.method(context);
+    final result = await model.method(context);
     if (result != null) {
-      selectedAsset.value = result;
+      assets = [...assets, result];
       if (mounted) {
         setState(() {});
       }
@@ -38,6 +37,7 @@ class _MyHomePageState extends State<HomePage> {
   Widget header(BuildContext context) {
     return Container(
       margin: const EdgeInsetsDirectional.only(top: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       height: 60,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -57,11 +57,13 @@ class _MyHomePageState extends State<HomePage> {
               children: <Widget>[
                 Semantics(
                   sortKey: const OrdinalSortKey(0),
-                  child: Text(
-                    context.l10n.appTitle,
-                    style: Theme.of(context).textTheme.titleLarge,
-                    overflow: TextOverflow.fade,
-                    maxLines: 1,
+                  child: FittedBox(
+                    child: Text(
+                      context.l10n.appTitle,
+                      style: Theme.of(context).textTheme.titleLarge,
+                      overflow: TextOverflow.fade,
+                      maxLines: 1,
+                    ),
                   ),
                 ),
                 Semantics(
@@ -107,19 +109,15 @@ class _MyHomePageState extends State<HomePage> {
                   onSelectMethod: selectAssets,
                 ),
               ),
-              ValueListenableBuilder<AssetEntity?>(
-                valueListenable: selectedAsset,
-                builder: (_, AssetEntity? asset, __) {
-                  if (asset == null) {
-                    return const SizedBox.shrink();
-                  }
-                  return SelectedAssetView(
-                    asset: asset,
-                    isDisplayingDetail: isDisplayingDetail,
-                    onRemoveAsset: () => selectedAsset.value = null,
-                  );
-                },
-              ),
+              if (assets.isNotEmpty)
+                SelectedAssetsListView(
+                  assets: assets,
+                  isDisplayingDetail: isDisplayingDetail,
+                  onRemoveAsset: (int index) {
+                    assets.removeAt(index);
+                    setState(() {});
+                  },
+                ),
             ],
           ),
         ),

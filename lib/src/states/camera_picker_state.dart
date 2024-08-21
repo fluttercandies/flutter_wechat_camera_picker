@@ -8,6 +8,7 @@ import 'dart:math' as math;
 
 import 'package:camera/camera.dart';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +43,7 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Available cameras.
   /// 可用的相机实例
-  late List<CameraDescription> cameras;
+  List<CameraDescription> cameras = [];
 
   /// Whether the controller is handling method calls.
   /// 相机控制器是否在处理方法调用
@@ -269,7 +270,9 @@ class CameraPickerState extends State<CameraPicker>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final CameraController? c = innerController;
     if (state == AppLifecycleState.resumed && !accessDenied) {
-      initCameras(cameraDescription: currentCamera);
+      initCameras(
+        cameraDescription: cameras.elementAtOrNull(currentCameraIndex),
+      );
     } else if (c == null || !c.value.isInitialized) {
       // App state changed before we got the chance to initialize.
       return;
@@ -605,10 +608,17 @@ class CameraPickerState extends State<CameraPicker>
     if (controller.value.isTakingPicture || controller.value.isRecordingVideo) {
       return;
     }
-    ++currentCameraIndex;
-    if (currentCameraIndex == cameras.length) {
-      currentCameraIndex = 0;
+    final preferredCameras = CameraLensDirection.values
+        .map((e) => cameras.firstWhereOrNull((c) => c.lensDirection == e))
+        .whereType<CameraDescription>()
+        .map((e) => cameras.indexOf(e))
+        .toList();
+    int index = preferredCameras.indexOf(currentCameraIndex);
+    ++index;
+    if (index == preferredCameras.length) {
+      index = 0;
     }
+    currentCameraIndex = preferredCameras[index];
     initCameras(cameraDescription: currentCamera);
   }
 
@@ -1066,6 +1076,7 @@ class CameraPickerState extends State<CameraPicker>
       handleErrorWithHandler(e, s, pickerConfig.onError);
     } finally {
       safeSetState(() {
+        isCaptureButtonTapDown = false;
         isControllerBusy = false;
         isShootingButtonAnimate = false;
       });
@@ -1410,7 +1421,11 @@ class CameraPickerState extends State<CameraPicker>
             onTap: onTap,
             onLongPress: onLongPress,
             onTapDown: (_) => safeSetState(() => isCaptureButtonTapDown = true),
-            onTapUp: (_) => safeSetState(() => isCaptureButtonTapDown = false),
+            onTapUp: (_) => safeSetState(() {
+              if (!enableTapRecording) {
+                isCaptureButtonTapDown = false;
+              }
+            }),
             onTapCancel: () =>
                 safeSetState(() => isCaptureButtonTapDown = false),
             onLongPressStart: (_) =>
@@ -1972,7 +1987,11 @@ class CameraPickerState extends State<CameraPicker>
       );
     }
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
       child: Theme(
         data: theme,
         child: Material(
