@@ -1066,6 +1066,7 @@ class CameraPickerState extends State<CameraPicker>
       handleErrorWithHandler(e, s, pickerConfig.onError);
     } finally {
       safeSetState(() {
+        isCaptureButtonTapDown = false;
         isControllerBusy = false;
         isShootingButtonAnimate = false;
       });
@@ -1410,7 +1411,11 @@ class CameraPickerState extends State<CameraPicker>
             onTap: onTap,
             onLongPress: onLongPress,
             onTapDown: (_) => safeSetState(() => isCaptureButtonTapDown = true),
-            onTapUp: (_) => safeSetState(() => isCaptureButtonTapDown = false),
+            onTapUp: (_) => safeSetState(() {
+              if (!enableTapRecording) {
+                isCaptureButtonTapDown = false;
+              }
+            }),
             onTapCancel: () =>
                 safeSetState(() => isCaptureButtonTapDown = false),
             onLongPressStart: (_) =>
