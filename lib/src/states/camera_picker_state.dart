@@ -43,7 +43,7 @@ class CameraPickerState extends State<CameraPicker>
 
   /// Available cameras.
   /// 可用的相机实例
-  late List<CameraDescription> cameras;
+  List<CameraDescription> cameras = [];
 
   /// Whether the controller is handling method calls.
   /// 相机控制器是否在处理方法调用
@@ -270,7 +270,9 @@ class CameraPickerState extends State<CameraPicker>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     final CameraController? c = innerController;
     if (state == AppLifecycleState.resumed && !accessDenied) {
-      initCameras(cameraDescription: currentCamera);
+      initCameras(
+        cameraDescription: cameras.elementAtOrNull(currentCameraIndex),
+      );
     } else if (c == null || !c.value.isInitialized) {
       // App state changed before we got the chance to initialize.
       return;
