@@ -22,7 +22,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  wechat_picker_library: ^1.0.0
+  wechat_picker_library: ^1.0.2
 
   camera: ^0.10.0
   camera_android: '>=0.10.0 <0.10.9+4'
@@ -30,7 +30,7 @@ dependencies:
 
   collection: '>=1.18.0 <2.0.0'
   path: ^1.8.0
-  photo_manager: ^3.0.0
+  photo_manager: ^3.2.3
   photo_manager_image_provider: ^2.0.0
   sensors_plus: '>=4.0.0 <6.0.0'
   video_player: ^2.7.0
