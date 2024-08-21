@@ -6,6 +6,19 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
 
+## Unreleased
+
+### Fixes
+
+- Fix button displays when tap to record.
+- Prevent camera description exceptions when initializing the camera in the lifecycle callback.
+
+### Improvements
+
+- Use more precise overlay styles.
+- Switching between different lens with a single camera by default.
+- Always delete the preview file when popping from the preview.
+
 ## 4.3.1
 
 ### Improvements
