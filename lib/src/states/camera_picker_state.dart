@@ -96,14 +96,6 @@ class CameraPickerState extends State<CameraPicker>
   /// 当前相机的索引。默认为0
   int currentCameraIndex = 0;
 
-  /// Whether the [buildCaptureButton] should animate according to the gesture.
-  /// 拍照按钮是否需要执行动画
-  ///
-  /// This happens when the [buildCaptureButton] is being long pressed.
-  /// It will animate for video recording state.
-  /// 当长按拍照按钮时，会进入准备录制视频的状态，此时需要执行动画。
-  bool isShootingButtonAnimate = false;
-
   /// Whether the [buildCaptureButton] is being tapped down.
   /// 拍照按钮是否已经按下
   bool isCaptureButtonTapDown = false;
@@ -197,12 +189,6 @@ class CameraPickerState extends State<CameraPicker>
     }
     return pickerConfig.minimumRecordingDuration;
   }
-
-  /// Whether the capture button is displaying.
-  bool get shouldCaptureButtonDisplay =>
-      isCaptureButtonTapDown &&
-      (innerController?.value.isRecordingVideo ?? false) &&
-      isRecordingRestricted;
 
   /// Whether the camera preview should be rotated.
   bool get isCameraRotated => pickerConfig.cameraQuarterTurns % 4 != 0;
@@ -955,7 +941,6 @@ class CameraPickerState extends State<CameraPicker>
     } finally {
       safeSetState(() {
         isControllerBusy = false;
-        isShootingButtonAnimate = false;
       });
     }
   }
@@ -970,9 +955,6 @@ class CameraPickerState extends State<CameraPicker>
     recordDetectTimer = Timer(recordDetectDuration, () {
       startRecordingVideo();
       safeSetState(() {});
-    });
-    setState(() {
-      isShootingButtonAnimate = true;
     });
   }
 
@@ -994,7 +976,10 @@ class CameraPickerState extends State<CameraPicker>
     if (isControllerBusy) {
       return;
     }
-    isControllerBusy = true;
+    safeSetState(() {
+      isCaptureButtonTapDown = true;
+      isControllerBusy = true;
+    });
     try {
       await controller.startVideoRecording();
       if (isRecordingRestricted) {
@@ -1015,7 +1000,6 @@ class CameraPickerState extends State<CameraPicker>
         await controller.stopVideoRecording();
       } catch (e, s) {
         recordCountdownTimer?.cancel();
-        isShootingButtonAnimate = false;
         handleErrorWithHandler(e, s, pickerConfig.onError);
       } finally {
         recordStopwatch.stop();
@@ -1039,7 +1023,6 @@ class CameraPickerState extends State<CameraPicker>
       recordCountdownTimer?.cancel();
       safeSetState(() {
         isControllerBusy = false;
-        isShootingButtonAnimate = false;
       });
       return;
     }
@@ -1078,7 +1061,6 @@ class CameraPickerState extends State<CameraPicker>
       safeSetState(() {
         isCaptureButtonTapDown = false;
         isControllerBusy = false;
-        isShootingButtonAnimate = false;
       });
     }
   }
@@ -1128,12 +1110,7 @@ class CameraPickerState extends State<CameraPicker>
       if (controller.value.isRecordingVideo) {
         return stopRecordingVideo;
       }
-      return () {
-        startRecordingVideo();
-        setState(() {
-          isShootingButtonAnimate = true;
-        });
-      };
+      return startRecordingVideo;
     }
     if (!onlyEnableRecording) {
       return takePicture;
@@ -1401,76 +1378,89 @@ class CameraPickerState extends State<CameraPicker>
   /// The shooting button.
   /// 拍照按钮
   Widget buildCaptureButton(BuildContext context, BoxConstraints constraints) {
-    if (!isCaptureButtonTapDown &&
-        (innerController?.value.isRecordingVideo ?? false)) {
-      return const SizedBox.shrink();
-    }
     const size = Size.square(82.0);
-    return MergeSemantics(
-      child: Semantics(
-        label: textDelegate.sActionShootingButtonTooltip,
-        onTap: onTap,
-        onTapHint: onTapHint,
-        onLongPress: onLongPress,
-        onLongPressHint: onLongPressHint,
-        child: Listener(
-          behavior: HitTestBehavior.opaque,
-          onPointerUp: onPointerUp,
-          onPointerMove: onPointerMove(constraints),
-          child: GestureDetector(
-            onTap: onTap,
-            onLongPress: onLongPress,
-            onTapDown: (_) => safeSetState(() => isCaptureButtonTapDown = true),
-            onTapUp: (_) => safeSetState(() {
-              if (!enableTapRecording) {
-                isCaptureButtonTapDown = false;
-              }
-            }),
-            onTapCancel: () =>
-                safeSetState(() => isCaptureButtonTapDown = false),
-            onLongPressStart: (_) =>
-                safeSetState(() => isCaptureButtonTapDown = true),
-            onLongPressEnd: (_) =>
-                safeSetState(() => isCaptureButtonTapDown = false),
-            onLongPressCancel: () =>
-                safeSetState(() => isCaptureButtonTapDown = false),
-            child: SizedBox.fromSize(
-              size: size,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  AnimatedContainer(
-                    duration: const Duration(microseconds: 100),
-                    padding: EdgeInsets.all(isCaptureButtonTapDown ? 16 : 8),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.white,
-                        strokeAlign: BorderSide.strokeAlignCenter,
-                        width: 2,
-                      ),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const DecoratedBox(
+    return buildInitializeWrapper(
+      builder: (value, child) => MergeSemantics(
+        child: Semantics(
+          label: textDelegate.sActionShootingButtonTooltip,
+          onTap: onTap,
+          onTapHint: onTapHint,
+          onLongPress: onLongPress,
+          onLongPressHint: onLongPressHint,
+          child: Listener(
+            behavior: HitTestBehavior.opaque,
+            onPointerUp: onPointerUp,
+            onPointerMove: onPointerMove(constraints),
+            child: GestureDetector(
+              onTap: onTap,
+              onLongPress: onLongPress,
+              onTapDown: (_) => safeSetState(() {
+                if (!enableTapRecording) {
+                  isCaptureButtonTapDown = true;
+                }
+              }),
+              onTapUp: (_) => safeSetState(() {
+                if (!enableTapRecording) {
+                  isCaptureButtonTapDown = false;
+                }
+              }),
+              onTapCancel: () => safeSetState(() {
+                if (!enableTapRecording) {
+                  isCaptureButtonTapDown = false;
+                }
+              }),
+              onLongPressStart: (_) => safeSetState(() {
+                if (!enableTapRecording) {
+                  isCaptureButtonTapDown = true;
+                }
+              }),
+              onLongPressEnd: (_) => safeSetState(() {
+                if (!enableTapRecording) {
+                  isCaptureButtonTapDown = false;
+                }
+              }),
+              onLongPressCancel: () => safeSetState(() {
+                if (!enableTapRecording) {
+                  isCaptureButtonTapDown = false;
+                }
+              }),
+              child: SizedBox.fromSize(
+                size: size,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    AnimatedContainer(
+                      duration: const Duration(microseconds: 100),
+                      padding: EdgeInsets.all(isCaptureButtonTapDown ? 16 : 8),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        border: Border.all(
+                          color: Colors.white,
+                          strokeAlign: BorderSide.strokeAlignCenter,
+                          width: 2,
+                        ),
                         shape: BoxShape.circle,
                       ),
-                    ),
-                  ),
-                  if (shouldCaptureButtonDisplay)
-                    RotatedBox(
-                      quarterTurns:
-                          !enableScaledPreview ? cameraQuarterTurns : 0,
-                      child: CameraProgressButton(
-                        isAnimating:
-                            isCaptureButtonTapDown && isShootingButtonAnimate,
-                        duration: pickerConfig.maximumRecordingDuration!,
-                        size: size,
-                        ringsColor: theme.indicatorColor,
-                        ringsWidth: 3,
+                      child: const DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
                       ),
                     ),
-                ],
+                    if (value.isRecordingVideo && isRecordingRestricted)
+                      RotatedBox(
+                        quarterTurns:
+                            !enableScaledPreview ? cameraQuarterTurns : 0,
+                        child: CameraProgressButton(
+                          isAnimating: true,
+                          duration: pickerConfig.maximumRecordingDuration!,
+                          size: size,
+                          ringsColor: theme.indicatorColor,
+                          ringsWidth: 3,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
