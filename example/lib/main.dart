@@ -12,6 +12,10 @@ import 'pages/splash_page.dart';
 
 const Color themeColor = Color(0xff00bc56);
 
+/// The mock size is used for integration tests.
+/// Changing this requires at least a hot-restart.
+const Size? mockSize = null;
+
 String? packageVersion;
 
 void main() {
@@ -45,6 +49,19 @@ class MyApp extends StatelessWidget {
       home: const SplashPage(),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      builder: (context, child) {
+        if (mockSize == null) {
+          return child!;
+        }
+        final mq = MediaQuery.of(context).copyWith(size: mockSize);
+        return MediaQuery(
+          data: mq,
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox.fromSize(size: mockSize, child: child),
+          ),
+        );
+      },
     );
   }
 }

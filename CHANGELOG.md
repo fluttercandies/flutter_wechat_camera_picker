@@ -6,16 +6,59 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
 
+## Unreleased
+
+- Evict the captured image cache once returned from the viewer.
+
+## 4.3.2
+
+### Fixes
+
+- Fix button displays when tap to record.
+- Prevent camera description exceptions when initializing the camera in the lifecycle callback.
+
+### Improvements
+
+- Use more precise overlay styles.
+- Switching between different lens with a single camera by default.
+- Always delete the preview file when popping from the preview.
+
+## 4.3.1
+
+### Improvements
+
+- Downgrades the default resolution preset from `max` to `ultraHigh`.
+- Improves pinch zooming experiences.
+- Do not wait for focus mode and exposure mode to reset.
+- Updates the capture actions section size to compatible with more cases.
+
+## 4.3.0+1
+
+### Fixes
+
+- Fixes the breaking `ColorScheme.background` implementation on older Flutter SDKs.
+
+## 4.3.0
+
+### Improvements
+
+- Adapt the latest interface of WeChat.
+
+### Fixes
+
+- Constraints `camera_android` version to resolves https://github.com/flutter/flutter/issues/150549.
+
 ## 4.2.2
 
 ### Fixes
 
 - Allows `wrapControllerMethod` to return nullable result.
-- Evict the captured image cache once returned from the viewer.
+- Allows newer versions of `sensors_plus`.
 
 ### Improvements
 
 - Provide the back button when no controller has been initialized.
+- Improves paddings of the heading actions in the viewer.
 
 ## 4.2.1
 

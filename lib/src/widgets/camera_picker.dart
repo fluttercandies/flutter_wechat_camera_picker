@@ -92,6 +92,7 @@ class CameraPicker extends StatefulWidget {
         primaryContainer: Colors.grey[900],
         secondary: themeColor,
         secondaryContainer: themeColor,
+        // ignore: deprecated_member_use
         background: Colors.grey[900]!,
         surface: Colors.grey[900]!,
         brightness: Brightness.dark,
@@ -99,6 +100,7 @@ class CameraPicker extends StatefulWidget {
         onPrimary: Colors.black,
         onSecondary: Colors.black,
         onSurface: Colors.white,
+        // ignore: deprecated_member_use
         onBackground: Colors.white,
         onError: Colors.black,
       ),

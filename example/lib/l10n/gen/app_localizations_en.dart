@@ -1,5 +1,7 @@
 import 'app_localizations.dart';
 
+// ignore_for_file: type=lint
+
 /// The translations for English (`en`).
 class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
@@ -54,12 +56,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pickMethodSilenceRecordingDescription => 'Make recordings silent.';
 
   @override
-  String get pickMethodAutoPreviewVideosName => 'Auto preview videos';
-
-  @override
-  String get pickMethodAutoPreviewVideosDescription => 'Play videos automatically in the preview after captured.';
-
-  @override
   String get pickMethodNoDurationLimitName => 'No duration limit';
 
   @override
@@ -78,10 +74,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pickMethodRotateInTurnsDescription => 'Rotate the picker layout in quarter turns, without the camera preview.';
 
   @override
-  String get pickMethodPreventScalingName => 'Prevent scaling for camera preview';
+  String get pickMethodScalingPreviewName => 'Scaling for camera preview';
 
   @override
-  String get pickMethodPreventScalingDescription => 'Camera preview will not be scaled to cover the whole screen of the device, only fit for the raw aspect ratio.';
+  String get pickMethodScalingPreviewDescription => 'Camera preview will be scaled to cover the whole screen of the device with the original aspect ratio.';
 
   @override
   String get pickMethodLowerResolutionName => 'Lower resolutions';

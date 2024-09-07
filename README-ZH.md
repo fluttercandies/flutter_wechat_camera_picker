@@ -20,7 +20,7 @@ Language: [English](README.md) | 中文
 基于 **微信 UI** 的 Flutter 相机选择器，可以单独运行，
 同时是 [wechat_assets_picker][wechat_assets_picker pub] 的扩展。
 
-当前的界面设计基于的微信版本：**8.3.x**
+当前的界面设计基于的微信版本：**8.0.49**
 界面更新将在微信版本更新后随时进行跟进。
 
 查看 [迁移指南][] 了解如何从破坏性改动中迁移为可用代码。
@@ -188,13 +188,14 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 | enableExposureControlOnPoint  | `bool`                      | 用户是否可以根据已经设置的曝光点调节曝光度                              | `true`                                     |
 | enablePinchToZoom             | `bool`                      | 用户是否可以在界面上双指缩放相机对焦                                 | `true`                                     |
 | enablePullToZoomInRecord      | `bool`                      | 用户是否可以在录制视频时上拉缩放                                   | `true`                                     |
+| enableScaledPreview           | `bool`                      | 拍摄过程中相机预览是否需要缩放                                    | `false`                                    |
 | shouldDeletePreviewFile       | `bool`                      | 返回页面时是否删除预览文件                                      | `false`                                    |
-| shouldAutoPreviewVideo        | `bool`                      | 在预览时是否直接播放视频                                       | `false`                                    |
+| shouldAutoPreviewVideo        | `bool`                      | 在预览时是否直接播放视频                                       | `true`                                     |
 | maximumRecordingDuration      | `Duration?`                 | 录制视频最长时长                                           | `const Duration(seconds: 15)`              |
 | minimumRecordingDuration      | `Duration`                  | 录制视频最短时长                                           | `const Duration(seconds: 1)`               |
 | theme                         | `ThemeData?`                | 选择器的主题                                             | `CameraPicker.themeData(wechatThemeColor)` |
 | textDelegate                  | `CameraPickerTextDelegate?` | 控制部件中的文字实现                                         | `CameraPickerTextDelegate`                 |
-| resolutionPreset              | `ResolutionPreset`          | 相机的分辨率预设                                           | `ResolutionPreset.max`                     |
+| resolutionPreset              | `ResolutionPreset`          | 相机的分辨率预设                                           | `ResolutionPreset.ultraHigh`               |
 | cameraQuarterTurns            | `int`                       | 摄像机视图顺时针旋转次数，每次 90 度                               | `0`                                        |
 | imageFormatGroup              | `ImageFormatGroup`          | 输出图像的格式描述                                          | `ImageFormatGroup.unknown`                 |
 | preferredLensDirection        | `CameraLensDirection`       | 首次使用相机时首选的镜头方向                                     | `CameraLensDirection.back`                 |

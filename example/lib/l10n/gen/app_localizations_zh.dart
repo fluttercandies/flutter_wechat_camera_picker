@@ -1,5 +1,7 @@
 import 'app_localizations.dart';
 
+// ignore_for_file: type=lint
+
 /// The translations for Chinese (`zh`).
 class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
@@ -54,12 +56,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pickMethodSilenceRecordingDescription => '录像时不录制声音。';
 
   @override
-  String get pickMethodAutoPreviewVideosName => '自动预览录制的视频';
-
-  @override
-  String get pickMethodAutoPreviewVideosDescription => '预览录制的视频时，自动播放。';
-
-  @override
   String get pickMethodNoDurationLimitName => '无时长限制录像';
 
   @override
@@ -78,10 +74,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pickMethodRotateInTurnsDescription => '顺时针旋转选择器的元素布局，不旋转相机视图。';
 
   @override
-  String get pickMethodPreventScalingName => '禁止缩放相机预览';
+  String get pickMethodScalingPreviewName => '缩放相机预览';
 
   @override
-  String get pickMethodPreventScalingDescription => '相机预览视图不会被放大到覆盖整个屏幕，仅适应原始的预览比例。';
+  String get pickMethodScalingPreviewDescription => '相机预览视图会被放大到覆盖整个屏幕且保持原始的预览比例。';
 
   @override
   String get pickMethodLowerResolutionName => '低分辨率拍照';
