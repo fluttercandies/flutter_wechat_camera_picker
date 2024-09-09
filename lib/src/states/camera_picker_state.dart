@@ -926,9 +926,9 @@ class CameraPickerState extends State<CameraPicker>
         viewType: CameraPickerViewType.image,
       );
       if (entity != null) {
-        if (pickerConfig.onPicked case final onPicked?) {
+        if (pickerConfig.onPickConfirmed case final onPickConfirmed?) {
           await controller.resumePreview();
-          onPicked(entity);
+          onPickConfirmed(entity);
         } else {
           Navigator.of(context).pop(entity);
         }
@@ -1061,9 +1061,9 @@ class CameraPickerState extends State<CameraPicker>
         viewType: CameraPickerViewType.video,
       );
       if (entity != null) {
-        if (pickerConfig.onPicked case final onPicked?) {
+        if (pickerConfig.onPickConfirmed case final onPickConfirmed?) {
           await controller.resumePreview();
-          onPicked(entity);
+          onPickConfirmed(entity);
         } else {
           Navigator.of(context).pop(entity);
         }

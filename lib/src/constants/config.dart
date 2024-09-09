@@ -43,7 +43,7 @@ final class CameraPickerConfig {
     this.onError,
     this.onXFileCaptured,
     this.onMinimumRecordDurationNotMet,
-    this.onPicked,
+    this.onPickConfirmed,
   }) : assert(
           enableRecording == true || onlyEnableRecording != true,
           'Recording mode error.',
@@ -170,5 +170,5 @@ final class CameraPickerConfig {
 
   /// The callback when picture is taken or video is confirmed.
   /// 拍照或录像确认时的回调方法。
-  final Function(AssetEntity)? onPicked;
+  final void Function(AssetEntity)? onPickConfirmed;
 }

@@ -211,7 +211,7 @@ Fields in `CameraPickerConfig`:
 | onError                       | `CameraErrorHandler?`       | The error handler when any error occurred during the picking process.                                 | null                                       |
 | onXFileCaptured               | `XFileCapturedCallback?`    | The callback type definition when the XFile is captured by the camera.                                | null                                       |
 | onMinimumRecordDurationNotMet | `VoidCallback?`             | The callback when the recording is not met the minimum recording duration.                            | null                                       |
-| onPicked                      | `Function(AssetEntity)?`    | The callback when picture is taken or video is confirmed.                                             | null                                       |
+| onPickConfirmed                      | `void Function(AssetEntity)?`    | The callback when picture is taken or video is confirmed.                                             | null                                       |
 
 ### Using custom `State`s
 
