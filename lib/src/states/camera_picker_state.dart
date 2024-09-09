@@ -927,12 +927,10 @@ class CameraPickerState extends State<CameraPicker>
       );
       if (entity != null) {
         if (pickerConfig.onPickConfirmed case final onPickConfirmed?) {
-          await controller.resumePreview();
           onPickConfirmed(entity);
         } else {
-          Navigator.of(context).pop(entity);
+          return Navigator.of(context).pop(entity);
         }
-        return;
       }
       wrapControllerMethod<void>(
         'setFocusMode',
