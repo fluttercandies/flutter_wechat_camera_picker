@@ -168,7 +168,7 @@ final class CameraPickerConfig {
   /// 录制时长未达到最小时长时的回调方法。
   final VoidCallback? onMinimumRecordDurationNotMet;
 
-  /// The callback when picture is taken or video is confirmed.
+  /// The callback when the picture or the video is confirmed as picked.
   /// 拍照或录像确认时的回调方法。
   final void Function(AssetEntity)? onPickConfirmed;
 }
