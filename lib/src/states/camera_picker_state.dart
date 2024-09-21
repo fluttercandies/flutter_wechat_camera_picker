@@ -18,10 +18,10 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:wechat_picker_library/wechat_picker_library.dart';
 
 import '../constants/config.dart';
-import '../internals/singleton.dart';
 import '../constants/enums.dart';
 import '../delegates/camera_picker_text_delegate.dart';
 import '../internals/methods.dart';
+import '../internals/singleton.dart';
 import '../widgets/camera_focus_point.dart';
 import '../widgets/camera_picker.dart';
 import '../widgets/camera_picker_viewer.dart';
@@ -936,8 +936,11 @@ class CameraPickerState extends State<CameraPicker>
         viewType: CameraPickerViewType.image,
       );
       if (entity != null) {
-        Navigator.of(context).pop(entity);
-        return;
+        if (pickerConfig.onPickConfirmed case final onPickConfirmed?) {
+          onPickConfirmed(entity);
+        } else {
+          return Navigator.of(context).pop(entity);
+        }
       }
       wrapControllerMethod<void>(
         'setFocusMode',
@@ -1066,7 +1069,12 @@ class CameraPickerState extends State<CameraPicker>
         viewType: CameraPickerViewType.video,
       );
       if (entity != null) {
-        Navigator.of(context).pop(entity);
+        if (pickerConfig.onPickConfirmed case final onPickConfirmed?) {
+          await controller.resumePreview();
+          onPickConfirmed(entity);
+        } else {
+          Navigator.of(context).pop(entity);
+        }
       } else {
         await controller.resumePreview();
       }
