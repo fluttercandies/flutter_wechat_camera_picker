@@ -8,7 +8,7 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## Unreleased
 
-*None.*
+- Evict the captured image cache once returned from the viewer.
 
 ## 4.3.2
 

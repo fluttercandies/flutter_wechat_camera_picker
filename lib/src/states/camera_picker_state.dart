@@ -1095,15 +1095,24 @@ class CameraPickerState extends State<CameraPicker>
     required XFile file,
     required CameraPickerViewType viewType,
   }) async {
+    final FileImage? image;
     if (viewType == CameraPickerViewType.image) {
+      image = FileImage(File(file.path));
       await precacheImage(FileImage(File(file.path)), context);
+    } else {
+      image = null;
     }
-    return CameraPickerViewer.pushToViewer(
+    final result = await CameraPickerViewer.pushToViewer(
       context,
       pickerConfig: pickerConfig,
       viewType: viewType,
       previewXFile: file,
     );
+    if (image != null) {
+      final evicted = PaintingBinding.instance.imageCache.evict(image);
+      realDebugPrint('Preview image cache evicted: $evicted');
+    }
+    return result;
   }
 
   ////////////////////////////////////////////////////////////////////////////
