@@ -25,7 +25,7 @@ dependencies:
   wechat_picker_library: ^1.0.2
 
   camera: ^0.10.0
-  camera_android: '>=0.10.0 <0.10.9+4'
+  camera_android: ^0.10.9+6
   camera_platform_interface: ^2.1.5
 
   collection: '>=1.18.0 <2.0.0'
