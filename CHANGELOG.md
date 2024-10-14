@@ -8,6 +8,10 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## Unreleased
 
+*None.*
+
+## 4.3.3
+
 ### New features
 
 - Introduces `CameraPickerConfig.permissionRequestOption`.
