@@ -44,6 +44,7 @@ final class CameraPickerConfig {
     this.onXFileCaptured,
     this.onMinimumRecordDurationNotMet,
     this.onPickConfirmed,
+    this.permissionRequestOption,
   }) : assert(
           enableRecording == true || onlyEnableRecording != true,
           'Recording mode error.',
@@ -171,4 +172,9 @@ final class CameraPickerConfig {
   /// The callback when the picture or the video is confirmed as picked.
   /// 拍照或录像确认时的回调方法。
   final void Function(AssetEntity)? onPickConfirmed;
+
+  /// The permission request option when saving the captured file using
+  /// the `photo_manager` package.
+  /// 使用 `photo_manager` 保存拍摄的文件的权限请求配置。
+  final PermissionRequestOption? permissionRequestOption;
 }

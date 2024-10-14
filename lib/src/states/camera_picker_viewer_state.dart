@@ -11,6 +11,7 @@ import 'package:path/path.dart' as path;
 import 'package:video_player/video_player.dart';
 import 'package:wechat_picker_library/wechat_picker_library.dart';
 
+import '../constants/config.dart';
 import '../internals/singleton.dart';
 import '../constants/enums.dart';
 import '../constants/type_defs.dart';
@@ -19,12 +20,14 @@ import '../widgets/camera_picker.dart';
 import '../widgets/camera_picker_viewer.dart';
 
 class CameraPickerViewerState extends State<CameraPickerViewer> {
+  CameraPickerConfig get pickerConfig => widget.pickerConfig;
+
   /// Whether the player is playing.
   /// 播放器是否在播放
-  final ValueNotifier<bool> isPlaying = ValueNotifier<bool>(false);
+  final isPlaying = ValueNotifier<bool>(false);
 
-  late final ThemeData theme = widget.pickerConfig.theme ??
-      CameraPicker.themeData(defaultThemeColorWeChat);
+  late final theme =
+      pickerConfig.theme ?? CameraPicker.themeData(defaultThemeColorWeChat);
 
   /// Construct an [File] instance through [previewXFile].
   /// 通过 [previewXFile] 构建 [File] 实例。
@@ -49,7 +52,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   /// Whether the saving process is ongoing.
   bool isSavingEntity = false;
 
-  CameraErrorHandler? get onError => widget.pickerConfig.onError;
+  CameraErrorHandler? get onError => pickerConfig.onError;
 
   @override
   void initState() {
@@ -73,7 +76,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
       await videoController.initialize();
       videoController.addListener(videoControllerListener);
       hasLoaded = true;
-      if (widget.pickerConfig.shouldAutoPreviewVideo) {
+      if (pickerConfig.shouldAutoPreviewVideo) {
         videoController.play();
         videoController.setLooping(true);
       }
@@ -129,9 +132,9 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
     });
 
     // Handle the explicitly entity saving method.
-    if (widget.pickerConfig.onEntitySaving != null) {
+    if (pickerConfig.onEntitySaving != null) {
       try {
-        await widget.pickerConfig.onEntitySaving!(
+        await pickerConfig.onEntitySaving!(
           context,
           widget.viewType,
           File(widget.previewXFile.path),
@@ -148,7 +151,23 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
 
     AssetEntity? entity;
     try {
-      final PermissionState ps = await PhotoManager.requestPermissionExtend();
+      final ps = await PhotoManager.requestPermissionExtend(
+        requestOption: pickerConfig.permissionRequestOption ??
+            PermissionRequestOption(
+              iosAccessLevel: IosAccessLevel.addOnly,
+              androidPermission: AndroidPermission(
+                type: switch ((
+                  pickerConfig.enableRecording,
+                  pickerConfig.enableTapRecording
+                )) {
+                  (true, false) => RequestType.common,
+                  (true, true) => RequestType.video,
+                  (false, _) => RequestType.image,
+                },
+                mediaLocation: false,
+              ),
+            ),
+      );
       if (ps == PermissionState.authorized || ps == PermissionState.limited) {
         final filePath = previewFile.path;
         switch (widget.viewType) {
@@ -165,8 +184,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
             );
             break;
         }
-        if (widget.pickerConfig.shouldDeletePreviewFile &&
-            previewFile.existsSync()) {
+        if (pickerConfig.shouldDeletePreviewFile && previewFile.existsSync()) {
           previewFile.delete().catchError((e, s) {
             handleErrorWithHandler(e, s, onError);
             return previewFile;
