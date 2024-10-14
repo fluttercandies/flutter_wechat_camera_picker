@@ -8,7 +8,14 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## Unreleased
 
+### New features
+
+- Introduces `CameraPickerConfig.permissionRequestOption`.
+
+### Improvements
+
 - Evict the captured image cache once returned from the viewer.
+- Allows `camera_android: ^0.10.9+6`.
 
 ## 4.3.2
 
