@@ -10,6 +10,12 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 *None.*
 
+## 4.3.4
+
+### Fixes
+
+- Fix preview file delete predication.
+
 ## 4.3.3
 
 ### New features
