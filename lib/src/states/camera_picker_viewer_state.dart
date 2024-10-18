@@ -120,6 +120,22 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
     }
   }
 
+  /// If [CameraPickerConfig.shouldDeletePreviewFile] is true, the preview file
+  /// will be deleted after unused.
+  ///
+  /// [CameraPickerConfig.onEntitySaving] will reference the file, we don't want
+  /// the file to be deleted in this case too.
+  void deletePreviewFileIfConfigured() {
+    if (pickerConfig.shouldDeletePreviewFile &&
+        pickerConfig.onEntitySaving != null &&
+        previewFile.existsSync()) {
+      previewFile.delete().catchError((e, s) {
+        handleErrorWithHandler(e, s, onError);
+        return previewFile;
+      });
+    }
+  }
+
   /// When users confirm to use the taken file, create the [AssetEntity].
   /// While the entity might returned null, there's no side effects if popping `null`
   /// because the parent picker will ignore it.
@@ -137,7 +153,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
         await pickerConfig.onEntitySaving!(
           context,
           widget.viewType,
-          File(widget.previewXFile.path),
+          previewFile,
         );
       } catch (e, s) {
         handleErrorWithHandler(e, s, onError);
@@ -184,12 +200,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
             );
             break;
         }
-        if (pickerConfig.shouldDeletePreviewFile && previewFile.existsSync()) {
-          previewFile.delete().catchError((e, s) {
-            handleErrorWithHandler(e, s, onError);
-            return previewFile;
-          });
-        }
+        deletePreviewFileIfConfigured();
         return;
       }
       handleErrorWithHandler(
@@ -387,11 +398,8 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
       canPop: true,
       // ignore: deprecated_member_use
       onPopInvoked: (didPop) {
-        if (didPop && previewFile.existsSync()) {
-          previewFile.delete().catchError((e, s) {
-            handleErrorWithHandler(e, s, onError);
-            return previewFile;
-          });
+        if (didPop) {
+          deletePreviewFileIfConfigured();
         }
       },
       child: Material(
