@@ -16,6 +16,10 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 - Allows `sensor_plus` v6.
 
+### Fixes
+
+- Predicate the flash mode correctly when retrying the initialization.
+
 ## 4.3.4
 
 ### Fixes
