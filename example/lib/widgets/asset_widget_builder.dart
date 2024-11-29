@@ -64,6 +64,7 @@ class AssetWidgetBuilder extends StatelessWidget {
       children: <Widget>[
         Positioned.fill(child: _imageAssetWidget(context)),
         ColoredBox(
+          // ignore: deprecated_member_use
           color: Theme.of(context).dividerColor.withOpacity(0.3),
           child: Center(
             child: Icon(
