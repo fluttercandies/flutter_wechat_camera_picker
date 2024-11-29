@@ -318,18 +318,18 @@ class CameraPickerState extends State<CameraPicker>
   Future<T?> wrapControllerMethod<T>(
     String key,
     Future<T> Function() method, {
-    CameraDescription? description,
+    CameraDescription? camera,
     VoidCallback? onError,
     T? fallback,
   }) async {
-    description ??= currentCamera;
-    if (invalidControllerMethods[description]!.contains(key)) {
+    camera ??= currentCamera;
+    if (invalidControllerMethods[camera]!.contains(key)) {
       return fallback;
     }
     try {
       return await method();
     } catch (e) {
-      invalidControllerMethods[description]!.add(key);
+      invalidControllerMethods[camera]!.add(key);
       onError?.call();
       rethrow;
     }
@@ -407,10 +407,10 @@ class CameraPickerState extends State<CameraPicker>
         index = currentCameraIndex;
       }
       // Initialize the controller with the given resolution preset.
-      final description = cameraDescription ?? cameras[index];
-      invalidControllerMethods[description] ??= <String>{};
+      final camera = cameraDescription ?? cameras[index];
+      invalidControllerMethods[camera] ??= <String>{};
       final CameraController newController = CameraController(
-        description,
+        camera,
         pickerConfig.resolutionPreset,
         enableAudio: enableAudio,
         imageFormatGroup: pickerConfig.imageFormatGroup,
@@ -440,37 +440,37 @@ class CameraPickerState extends State<CameraPicker>
             wrapControllerMethod(
               'getExposureOffsetStepSize',
               () => newController.getExposureOffsetStepSize(),
-              description: description,
+              camera: camera,
               fallback: exposureStep,
             ).then((value) => exposureStep = value!),
             wrapControllerMethod(
               'getMaxExposureOffset',
               () => newController.getMaxExposureOffset(),
-              description: description,
+              camera: camera,
               fallback: maxAvailableExposureOffset,
             ).then((value) => maxAvailableExposureOffset = value!),
             wrapControllerMethod(
               'getMinExposureOffset',
               () => newController.getMinExposureOffset(),
-              description: description,
+              camera: camera,
               fallback: minAvailableExposureOffset,
             ).then((value) => minAvailableExposureOffset = value!),
             wrapControllerMethod(
               'getMaxZoomLevel',
               () => newController.getMaxZoomLevel(),
-              description: description,
+              camera: camera,
               fallback: maxAvailableZoom,
             ).then((value) => maxAvailableZoom = value!),
             wrapControllerMethod(
               'getMinZoomLevel',
               () => newController.getMinZoomLevel(),
-              description: description,
+              camera: camera,
               fallback: minAvailableZoom,
             ).then((value) => minAvailableZoom = value!),
             wrapControllerMethod(
               'getMinZoomLevel',
               () => newController.getMinZoomLevel(),
-              description: description,
+              camera: camera,
               fallback: minAvailableZoom,
             ).then((value) => minAvailableZoom = value!),
             if (pickerConfig.lockCaptureOrientation != null)
@@ -479,23 +479,24 @@ class CameraPickerState extends State<CameraPicker>
                 () => newController.lockCaptureOrientation(
                   pickerConfig.lockCaptureOrientation,
                 ),
-                description: description,
+                camera: camera,
               ),
             // Do not set flash modes for the front camera.
-            if (description.lensDirection != CameraLensDirection.front &&
-                pickerConfig.preferredFlashMode != FlashMode.auto)
-              wrapControllerMethod<void>(
-                'setFlashMode',
-                () => newController.setFlashMode(
-                  pickerConfig.preferredFlashMode,
-                ),
-                description: description,
-                onError: () {
-                  validFlashModes[description]?.remove(
-                    pickerConfig.preferredFlashMode,
+            if (camera.lensDirection != CameraLensDirection.front)
+              Future(() async {
+                final flashMode = pickerConfig.preferredFlashMode;
+                if (flashMode != FlashMode.auto &&
+                    validFlashModes[camera]?.contains(flashMode) != false) {
+                  return wrapControllerMethod<void>(
+                    'setFlashMode',
+                    () => newController.setFlashMode(flashMode),
+                    camera: camera,
+                    onError: () {
+                      validFlashModes[camera]?.remove(flashMode);
+                    },
                   );
-                },
-              ),
+                }
+              }),
           ],
           eagerError: false,
         );
