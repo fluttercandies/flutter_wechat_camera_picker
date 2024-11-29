@@ -1,5 +1,5 @@
 name: wechat_camera_picker
-version: 4.3.4
+version: 4.3.5
 description: |
   A camera picker for Flutter projects based on WeChat's UI,
   which is also a separate runnable extension to the
