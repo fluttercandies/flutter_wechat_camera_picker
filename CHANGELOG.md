@@ -10,15 +10,17 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 *None.*
 
+## 4.3.6
+
+### Fixes
+
+- Predicate the flash mode correctly when retrying the initialization.
+
 ## 4.3.5
 
 ### Improvements
 
 - Allows `sensor_plus` v6.
-
-### Fixes
-
-- Predicate the flash mode correctly when retrying the initialization.
 
 ## 4.3.4
 
