@@ -2,7 +2,7 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
-library wechat_camera_picker;
+library;
 
 export 'package:camera/camera.dart';
 export 'package:photo_manager/photo_manager.dart';
