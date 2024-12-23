@@ -63,6 +63,7 @@ submit issues to our issue tracker first.
   * [READ THIS FIRST ‼️](#read-this-first-)
   * [Preparing for use 🍭](#preparing-for-use-)
     * [Setup](#setup)
+      * [Notes 📝](#notes-)
   * [Usage 📖](#usage-)
     * [Localizations](#localizations)
     * [Simple usage](#simple-usage)
@@ -140,6 +141,13 @@ The latest **dev** version is:
 Follow these detailed setup guide before runs:
 - [wechat_assets_picker#preparing-for-use](https://github.com/fluttercandies/flutter_wechat_assets_picker#preparing-for-use-)
 - [camera#installation](https://pub.dev/packages/camera#installation)
+
+#### Notes 📝
+
+1. When using `NSPhotoLibraryAddUsageDescription` on iOS,
+   it requires using `onEntitySaving` or `onXFileCaptured` to handle the captured file,
+   an `AssetEntity` is not available in this circumstance,
+   obtaining that asset with its ID will lead to a crash.
 
 Then import the package in your code:
 ```dart
