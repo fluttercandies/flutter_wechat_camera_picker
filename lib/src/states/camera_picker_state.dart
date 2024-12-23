@@ -966,15 +966,19 @@ class CameraPickerState extends State<CameraPicker>
       }
       wrapControllerMethod<void>(
         'setFocusMode',
-        () => controller.setFocusMode(FocusMode.auto),
+        () async {
+          await innerController?.setFocusMode(FocusMode.auto);
+        },
       );
       if (previousExposureMode != ExposureMode.locked) {
         wrapControllerMethod<void>(
           'setExposureMode',
-          () => controller.setExposureMode(previousExposureMode),
+          () async {
+            await innerController?.setExposureMode(previousExposureMode);
+          },
         );
       }
-      await controller.resumePreview();
+      await innerController?.resumePreview();
     } catch (e, s) {
       handleErrorWithHandler(e, s, pickerConfig.onError);
     } finally {
@@ -1092,13 +1096,13 @@ class CameraPickerState extends State<CameraPicker>
       );
       if (entity != null) {
         if (pickerConfig.onPickConfirmed case final onPickConfirmed?) {
-          await controller.resumePreview();
+          await innerController?.resumePreview();
           onPickConfirmed(entity);
         } else {
           Navigator.of(context).pop(entity);
         }
       } else {
-        await controller.resumePreview();
+        await innerController?.resumePreview();
       }
     } catch (e, s) {
       recordCountdownTimer?.cancel();
