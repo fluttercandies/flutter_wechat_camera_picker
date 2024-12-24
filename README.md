@@ -21,14 +21,14 @@ A **camera picker** for Flutter projects based on WeChat's UI,
 which is also a separate runnable extension to the
 [wechat_assets_picker][wechat_assets_picker pub].
 
-Current WeChat version that UI based on: **8.0.49**
-UI designs will be updated following the WeChat update in anytime.
+The current WeChat version that UI is based on: `8.0.49`.
+UI designs will be updated at any time following the WeChat update.
 
 See the [Migration Guide][] to learn how to migrate between breaking changes.
 
 ## Versions compatibility
 
-The package only guarantees to be working on **the stable version of Flutter**.
+The package only guarantees that it will work on **the stable version of Flutter**.
 We won't update it in real-time to align with other channels of Flutter.
 
 |        | 2.8.0 | 3.3.0 | 3.16.0 |
@@ -82,7 +82,7 @@ submit issues to our issue tracker first.
 - 🎏 Fully customizable theme based on `ThemeData`
 - 💚 Completely WeChat style (even more)
 - ⚡️ Adjustable performance with different configurations
-- 📷 Picture taking support
+- 📷 Picture capturing support
 - 🎥 Video recording support
   - ⏱ Duration limitation support
   - 🔍 Scale when recording support
@@ -91,20 +91,20 @@ submit issues to our issue tracker first.
 - 💱 i18n support
   - ⏪ RTL language support
 - 🖾 Foreground custom widget builder support
-- 🕹️ Intercept saving with custom process
+- 🕹️ Intercept saving with a custom process
 
 ## Screenshots 📸
 
-| ![](https://pic.alexv525.com/202310181547760.jpg) | ![](https://pic.alexv525.com/202310181547670.jpg) | ![](https://pic.alexv525.com/202310181547132.jpg) | ![](https://pic.alexv525.com/202310181547726.jpg) | ![](https://pic.alexv525.com/202310181548711.jpg) |
-|---------------------------------------------------|---------------------------------------------------|---------------------------------------------------|---------------------------------------------------|---------------------------------------------------|
+| ![1](screenshots/README_1.jpg) | ![2](screenshots/README_2.jpg) | ![3](screenshots/README_3.jpg) | ![4](screenshots/README_4.jpg) | ![5](screenshots/README_5.jpg) |
+|--------------------------------|--------------------------------|--------------------------------|--------------------------------|--------------------------------|
 
 ## READ THIS FIRST ‼️
 
-Be aware of below notices before you started anything:
-- Due to understanding differences and the limitation of a single document,
+Be aware of the below notices before you start anything:
+- Due to understanding the differences and limitations of a single document,
   documents will not cover all the contents.
   If you find nothing related to your expected features and cannot understand about concepts,
-  run the example project and check every options first.
+  run the example project and check every option first.
   It has covered 90% of regular requests with the package.
 - The package deeply integrates with the [photo_manager][photo_manager pub] plugin,
   make sure you understand these two concepts as much as possible:
@@ -114,7 +114,7 @@ Be aware of below notices before you started anything:
 When you have questions about related APIs and behaviors,
 check [photo_manager's API docs][] for more details.
 
-Most usages are detailed covered by the [example](example).
+Most usages are detailed and covered by the [example](example).
 Please walk through the [example](example) carefully
 before you have any questions.
 
@@ -224,11 +224,11 @@ Fields in `CameraPickerConfig`:
 
 ### Using custom `State`s
 
-All user interface can be customized through custom `State`s, including:
+All user interfaces can be customized through custom `State`s, including:
 - `CameraPickerState`
 - `CameraPickerViewerState`
 
-After override `State`s, pass them through the picking method, more specifically:
+After overriding `State`s, pass them through the picking method, more specifically:
 - `CameraPicker.pickFromCamera(createPickerState: () => CustomCameraPickerState());`
 - `CameraPickerViewer.pushToViewer(..., createViewerState: () => CustomCameraPickerViewerState());`
 
@@ -243,7 +243,7 @@ Other than that, please submit issues to describe your question.
 
 ## Contributors ✨
 
-Thank goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
@@ -272,7 +272,7 @@ Thank goes to these wonderful people ([emoji key](https://allcontributors.org/do
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind are welcome!
 
 [wechat_assets_picker pub]: https://pub.dev/packages/wechat_assets_picker
 [photo_manager pub]: https://pub.dev/packages/photo_manager
