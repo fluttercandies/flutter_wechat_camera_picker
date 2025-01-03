@@ -198,11 +198,13 @@ class CameraPickerState extends State<CameraPicker>
     return pickerConfig.minimumRecordingDuration;
   }
 
+  /// Whether the controller is recording a video.
+  bool get isRecordingVideo => innerController?.value.isRecordingVideo ?? false;
+
   /// Whether the capture button is displaying.
   bool get shouldCaptureButtonDisplay =>
-      isCaptureButtonTapDown &&
-      (innerController?.value.isRecordingVideo ?? false) &&
-      isRecordingRestricted;
+      (isCaptureButtonTapDown || MediaQuery.accessibleNavigationOf(context)) &&
+      isRecordingVideo;
 
   /// Whether the camera preview should be rotated.
   bool get isCameraRotated => pickerConfig.cameraQuarterTurns % 4 != 0;
@@ -235,6 +237,25 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The calculated capture actions section height.
   double? lastCaptureActionsEffectiveHeight;
+
+  /// Determine the label for the shooting button.
+  String get textShootingButtonLabel {
+    final String label;
+    if (pickerConfig.enableRecording) {
+      if (pickerConfig.onlyEnableRecording) {
+        if (pickerConfig.enableTapRecording) {
+          label = textDelegate.shootingTapRecordingTips;
+        } else {
+          label = textDelegate.shootingOnlyRecordingTips;
+        }
+      } else {
+        label = textDelegate.shootingWithRecordingTips;
+      }
+    } else {
+      label = textDelegate.shootingTips;
+    }
+    return label;
+  }
 
   @override
   void initState() {
@@ -878,7 +899,7 @@ class CameraPickerState extends State<CameraPicker>
     BoxConstraints constraints,
   ) {
     lastShootingButtonPressedPosition ??= event.position;
-    if (innerController?.value.isRecordingVideo == true) {
+    if (isRecordingVideo) {
       // First calculate relative offset.
       final Offset offset = event.position - lastShootingButtonPressedPosition!;
       // Then turn negative,
@@ -987,7 +1008,7 @@ class CameraPickerState extends State<CameraPicker>
   /// 将被取消，并且状态会重置。
   void recordDetectionCancel(PointerUpEvent event) {
     recordDetectTimer?.cancel();
-    if (innerController?.value.isRecordingVideo == true) {
+    if (isRecordingVideo) {
       stopRecordingVideo();
     }
   }
@@ -1164,7 +1185,7 @@ class CameraPickerState extends State<CameraPicker>
       return null;
     }
     if (enableTapRecording) {
-      if (innerController?.value.isRecordingVideo ?? false) {
+      if (isRecordingVideo) {
         return textDelegate.sActionStopRecordingHint;
       }
       return textDelegate.sActionRecordHint;
@@ -1297,20 +1318,6 @@ class CameraPickerState extends State<CameraPicker>
   /// Text widget for shooting tips.
   /// 拍摄的提示文字
   Widget buildCaptureTips(CameraController? controller) {
-    final String tips;
-    if (pickerConfig.enableRecording) {
-      if (pickerConfig.onlyEnableRecording) {
-        if (pickerConfig.enableTapRecording) {
-          tips = textDelegate.shootingTapRecordingTips;
-        } else {
-          tips = textDelegate.shootingOnlyRecordingTips;
-        }
-      } else {
-        tips = textDelegate.shootingWithRecordingTips;
-      }
-    } else {
-      tips = textDelegate.shootingTips;
-    }
     return AnimatedOpacity(
       duration: recordDetectDuration,
       opacity: controller?.value.isRecordingVideo ?? false ? 0 : 1,
@@ -1318,7 +1325,7 @@ class CameraPickerState extends State<CameraPicker>
         height: 48.0,
         alignment: Alignment.center,
         child: Text(
-          tips,
+          textShootingButtonLabel,
           style: const TextStyle(fontSize: 15),
           textAlign: TextAlign.center,
         ),
@@ -1419,14 +1426,19 @@ class CameraPickerState extends State<CameraPicker>
   /// The shooting button.
   /// 拍照按钮
   Widget buildCaptureButton(BuildContext context, BoxConstraints constraints) {
-    if (!isCaptureButtonTapDown &&
-        (innerController?.value.isRecordingVideo ?? false)) {
+    final showProgressIndicator =
+        isCaptureButtonTapDown || MediaQuery.accessibleNavigationOf(context);
+
+    if (!showProgressIndicator && isRecordingVideo) {
       return const SizedBox.shrink();
     }
     const size = Size.square(82.0);
     return MergeSemantics(
       child: Semantics(
-        label: textDelegate.sActionShootingButtonTooltip,
+        label: isRecordingVideo
+            ? textDelegate.sActionStopRecordingHint
+            : textShootingButtonLabel,
+        button: true,
         onTap: onTap,
         onTapHint: onTapHint,
         onLongPress: onLongPress,
@@ -1478,10 +1490,10 @@ class CameraPickerState extends State<CameraPicker>
                   if (shouldCaptureButtonDisplay)
                     RotatedBox(
                       quarterTurns:
-                          !enableScaledPreview ? cameraQuarterTurns : 0,
+                          enableScaledPreview ? 0 : cameraQuarterTurns,
                       child: CameraProgressButton(
                         isAnimating:
-                            isCaptureButtonTapDown && isShootingButtonAnimate,
+                            showProgressIndicator && isShootingButtonAnimate,
                         duration: pickerConfig.maximumRecordingDuration!,
                         size: size,
                         ringsColor: theme.indicatorColor,
