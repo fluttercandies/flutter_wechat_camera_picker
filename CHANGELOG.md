@@ -6,11 +6,12 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
 
-## Unreleased
+## 4.3.7
 
 ### Fixes
 
 - Fix semantics with the capture button.
+- Avoid potential null operations when saving the entity.
 
 ## 4.3.6
 
@@ -29,7 +30,6 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 ### Fixes
 
 - Fix preview file delete predication.
-- Avoid potential null operations when saving the entity.
 
 ## 4.3.3
 
