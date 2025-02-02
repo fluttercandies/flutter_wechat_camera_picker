@@ -8,7 +8,9 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## Unreleased
 
-*None.*
+### Fixes
+
+- Fix semantics with the capture button.
 
 ## 4.3.6
 
