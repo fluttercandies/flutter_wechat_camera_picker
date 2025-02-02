@@ -29,6 +29,7 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 ### Fixes
 
 - Fix preview file delete predication.
+- Avoid potential null operations when saving the entity.
 
 ## 4.3.3
 
