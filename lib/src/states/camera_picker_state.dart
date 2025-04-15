@@ -517,7 +517,14 @@ class CameraPickerState extends State<CameraPicker>
                     },
                   );
                 }
-              }),
+              }).timeout(
+                const Duration(milliseconds: 250),
+                onTimeout: () {
+                  validFlashModes[camera]
+                      ?.remove(pickerConfig.preferredFlashMode);
+                  return;
+                },
+              ),
           ],
           eagerError: false,
         );
