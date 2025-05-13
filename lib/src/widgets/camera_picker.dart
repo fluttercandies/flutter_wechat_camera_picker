@@ -78,6 +78,7 @@ class CameraPicker extends StatefulWidget {
         selectionColor: themeColor.withAlpha(100),
         selectionHandleColor: themeColor,
       ),
+      // ignore: deprecated_member_use
       indicatorColor: themeColor,
       appBarTheme: const AppBarTheme(
         systemOverlayStyle: SystemUiOverlayStyle(

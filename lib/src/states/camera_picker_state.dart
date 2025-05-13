@@ -1245,7 +1245,10 @@ class CameraPickerState extends State<CameraPicker>
           return const SizedBox.shrink();
         }
         Widget backButton = buildBackButton(context);
-        Widget flashModeSwitch = buildFlashModeSwitch(context, v);
+        Widget flashModeSwitch = buildFlashModeSwitch(
+          context: context,
+          cameraValue: v,
+        );
         if (isCameraRotated && !enableScaledPreview) {
           backButton = RotatedBox(
             quarterTurns: cameraQuarterTurns,
@@ -1296,9 +1299,12 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The button to switch flash modes.
   /// 切换闪光灯模式的按钮
-  Widget buildFlashModeSwitch(BuildContext context, CameraValue value) {
+  Widget buildFlashModeSwitch({
+    required BuildContext context,
+    required CameraValue cameraValue,
+  }) {
     final IconData icon;
-    switch (value.flashMode) {
+    switch (cameraValue.flashMode) {
       case FlashMode.off:
         icon = Icons.flash_off;
         break;
@@ -1313,15 +1319,18 @@ class CameraPickerState extends State<CameraPicker>
         break;
     }
     return IconButton(
-      onPressed: () => switchFlashesMode(value),
-      tooltip: textDelegate.sFlashModeLabel(value.flashMode),
+      onPressed: () => switchFlashesMode(cameraValue),
+      tooltip: textDelegate.sFlashModeLabel(cameraValue.flashMode),
       icon: Icon(icon, size: 24),
     );
   }
 
   /// Text widget for shooting tips.
   /// 拍摄的提示文字
-  Widget buildCaptureTips(CameraController? controller) {
+  Widget buildCaptureTips({
+    required BuildContext context,
+    CameraController? controller,
+  }) {
     return AnimatedOpacity(
       duration: recordDetectDuration,
       opacity: controller?.value.isRecordingVideo ?? false ? 0 : 1,
@@ -1398,7 +1407,10 @@ class CameraPickerState extends State<CameraPicker>
           const Spacer(),
           Expanded(
             child: Center(
-              child: buildCaptureButton(context, constraints),
+              child: buildCaptureButton(
+                context: context,
+                constraints: constraints,
+              ),
             ),
           ),
           if (controller != null &&
@@ -1429,7 +1441,10 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The shooting button.
   /// 拍照按钮
-  Widget buildCaptureButton(BuildContext context, BoxConstraints constraints) {
+  Widget buildCaptureButton({
+    required BuildContext context,
+    required BoxConstraints constraints,
+  }) {
     final showProgressIndicator =
         isCaptureButtonTapDown || MediaQuery.accessibleNavigationOf(context);
 
@@ -1500,7 +1515,8 @@ class CameraPickerState extends State<CameraPicker>
                             showProgressIndicator && isShootingButtonAnimate,
                         duration: pickerConfig.maximumRecordingDuration!,
                         size: size,
-                        ringsColor: theme.indicatorColor,
+                        // ignore: deprecated_member_use
+                        ringsColor: Theme.of(context).indicatorColor,
                         ringsWidth: 3,
                       ),
                     ),
@@ -1514,13 +1530,14 @@ class CameraPickerState extends State<CameraPicker>
   }
 
   Widget buildExposureSlider({
+    required BuildContext context,
     required ExposureMode mode,
     required double size,
     required double height,
     required double gap,
   }) {
     final bool isLocked = mode == ExposureMode.locked;
-    final Color? color = isLocked ? _lockedColor : theme.iconTheme.color;
+    final color = isLocked ? _lockedColor : Theme.of(context).iconTheme.color;
     final Widget lineWidget = ValueListenableBuilder<bool>(
       valueListenable: isFocusPointDisplays,
       builder: (_, bool value, Widget? child) => AnimatedOpacity(
@@ -1580,6 +1597,7 @@ class CameraPickerState extends State<CameraPicker>
   /// The area widget for the last exposure point that user manually set.
   /// 用户手动设置的曝光点的区域显示
   Widget buildFocusingPoint({
+    required BuildContext context,
     required CameraValue cameraValue,
     required BoxConstraints constraints,
     int quarterTurns = 0,
@@ -1612,6 +1630,7 @@ class CameraPickerState extends State<CameraPicker>
           const SizedBox(height: verticalGap),
           Expanded(
             child: buildExposureSlider(
+              context: context,
               mode: exposureMode,
               size: size,
               height: height,
@@ -1698,7 +1717,7 @@ class CameraPickerState extends State<CameraPicker>
               size: pointWidth,
               color: cameraValue.exposureMode == ExposureMode.locked
                   ? _lockedColor
-                  : theme.iconTheme.color!,
+                  : Theme.of(context).iconTheme.color,
             ),
           ),
         ),
@@ -1718,10 +1737,10 @@ class CameraPickerState extends State<CameraPicker>
 
   /// The [GestureDetector] widget for setting exposure point manually.
   /// 用于手动设置曝光点的 [GestureDetector]
-  Widget buildExposureDetector(
-    BuildContext context,
-    BoxConstraints constraints,
-  ) {
+  Widget buildExposureDetector({
+    required BuildContext context,
+    required BoxConstraints constraints,
+  }) {
     return Semantics(
       label: textDelegate.sCameraPreviewLabel(
         innerController?.description.lensDirection,
@@ -1812,8 +1831,9 @@ class CameraPickerState extends State<CameraPicker>
         children: <Widget>[
           preview,
           if (pickerConfig.enableSetExposure)
-            buildExposureDetector(context, constraints),
+            buildExposureDetector(context: context, constraints: constraints),
           buildFocusingPoint(
+            context: context,
             cameraValue: cameraValue,
             constraints: constraints,
             quarterTurns: cameraQuarterTurns,
@@ -1865,11 +1885,11 @@ class CameraPickerState extends State<CameraPicker>
     );
   }
 
-  Widget buildForegroundBody(
-    BuildContext context,
-    BoxConstraints constraints,
+  Widget buildForegroundBody({
+    required BuildContext context,
+    required BoxConstraints constraints,
     DeviceOrientation? deviceOrientation,
-  ) {
+  }) {
     final orientation = deviceOrientation ?? MediaQuery.orientationOf(context);
     final isPortrait = orientation.toString().contains('portrait');
     return SafeArea(
@@ -1888,7 +1908,12 @@ class CameraPickerState extends State<CameraPicker>
             child: buildSettingActions(context),
           ),
           const Spacer(),
-          ExcludeSemantics(child: buildCaptureTips(innerController)),
+          ExcludeSemantics(
+            child: buildCaptureTips(
+              context: context,
+              controller: innerController,
+            ),
+          ),
           Semantics(
             sortKey: const OrdinalSortKey(2),
             hidden: innerController == null,
@@ -1974,9 +1999,13 @@ class CameraPickerState extends State<CameraPicker>
             previewWidget,
             if (enableScaledPreview) ...<Widget>[
               if (pickerConfig.enableSetExposure)
-                buildExposureDetector(context, constraints),
+                buildExposureDetector(
+                  context: context,
+                  constraints: constraints,
+                ),
               buildInitializeWrapper(
                 builder: (CameraValue v, _) => buildFocusingPoint(
+                  context: context,
                   cameraValue: v,
                   constraints: constraints,
                 ),
@@ -1988,13 +2017,17 @@ class CameraPickerState extends State<CameraPicker>
                 ),
             ],
             if (innerController == null)
-              buildForegroundBody(context, constraints, null)
+              buildForegroundBody(
+                context: context,
+                constraints: constraints,
+                deviceOrientation: null,
+              )
             else
               buildInitializeWrapper(
                 builder: (CameraValue v, _) => buildForegroundBody(
-                  context,
-                  constraints,
-                  v.deviceOrientation,
+                  context: context,
+                  constraints: constraints,
+                  deviceOrientation: v.deviceOrientation,
                 ),
               ),
           ],
@@ -2005,21 +2038,6 @@ class CameraPickerState extends State<CameraPicker>
 
   @override
   Widget build(BuildContext context) {
-    Widget body = Builder(builder: buildBody);
-    if (isCameraRotated && enableScaledPreview) {
-      final MediaQueryData mq = MediaQuery.of(context);
-      body = RotatedBox(
-        quarterTurns: pickerConfig.cameraQuarterTurns,
-        child: MediaQuery(
-          data: mq.copyWith(
-            size: pickerConfig.cameraQuarterTurns.isOdd
-                ? mq.size.flipped
-                : mq.size,
-          ),
-          child: body,
-        ),
-      );
-    }
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         systemNavigationBarIconBrightness: Brightness.light,
@@ -2028,9 +2046,25 @@ class CameraPickerState extends State<CameraPicker>
       ),
       child: Theme(
         data: theme,
-        child: Material(
-          color: Colors.black,
-          child: body,
+        child: Builder(
+          builder: (context) {
+            Widget body = buildBody(context);
+            if (isCameraRotated && enableScaledPreview) {
+              final MediaQueryData mq = MediaQuery.of(context);
+              body = RotatedBox(
+                quarterTurns: pickerConfig.cameraQuarterTurns,
+                child: MediaQuery(
+                  data: mq.copyWith(
+                    size: pickerConfig.cameraQuarterTurns.isOdd
+                        ? mq.size.flipped
+                        : mq.size,
+                  ),
+                  child: body,
+                ),
+              );
+            }
+            return Material(color: Colors.black, child: body);
+          },
         ),
       ),
     );
