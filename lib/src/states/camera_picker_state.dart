@@ -1515,7 +1515,7 @@ class CameraPickerState extends State<CameraPicker>
                             showProgressIndicator && isShootingButtonAnimate,
                         duration: pickerConfig.maximumRecordingDuration!,
                         size: size,
-                        ringsColor: theme.indicatorColor,
+                        ringsColor: Theme.of(context).indicatorColor,
                         ringsWidth: 3,
                       ),
                     ),
@@ -1536,7 +1536,7 @@ class CameraPickerState extends State<CameraPicker>
     required double gap,
   }) {
     final bool isLocked = mode == ExposureMode.locked;
-    final Color? color = isLocked ? _lockedColor : theme.iconTheme.color;
+    final color = isLocked ? _lockedColor : Theme.of(context).iconTheme.color;
     final Widget lineWidget = ValueListenableBuilder<bool>(
       valueListenable: isFocusPointDisplays,
       builder: (_, bool value, Widget? child) => AnimatedOpacity(
@@ -1716,7 +1716,7 @@ class CameraPickerState extends State<CameraPicker>
               size: pointWidth,
               color: cameraValue.exposureMode == ExposureMode.locked
                   ? _lockedColor
-                  : theme.iconTheme.color!,
+                  : Theme.of(context).iconTheme.color,
             ),
           ),
         ),

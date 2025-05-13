@@ -289,7 +289,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
       minWidth: 20,
       height: 32,
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      color: theme.colorScheme.secondary,
+      color: Theme.of(context).colorScheme.secondary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(3),
       ),
@@ -298,7 +298,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
       child: Text(
         Singleton.textDelegate.confirm,
         style: TextStyle(
-          color: theme.textTheme.bodyLarge?.color,
+          color: Theme.of(context).textTheme.bodyLarge?.color,
           fontSize: 17,
           fontWeight: FontWeight.normal,
         ),
@@ -402,15 +402,20 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
           deletePreviewFileIfConfigured();
         }
       },
-      child: Material(
-        color: Colors.black,
-        child: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            buildPreview(context),
-            buildForeground(context),
-            if (isSavingEntity) buildLoading(context),
-          ],
+      child: Theme(
+        data: theme,
+        child: Builder(
+          builder: (context) => Material(
+            color: Colors.black,
+            child: Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                buildPreview(context),
+                buildForeground(context),
+                if (isSavingEntity) buildLoading(context),
+              ],
+            ),
+          ),
         ),
       ),
     );

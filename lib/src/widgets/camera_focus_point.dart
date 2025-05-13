@@ -13,7 +13,7 @@ final class CameraFocusPoint extends StatelessWidget {
   });
 
   final double size;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,7 @@ final class CameraFocusPointPainter extends CustomPainter {
   final double size;
   final double radius;
   final double strokeWidth;
-  final Color color;
+  final Color? color;
 
   Radius get _circularRadius => Radius.circular(radius);
 
@@ -61,8 +61,10 @@ final class CameraFocusPointPainter extends CustomPainter {
     final double lineLength = dividedSize.width - radius;
     final Paint paint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = color
       ..strokeWidth = strokeWidth;
+    if (color != null) {
+      paint.color = color!;
+    }
 
     final Path path = Path()
       // Move to the start of the arc-line group at the left-top.
