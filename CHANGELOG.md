@@ -6,6 +6,17 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
 
+## 4.4.0
+
+### Breaking changes
+
+- `CameraPickerState.build*` methods' signature are refactored to be more consistent.
+
+### Fixes
+
+- Fix theme usages.
+- Fix lints.
+
 ## 4.3.7
 
 ### Fixes
