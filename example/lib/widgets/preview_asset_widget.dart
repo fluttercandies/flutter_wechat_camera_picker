@@ -5,7 +5,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:better_player_plus/better_player_plus.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 class PreviewAssetWidget extends StatefulWidget {
@@ -20,7 +20,7 @@ class PreviewAssetWidget extends StatefulWidget {
 class _PreviewAssetWidgetState extends State<PreviewAssetWidget> {
   bool get _isVideo => widget.asset.type == AssetType.video;
   Object? _error;
-  VideoPlayerController? _playerController;
+  BetterPlayerController? _playerController;
 
   @override
   void initState() {
@@ -40,21 +40,36 @@ class _PreviewAssetWidgetState extends State<PreviewAssetWidget> {
     final String? url = await widget.asset.getMediaUrl();
     if (url == null) {
       _error = StateError('The media URL of the preview asset is null.');
+      if (mounted) {
+        setState(() {});
+      }
       return;
     }
-    final VideoPlayerController controller;
-    final Uri uri = Uri.parse(url);
-    if (Platform.isAndroid) {
-      controller = VideoPlayerController.contentUri(uri);
-    } else {
-      controller = VideoPlayerController.networkUrl(uri);
-    }
-    _playerController = controller;
     try {
-      await controller.initialize();
-      controller
-        ..setLooping(true)
-        ..play();
+      final betterPlayerDataSource = BetterPlayerDataSource(
+        BetterPlayerDataSourceType.network,
+        url,
+        videoFormat: BetterPlayerVideoFormat.other,
+      );
+      final betterPlayerConfiguration = BetterPlayerConfiguration(
+        autoPlay: true,
+        looping: true,
+        controlsConfiguration: BetterPlayerControlsConfiguration(
+          showControls: false,
+        ),
+        errorBuilder: (context, errorMessage) {
+          return Center(
+            child: Text(
+              errorMessage ?? 'Failed to load video',
+              style: const TextStyle(color: Colors.white),
+            ),
+          );
+        },
+      );
+      _playerController = BetterPlayerController(
+        betterPlayerConfiguration,
+        betterPlayerDataSource: betterPlayerDataSource,
+      );
     } catch (e) {
       _error = e;
     } finally {
@@ -69,13 +84,12 @@ class _PreviewAssetWidgetState extends State<PreviewAssetWidget> {
   }
 
   Widget _buildVideo(BuildContext context) {
-    final VideoPlayerController? controller = _playerController;
+    final BetterPlayerController? controller = _playerController;
     if (controller == null) {
       return const CircularProgressIndicator();
     }
-    return AspectRatio(
-      aspectRatio: controller.value.aspectRatio,
-      child: VideoPlayer(controller),
+    return BetterPlayer(
+      controller: controller,
     );
   }
 
