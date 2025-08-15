@@ -14,7 +14,7 @@ import '../states/camera_picker_viewer_state.dart';
 
 class CameraPickerViewer extends StatefulWidget {
   const CameraPickerViewer._({
-    // ignore: unused_element
+    // ignore: unused_element, unused_element_parameter
     super.key,
     required this.viewType,
     required this.previewXFile,

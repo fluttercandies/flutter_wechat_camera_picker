@@ -6,7 +6,8 @@ import 'dart:async';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:wechat_picker_library/wechat_picker_library.dart'
+    show buildTheme;
 
 import '../constants/config.dart';
 import '../internals/singleton.dart';
@@ -64,48 +65,11 @@ class CameraPicker extends StatefulWidget {
 
   /// Build a dark theme according to the theme color.
   /// 通过主题色构建一个默认的暗黑主题
-  static ThemeData themeData(Color themeColor) {
-    return ThemeData.dark().copyWith(
-      primaryColor: Colors.grey[900],
-      primaryColorLight: Colors.grey[900],
-      primaryColorDark: Colors.grey[900],
-      canvasColor: Colors.grey[850],
-      scaffoldBackgroundColor: Colors.grey[900],
-      cardColor: Colors.grey[900],
-      highlightColor: Colors.transparent,
-      textSelectionTheme: TextSelectionThemeData(
-        cursorColor: themeColor,
-        selectionColor: themeColor.withAlpha(100),
-        selectionHandleColor: themeColor,
-      ),
-      // ignore: deprecated_member_use
-      indicatorColor: themeColor,
-      appBarTheme: const AppBarTheme(
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarBrightness: Brightness.dark,
-          statusBarIconBrightness: Brightness.light,
-        ),
-        elevation: 0,
-      ),
-      buttonTheme: ButtonThemeData(buttonColor: themeColor),
-      colorScheme: ColorScheme(
-        primary: Colors.grey[900]!,
-        primaryContainer: Colors.grey[900],
-        secondary: themeColor,
-        secondaryContainer: themeColor,
-        // ignore: deprecated_member_use
-        background: Colors.grey[900]!,
-        surface: Colors.grey[900]!,
-        brightness: Brightness.dark,
-        error: const Color(0xffcf6679),
-        onPrimary: Colors.black,
-        onSecondary: Colors.black,
-        onSurface: Colors.white,
-        // ignore: deprecated_member_use
-        onBackground: Colors.white,
-        onError: Colors.black,
-      ),
-    );
+  static ThemeData themeData(
+    Color themeColor, {
+    bool light = false,
+  }) {
+    return buildTheme(themeColor, light: light);
   }
 
   @override
