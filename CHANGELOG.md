@@ -6,18 +6,16 @@ that can be found in the LICENSE file. -->
 
 See the [Migration Guide](guides/migration_guide.md) for breaking changes between versions.
 
-## 4.5.0
+## Unreleased
 
-### Fixes
-
-- Fix theme usages based on Flutter 3.35.
-- Requires Flutter 3.22.
+*None.*
 
 ## 4.4.0
 
 ### Breaking changes
 
 - `CameraPickerState.build*` methods' signature are refactored to be more consistent.
+- Requires Flutter 3.22.
 
 ### Fixes
 
