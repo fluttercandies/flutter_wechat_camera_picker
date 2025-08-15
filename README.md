@@ -31,11 +31,11 @@ See the [Migration Guide][] to learn how to migrate between breaking changes.
 The package only guarantees that it will work on **the stable version of Flutter**.
 We won't update it in real-time to align with other channels of Flutter.
 
-|        | 2.8.0 | 3.3.0 | 3.16.0 |
-|--------|:-----:|:-----:|:------:|
-| 4.2.0+ |   ❌   |   ❌   |   ✅    |
-| 4.0.0+ |   ❌   |   ✅   |   ❌    |
-| 3.0.0+ |   ✅   |   ❌   |   ❌    |
+|        | 3.3.0 | 3.16.0 | 3.22.0 |
+|--------|:-----:|:------:|:------:|
+| 4.5.0+ |   ❌   |   ✅    |   ✅    | 
+| 4.2.0+ |   ❌   |   ✅    |   ❌    |
+| 4.0.0+ |   ✅   |   ❌    |   ❌    |
 
 ## Package credits
 
