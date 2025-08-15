@@ -5,6 +5,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:better_player_plus/better_player_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:path/path.dart' as path;
@@ -12,10 +13,10 @@ import 'package:video_player/video_player.dart';
 import 'package:wechat_picker_library/wechat_picker_library.dart';
 
 import '../constants/config.dart';
-import '../internals/singleton.dart';
 import '../constants/enums.dart';
 import '../constants/type_defs.dart';
 import '../internals/methods.dart';
+import '../internals/singleton.dart';
 import '../widgets/camera_picker.dart';
 import '../widgets/camera_picker_viewer.dart';
 
@@ -35,11 +36,11 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
 
   /// Controller for the video player.
   /// 视频播放的控制器
-  late final videoController = VideoPlayerController.file(previewFile);
+  BetterPlayerController? _controller;
 
   /// Whether the controller is playing.
   /// 播放控制器是否在播放
-  bool get isControllerPlaying => videoController.value.isPlaying;
+  bool get isControllerPlaying => _controller?.isPlaying() ?? false;
 
   /// Whether the controller has initialized.
   /// 控制器是否已初始化
@@ -64,22 +65,58 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
 
   @override
   void dispose() {
-    videoController
-      ..removeListener(videoControllerListener)
-      ..pause()
-      ..dispose();
+    _controller?.removeEventsListener(betterPlayerListener);
+    _controller?.pause();
+    _controller?.dispose();
     super.dispose();
   }
 
   Future<void> initializeVideoPlayerController() async {
     try {
+      final betterPlayerDataSource = BetterPlayerDataSource(
+        BetterPlayerDataSourceType.file,
+        previewFile.path,
+        videoFormat: BetterPlayerVideoFormat.other,
+      );
+
+      // 使用 VideoPlayerController 获取宽高比
+      final videoController =
+          VideoPlayerController.file(File(previewFile.path));
       await videoController.initialize();
-      videoController.addListener(videoControllerListener);
-      hasLoaded = true;
-      if (pickerConfig.shouldAutoPreviewVideo) {
-        videoController.play();
-        videoController.setLooping(true);
+      double aspectRatio = videoController.value.aspectRatio;
+      // 检查旋转角度
+      final orientation = videoController.value.rotationCorrection; // 如果可用
+      if (orientation == 90 || orientation == 270) {
+        aspectRatio = 1 / aspectRatio;
       }
+      debugPrint('Error when initializing video controller:2222 $aspectRatio');
+
+      videoController.dispose(); // 释放临时控制器
+      final betterPlayerConfiguration = BetterPlayerConfiguration(
+        autoPlay: pickerConfig.shouldAutoPreviewVideo,
+        looping: pickerConfig.shouldAutoPreviewVideo,
+        aspectRatio: aspectRatio,
+        controlsConfiguration: BetterPlayerControlsConfiguration(
+          showControls: false,
+        ),
+        errorBuilder: (context, errorMessage) {
+          hasErrorWhenInitializing = true;
+          safeSetState(() {});
+          return Center(
+            child: Text(
+              Singleton.textDelegate.loadFailed,
+              style: const TextStyle(inherit: false),
+            ),
+          );
+        },
+      );
+      _controller = BetterPlayerController(
+        betterPlayerConfiguration,
+        betterPlayerDataSource: betterPlayerDataSource,
+      );
+
+      _controller!.addEventsListener(betterPlayerListener);
+      hasLoaded = true;
     } catch (e, s) {
       hasErrorWhenInitializing = true;
       realDebugPrint('Error when initializing video controller: $e');
@@ -91,9 +128,19 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
 
   /// Listener for the video player.
   /// 播放器的监听方法
-  void videoControllerListener() {
-    if (isControllerPlaying != isPlaying.value) {
-      isPlaying.value = isControllerPlaying;
+  void betterPlayerListener(BetterPlayerEvent event) {
+    if (event.betterPlayerEventType == BetterPlayerEventType.initialized) {
+      debugPrint(
+          "_controller?.getAspectRatio(); ${_controller?.getAspectRatio()}");
+    }
+    if (event.betterPlayerEventType == BetterPlayerEventType.play) {
+      if (!isPlaying.value) {
+        isPlaying.value = true;
+      }
+    } else if (event.betterPlayerEventType == BetterPlayerEventType.pause) {
+      if (isPlaying.value) {
+        isPlaying.value = false;
+      }
     }
   }
 
@@ -106,14 +153,18 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   Future<void> playButtonCallback() async {
     try {
       if (isPlaying.value) {
-        videoController.pause();
+        _controller?.pause();
       } else {
-        if (videoController.value.duration == videoController.value.position) {
-          videoController.seekTo(Duration.zero);
+        if (_controller != null &&
+            _controller!.videoPlayerController!.value.position >=
+                (_controller!.videoPlayerController!.value?.duration ??
+                    Duration.zero)) {
+          _controller
+            ?..seekTo(Duration.zero)
+            ..play();
+        } else {
+          _controller?.play();
         }
-        videoController
-          ..play()
-          ..setLooping(true);
       }
     } catch (e, s) {
       handleErrorWithHandler(e, s, onError);
@@ -260,10 +311,9 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
       builder = Stack(
         children: <Widget>[
           Center(
-            child: AspectRatio(
-              aspectRatio: videoController.value.aspectRatio,
-              child: VideoPlayer(videoController),
-            ),
+            child: _controller != null
+                ? BetterPlayer(controller: _controller!)
+                : const SizedBox.shrink(),
           ),
           buildPlayControlButton(context),
         ],
