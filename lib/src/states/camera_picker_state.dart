@@ -488,12 +488,6 @@ class CameraPickerState extends State<CameraPicker>
               camera: camera,
               fallback: minAvailableZoom,
             ).then((value) => minAvailableZoom = value!),
-            wrapControllerMethod(
-              'getMinZoomLevel',
-              () => newController.getMinZoomLevel(),
-              camera: camera,
-              fallback: minAvailableZoom,
-            ).then((value) => minAvailableZoom = value!),
             if (pickerConfig.lockCaptureOrientation != null)
               wrapControllerMethod<void>(
                 'lockCaptureOrientation',
