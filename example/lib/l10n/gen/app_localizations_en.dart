@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -35,7 +37,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pickMethodPhotosAndVideosName => 'Taking photos and videos';
 
   @override
-  String get pickMethodPhotosAndVideosDescription => 'Use cameras to take photos and videos.';
+  String get pickMethodPhotosAndVideosDescription =>
+      'Use cameras to take photos and videos.';
 
   @override
   String get pickMethodVideosName => 'Taking videos';
@@ -47,7 +50,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pickMethodVideosByTapName => 'Taking videos by tap';
 
   @override
-  String get pickMethodVideosByTapDescription => 'Use cameras only to take videos, but not with long-press, just a single tap.';
+  String get pickMethodVideosByTapDescription =>
+      'Use cameras only to take videos, but not with long-press, just a single tap.';
 
   @override
   String get pickMethodSilenceRecordingName => 'Silence recording';
@@ -59,47 +63,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pickMethodNoDurationLimitName => 'No duration limit';
 
   @override
-  String get pickMethodNoDurationLimitDescription => 'Record as long as you with (if your device stays alive)...';
+  String get pickMethodNoDurationLimitDescription =>
+      'Record as long as you with (if your device stays alive)...';
 
   @override
-  String get pickMethodCustomizableThemeName => 'Customizable theme (ThemeData)';
+  String get pickMethodCustomizableThemeName =>
+      'Customizable theme (ThemeData)';
 
   @override
-  String get pickMethodCustomizableThemeDescription => 'Picking assets with the light theme or with a different color.';
+  String get pickMethodCustomizableThemeDescription =>
+      'Picking assets with the light theme or with a different color.';
 
   @override
   String get pickMethodRotateInTurnsName => 'Rotate picker in turns';
 
   @override
-  String get pickMethodRotateInTurnsDescription => 'Rotate the picker layout in quarter turns, without the camera preview.';
+  String get pickMethodRotateInTurnsDescription =>
+      'Rotate the picker layout in quarter turns, without the camera preview.';
 
   @override
   String get pickMethodScalingPreviewName => 'Scaling for camera preview';
 
   @override
-  String get pickMethodScalingPreviewDescription => 'Camera preview will be scaled to cover the whole screen of the device with the original aspect ratio.';
+  String get pickMethodScalingPreviewDescription =>
+      'Camera preview will be scaled to cover the whole screen of the device with the original aspect ratio.';
 
   @override
   String get pickMethodLowerResolutionName => 'Lower resolutions';
 
   @override
-  String get pickMethodLowerResolutionDescription => 'Use a lower resolution preset might be helpful in some specific scenarios.';
+  String get pickMethodLowerResolutionDescription =>
+      'Use a lower resolution preset might be helpful in some specific scenarios.';
 
   @override
   String get pickMethodPreferFrontCameraName => 'Prefer front camera';
 
   @override
-  String get pickMethodPreferFrontCameraDescription => 'Use the front camera as the preferred lens direction if the device supports.';
+  String get pickMethodPreferFrontCameraDescription =>
+      'Use the front camera as the preferred lens direction if the device supports.';
 
   @override
   String get pickMethodPreferFlashlightOnName => 'Prefer flashlight always on';
 
   @override
-  String get pickMethodPreferFlashlightOnDescription => 'Prefer to keep using the flashlight during captures.';
+  String get pickMethodPreferFlashlightOnDescription =>
+      'Prefer to keep using the flashlight during captures.';
 
   @override
   String get pickMethodForegroundBuilderName => 'Foreground builder';
 
   @override
-  String get pickMethodForegroundBuilderDescription => 'Build your widgets with the given CameraController on the top of the camera preview.';
+  String get pickMethodForegroundBuilderDescription =>
+      'Build your widgets with the given CameraController on the top of the camera preview.';
 }

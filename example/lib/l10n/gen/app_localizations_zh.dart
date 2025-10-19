@@ -1,3 +1,5 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -77,7 +79,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pickMethodScalingPreviewName => '缩放相机预览';
 
   @override
-  String get pickMethodScalingPreviewDescription => '相机预览视图会被放大到覆盖整个屏幕且保持原始的预览比例。';
+  String get pickMethodScalingPreviewDescription =>
+      '相机预览视图会被放大到覆盖整个屏幕且保持原始的预览比例。';
 
   @override
   String get pickMethodLowerResolutionName => '低分辨率拍照';
@@ -101,5 +104,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get pickMethodForegroundBuilderName => '构建前景';
 
   @override
-  String get pickMethodForegroundBuilderDescription => '通过 CameraController 构建在相机预览部分的前景 widget。';
+  String get pickMethodForegroundBuilderDescription =>
+      '通过 CameraController 构建在相机预览部分的前景 widget。';
 }

@@ -110,8 +110,8 @@ class SelectedAssetsListView extends StatelessWidget {
         curve: Curves.easeInOut,
         height: assets.isNotEmpty
             ? value
-            ? 120.0
-            : 80.0
+                ? 120.0
+                : 80.0
             : 40.0,
         child: Column(
           children: <Widget>[

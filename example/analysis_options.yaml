@@ -1,5 +1,8 @@
 include: ../analysis_options.yaml
 
+formatter:
+  trailing_commas: preserve
+
 analyzer:
   exclude:
     - lib/l10n/gen/*.dart

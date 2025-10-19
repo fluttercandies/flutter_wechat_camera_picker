@@ -1,5 +1,8 @@
 include: package:flutter_lints/flutter.yaml
 
+formatter:
+  trailing_commas: preserve
+
 linter:
   rules:
     always_declare_return_types: true
