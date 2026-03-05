@@ -136,7 +136,7 @@ dependencies:
 
 运行前，按照这些步骤逐一配置：
 - [wechat_assets_picker#准备工作](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/README-ZH.md#preparing-for-use-)
-- [camera#installation](https://pub.flutter-io.cn/packages/camera#installation)
+- [camera#setup](https://pub.flutter-io.cn/packages/camera#setup)
 
 在你的代码中导入：
 
