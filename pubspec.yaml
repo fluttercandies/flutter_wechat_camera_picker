@@ -34,6 +34,8 @@ dependencies:
   photo_manager_image_provider: ^2.0.0
   sensors_plus: '>=4.0.0 <7.0.0'
   video_player: ^2.7.0
+  better_player_plus: ^1.0.8
+
 
 dev_dependencies:
   flutter_lints: any
