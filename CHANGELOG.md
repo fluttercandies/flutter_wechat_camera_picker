@@ -13,6 +13,10 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 - Allows `camera 0.11+` (including 0.12).
 - Allows `sensor_plus 7.0`.
 
+### Fixes
+
+- Display preview with the correct orientation when using `lockCaptureOrientation`. 
+
 ## 4.4.0
 
 ### Breaking changes
