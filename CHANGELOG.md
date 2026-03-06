@@ -8,72 +8,72 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## Unreleased
 
-### New features
+**New features**
 
 - Allows `camera 0.11+` (including 0.12).
 - Allows `sensor_plus 7.0`.
 
-### Fixes
+**Fixes**
 
 - Display preview with the correct orientation when using `lockCaptureOrientation`. 
 
 ## 4.4.0
 
-### Breaking changes
+**Breaking changes**
 
 - `CameraPickerState.build*` methods' signature are refactored to be more consistent.
 - Requires Flutter 3.22.
 
-### Fixes
+**Fixes**
 
 - Fix theme usages.
 - Fix lints.
 
 ## 4.3.7
 
-### Fixes
+**Fixes**
 
 - Fix semantics with the capture button.
 - Avoid potential null operations when saving the entity.
 
 ## 4.3.6
 
-### Fixes
+**Fixes**
 
 - Predicate the flash mode correctly when retrying the initialization.
 
 ## 4.3.5
 
-### Improvements
+**Improvements**
 
 - Allows `sensor_plus` v6.
 
 ## 4.3.4
 
-### Fixes
+**Fixes**
 
 - Fix preview file delete predication.
 
 ## 4.3.3
 
-### New features
+**New features**
 
 - Adds `CameraPickerConfig.onPickConfirmed` to gets called when an asset entity is confirmed to be picked.
 - Introduces `CameraPickerConfig.permissionRequestOption`.
 
-### Improvements
+**Improvements**
 
 - Evicts the captured image cache once returned from the viewer.
 - Allows `camera_android: ^0.10.9+6`.
 
 ## 4.3.2
 
-### Fixes
+**Fixes**
 
 - Fix button displays when tap to record.
 - Prevent camera description exceptions when initializing the camera in the lifecycle callback.
 
-### Improvements
+**Improvements**
 
 - Use more precise overlay styles.
 - Switching between different lens with a single camera by default.
@@ -81,7 +81,7 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## 4.3.1
 
-### Improvements
+**Improvements**
 
 - Downgrades the default resolution preset from `max` to `ultraHigh`.
 - Improves pinch zooming experiences.
@@ -90,88 +90,88 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## 4.3.0+1
 
-### Fixes
+**Fixes**
 
 - Fixes the breaking `ColorScheme.background` implementation on older Flutter SDKs.
 
 ## 4.3.0
 
-### Improvements
+**Improvements**
 
 - Adapt the latest interface of WeChat.
 
-### Fixes
+**Fixes**
 
 - Constraints `camera_android` version to resolves https://github.com/flutter/flutter/issues/150549.
 
 ## 4.2.2
 
-### Fixes
+**Fixes**
 
 - Allows `wrapControllerMethod` to return nullable result.
 - Allows newer versions of `sensors_plus`.
 
-### Improvements
+**Improvements**
 
 - Provide the back button when no controller has been initialized.
 - Improves paddings of the heading actions in the viewer.
 
 ## 4.2.1
 
-### Fixes
+**Fixes**
 
 - Fix ignore locks when exception throws.
 
 ## 4.2.0
 
-### Breaking changes
+**Breaking changes**
 
 - Migrate to Flutter 3.16, and drop supports for previous Flutter versions.
 - Bump `photo_manager` to v3.x.
 - Export `photo_manager_image_provider`.
 
-### Improvements
+**Improvements**
 
 - Roll `sensors_plus`.
 - Catch exceptions when obtain/subscribe to the accelerometer stream.
 - Use `wechat_picker_library`.
 
-### Fixes
+**Fixes**
 
 - Fix `onEntitySaving` not returned after called. (#223)
 - Predicate access denied to avoid deadlocks.
 
 ## 4.1.0
 
-### New features
+**New features**
 
 - Automatically determine the capture orientation and lock accordingly.
 
-### Fixes
+**Fixes**
 
 - Handle exceptions after all flows.
 - Fix various problems with the capture button.
 
 ## 4.0.3
 
-### Fixes
+**Fixes**
 
 - Prevent duplicate shooting actions.
 
-### Improvements
+**Improvements**
 
 - Provide overall invalid wrapping for controller methods.
 - Throw exceptions with more accurate stack traces.
 
 ## 4.0.2
 
-### Fixes
+**Fixes**
 
 - Handles exceptions if locking methods are failed.
 
 ## 4.0.1
 
-### Fixes
+**Fixes**
 
 - Fix uncaught exceptions for controller methods.
 
@@ -179,12 +179,12 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 To know more about breaking changes, see [Migration Guide][].
 
-### New features
+**New features**
 
 - Migrate to Flutter 3.3, and drop supports for previous Flutter versions.
 - Sync all UI details from WeChat 8.3.x. (#181)
 
-### Improvements
+**Improvements**
 
 - Adapt layouts according to the device orientation.
 - Improve the performance when taking photos.
@@ -192,18 +192,18 @@ To know more about breaking changes, see [Migration Guide][].
 - Prefer `FlashMode.off` for better performance.
 - Allow `cameras` to be set repeatedly.
 
-### Fixes
+**Fixes**
 
 - Fix accessibility on the switch cameras button.
 
 ## 3.8.0
 
-### New features
+**New features**
 
 - Add Vietnamese language text delegate. (#166).
 - Add `CameraPickerConfig.minimumRecordingDuration`. (#168)
 
-### Improvements
+**Improvements**
 
 - Hide the loading widget in the preview until an actual saving process has been invoked.
 - Remove the implied system UI overlay manipulations.
@@ -211,69 +211,69 @@ To know more about breaking changes, see [Migration Guide][].
 
 ## 3.7.0
 
-### New features
+**New features**
 
 - Add `preferredFlashMode`, allowing users to choose which flash mode is preferred when first using the camera. (#158)
 
-### Improvements
+**Improvements**
 
 - Allow flash modes failed to switch and can move on to next when switching. (#156)
 
-### Fixes
+**Fixes**
 
 - Fix lifecycle integrations with the camera preview. (#157)
 
 ## 3.6.5
 
-### Fixes
+**Fixes**
 
 - Correct sizes when using `cameraQuarterTurns`. (#149)
 
 ## 3.6.4
 
-### Improvements
+**Improvements**
 
 - Improve stop-capturing experiences. (#146)
 - Precache captured images for better experiences. (#145)
 
 ## 3.6.3
 
-### Improvements
+**Improvements**
 
 - Add the loading indicator when saving. (#140)
 
 ## 3.6.2
 
-### Improvements
+**Improvements**
 
 - Bump `photo_manager` to explicitly remove the requirements of `requiredLegacyExternalStorage`.
 
 ## 3.6.1
 
-### New features
+**New features**
 
 - Add torch flashlight support. (#137)
 
 ## 3.6.0
 
-### New features
+**New features**
 
 - Upgrade `camera` to `0.10.x`. (#133)
 - Upgrade `photo_maanger` for Android 13. (#133)
 
 ## 3.5.0+1
 
-### Fixes
+**Fixes**
 
 - Fix the too early `widget` access in `CameraPickerState`. (#124)
 
 ## 3.5.0
 
-### New features
+**New features**
 
 - Support customize UI by override `State`s. (#113)
 
-### Improvements
+**Improvements**
 
 - Expose multiple internal widgets. (#113)
 - Re-export `CameraPicker`'s constructor. (#116)
@@ -282,11 +282,11 @@ To know more about breaking changes, see [Migration Guide][].
 
 ## 3.4.0
 
-### New features
+**New features**
 
 - Add `enableScaledPreview`. (#108)
 
-### Improvements
+**Improvements**
 
 - Catch more errors with handler. (#110)
 - Improve tapping exposure updates. (#109)
@@ -294,68 +294,68 @@ To know more about breaking changes, see [Migration Guide][].
 
 ## 3.3.0
 
-### Breaking Changes
+**Breaking changes**
 
 - Allow the foreground builder to be used all the time (#97) .
   The signature of the `ForegroundBuilder` has changed
   but can be easily migrated.
 
-### Improvements
+**Improvements**
 
 - Allow text delegates to be obtained by `Locale`. (#99)
 
 ## 3.2.0+1
 
-### New features
+**New features**
 
 - Support Flutter 3.
 
 ## 3.1.0
 
-### New features
+**New features**
 
 - Add `onXFileCaptured`. (#87)
 
 ## 3.0.4
 
-### Fixes
+**Fixes**
 
 - Unify the method to push to the viewer. (#86)
 
 ## 3.0.3
 
-### Fixes
+**Fixes**
 
 - Correct arguments of `EntitySaveCallback`. (#85)
 
 ## 3.0.2
 
-### Improvements
+**Improvements**
 
 - Export enums and typedefs.
 
 ## 3.0.1
 
-### Fixes
+**Fixes**
 
 - Remove redundant dispose with the controller.
 
 ## 3.0.0
 
-### New features
+**New features**
 
 - Add full semantics support. (#72)
 - Add `lockCaptureOrientation`, allowing users to determine lock to the specific orientation during captures. (#68)
 - Export `CameraPickerPageRoute`.
 - Abstract `CamearPickerConfig`, which moved all arguments from `pickFromCamera` to `pickerConfig`.
 
-### Improvements
+**Improvements**
 
 - Improve camera initializes by adding a lock.
 - Tweak asynchronous methods call during initializations.
 - Make camera controllers available as soon as possible.
 
-### Fixes
+**Fixes**
 
 - Fix scaling issues with turns and orientations.
 - Fix lint issues on Flutter 2.10.
@@ -447,7 +447,7 @@ To know more about breaking changes, see [Migration Guide][].
 
 ## 2.0.0
 
-### New Features
+**New features**
 
 - Add `enableSetExposure`, allowing users to update the exposure from the point tapped on the screen.
 - Add `enableExposureControlOnPoint`, allowing users to control the exposure offset with an offset slide from the exposure point.
@@ -457,13 +457,13 @@ To know more about breaking changes, see [Migration Guide][].
 - Add `shouldDeletePreviewFile`, allowing users to choose whether the captured file should be deleted.
 - Sync `imageFormatGroup` from the `camera` plugin.
 
-### Breaking Changes
+**Breaking changes**
 
 - Migrate to non-nullable by default.
 - `isAllowRecording` -> `enableRecording`
 - `isOnlyAllowRecording` -> `onlyAllowRecording`
 
-### Fixes
+**Fixes**
 
 - All fixes from the `camera` plugin.
 
