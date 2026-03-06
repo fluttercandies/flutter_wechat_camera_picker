@@ -8,6 +8,10 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## Unreleased
 
+*None.*
+
+## 4.5.0
+
 **New features**
 
 - Allows `camera 0.11+` (including 0.12).
