@@ -488,12 +488,10 @@ class CameraPickerState extends State<CameraPicker>
               camera: camera,
               fallback: minAvailableZoom,
             ).then((value) => minAvailableZoom = value!),
-            if (pickerConfig.lockCaptureOrientation != null)
+            if (pickerConfig.lockCaptureOrientation case final orientation?)
               wrapControllerMethod<void>(
                 'lockCaptureOrientation',
-                () => newController.lockCaptureOrientation(
-                  pickerConfig.lockCaptureOrientation,
-                ),
+                () => newController.lockCaptureOrientation(orientation),
                 camera: camera,
               ),
             // Do not set flash modes for the front camera.
@@ -565,8 +563,8 @@ class CameraPickerState extends State<CameraPicker>
   /// which enables the captured file stored the correct orientation.
   void handleAccelerometerEvent(AccelerometerEvent event) {
     if (!mounted ||
-        pickerConfig.lockCaptureOrientation != null ||
         innerController == null ||
+        lockedCaptureOrientation != null ||
         !controller.value.isInitialized ||
         controller.value.isPreviewPaused ||
         controller.value.isRecordingVideo ||
@@ -1253,7 +1251,11 @@ class CameraPickerState extends State<CameraPicker>
             child: flashModeSwitch,
           );
         }
-        final isPortrait = v.deviceOrientation.toString().contains('portrait');
+        final isPortrait = switch (lockedCaptureOrientation) {
+          DeviceOrientation.portraitUp => true,
+          DeviceOrientation.portraitDown => true,
+          _ => v.deviceOrientation.toString().contains('portrait'),
+        };
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Flex(
@@ -1352,9 +1354,14 @@ class CameraPickerState extends State<CameraPicker>
   }) {
     const fallbackSize = 150.0;
     final previewSize = controller?.value.previewSize;
-    final orientation = controller?.value.deviceOrientation ??
+    final orientation = lockedCaptureOrientation ??
+        controller?.value.deviceOrientation ??
         MediaQuery.orientationOf(context);
-    final isPortrait = orientation.toString().contains('portrait');
+    final isPortrait = switch (lockedCaptureOrientation) {
+      DeviceOrientation.portraitUp => true,
+      DeviceOrientation.portraitDown => true,
+      _ => orientation.toString().contains('portrait'),
+    };
     double effectiveSize;
     if (controller == null || pickerConfig.enableScaledPreview) {
       effectiveSize = lastCaptureActionsEffectiveHeight ?? fallbackSize;
@@ -1784,6 +1791,9 @@ class CameraPickerState extends State<CameraPicker>
       preview = ValueListenableBuilder<CameraValue>(
         valueListenable: controller,
         builder: (_, CameraValue value, Widget? child) {
+          if (lockedCaptureOrientation == DeviceOrientation.portraitUp) {
+            return RotatedBox(quarterTurns: 0, child: child);
+          }
           final lockedOrientation = value.lockedCaptureOrientation;
           int? quarterTurns = lockedOrientation?.index;
           if (quarterTurns == null) {
@@ -1884,7 +1894,9 @@ class CameraPickerState extends State<CameraPicker>
     required BoxConstraints constraints,
     DeviceOrientation? deviceOrientation,
   }) {
-    final orientation = deviceOrientation ?? MediaQuery.orientationOf(context);
+    final orientation = lockedCaptureOrientation ??
+        deviceOrientation ??
+        MediaQuery.orientationOf(context);
     final isPortrait = orientation.toString().contains('portrait');
     return SafeArea(
       bottom: false,
@@ -1935,18 +1947,24 @@ class CameraPickerState extends State<CameraPicker>
                   constraints: constraints,
                 );
               }
+              final orientation =
+                  lockedCaptureOrientation ?? v.deviceOrientation;
               return Align(
-                alignment: {
-                  DeviceOrientation.portraitUp: Alignment.topCenter,
-                  DeviceOrientation.portraitDown: Alignment.bottomCenter,
-                  DeviceOrientation.landscapeLeft: Alignment.centerLeft,
-                  DeviceOrientation.landscapeRight: Alignment.centerRight,
-                }[v.deviceOrientation]!,
+                alignment: () {
+                  return {
+                    DeviceOrientation.portraitUp: Alignment.topCenter,
+                    DeviceOrientation.portraitDown: Alignment.bottomCenter,
+                    DeviceOrientation.landscapeLeft: Alignment.centerLeft,
+                    DeviceOrientation.landscapeRight: Alignment.centerRight,
+                  }[orientation]!;
+                }(),
                 child: AspectRatio(
-                  aspectRatio:
-                      v.deviceOrientation.toString().contains('portrait')
-                          ? 1 / v.aspectRatio
-                          : v.aspectRatio,
+                  aspectRatio: switch (orientation) {
+                    DeviceOrientation.portraitUp => 1 / v.aspectRatio,
+                    DeviceOrientation.portraitDown => 1 / v.aspectRatio,
+                    DeviceOrientation.landscapeLeft => v.aspectRatio,
+                    DeviceOrientation.landscapeRight => v.aspectRatio,
+                  },
                   child: LayoutBuilder(
                     builder: (BuildContext c, BoxConstraints constraints) {
                       return buildCameraPreview(
@@ -2014,7 +2032,6 @@ class CameraPickerState extends State<CameraPicker>
               buildForegroundBody(
                 context: context,
                 constraints: constraints,
-                deviceOrientation: null,
               )
             else
               buildInitializeWrapper(
