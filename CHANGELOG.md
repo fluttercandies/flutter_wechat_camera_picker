@@ -8,7 +8,10 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## Unreleased
 
-*None.*
+### New features
+
+- Allows `camera 0.11+` (including 0.12).
+- Allows `sensor_plus 7.0`.
 
 ## 4.4.0
 
