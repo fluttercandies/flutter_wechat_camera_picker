@@ -8,7 +8,9 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## Unreleased
 
-*None.*
+**Fixes**
+
+- Fix a crash in `switchCameras` when `innerController` is null during initialization.
 
 ## 4.5.0
 
