@@ -925,6 +925,7 @@ class CameraPickerState extends State<CameraPicker>
     });
     final ExposureMode previousExposureMode = controller.value.exposureMode;
     try {
+      //Lock focus and exposure
       await Future.wait(<Future<void>>[
         wrapControllerMethod<void>(
           'setFocusMode',
@@ -941,6 +942,23 @@ class CameraPickerState extends State<CameraPicker>
           }),
       ]);
       final XFile file = await controller.takePicture();
+
+      //The photo has been taken and we need to reset the focus and exposure level here
+      wrapControllerMethod<void>(
+        'setFocusMode',
+        () async {
+          await innerController?.setFocusMode(FocusMode.auto);
+        },
+      );
+      if (previousExposureMode != ExposureMode.locked) {
+        wrapControllerMethod<void>(
+          'setExposureMode',
+          () async {
+            await innerController?.setExposureMode(previousExposureMode);
+          },
+        );
+      }
+
       await controller.pausePreview();
       final bool? isCapturedFileHandled = pickerConfig.onXFileCaptured?.call(
         file,
@@ -959,20 +977,6 @@ class CameraPickerState extends State<CameraPicker>
         } else {
           return Navigator.of(context).pop(entity);
         }
-      }
-      wrapControllerMethod<void>(
-        'setFocusMode',
-        () async {
-          await innerController?.setFocusMode(FocusMode.auto);
-        },
-      );
-      if (previousExposureMode != ExposureMode.locked) {
-        wrapControllerMethod<void>(
-          'setExposureMode',
-          () async {
-            await innerController?.setExposureMode(previousExposureMode);
-          },
-        );
       }
       await innerController?.resumePreview();
     } catch (e, s) {
