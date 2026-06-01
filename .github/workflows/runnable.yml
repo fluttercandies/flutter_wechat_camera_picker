@@ -9,6 +9,9 @@ on:
       - main
   workflow_dispatch:
 
+# Disable permissions for all of the available permissions
+permissions: {}
+
 jobs:
   analyze:
     name: Analyze on ${{ matrix.os }}
@@ -17,12 +20,12 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-java@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
         with:
           distribution: 'zulu'
           java-version: '17'
-      - uses: flutter-actions/setup-flutter@v4
+      - uses: flutter-actions/setup-flutter@480ffd9d3a24db4ce099d7ceb62c3d6959661eb8
         with:
           channel: 'stable'
       - run: dart --version
@@ -38,12 +41,12 @@ jobs:
       matrix:
         os: [macos-latest]
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-java@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
         with:
           distribution: 'zulu'
           java-version: '17'
-      - uses: flutter-actions/setup-flutter@v4
+      - uses: flutter-actions/setup-flutter@480ffd9d3a24db4ce099d7ceb62c3d6959661eb8
         with:
           channel: 'stable'
       - run: dart --version
@@ -59,12 +62,12 @@ jobs:
       matrix:
         os: [ubuntu-latest]
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-java@v5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+      - uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654
         with:
           distribution: 'zulu'
           java-version: '17'
-      - uses: flutter-actions/setup-flutter@v4
+      - uses: flutter-actions/setup-flutter@480ffd9d3a24db4ce099d7ceb62c3d6959661eb8
         with:
           channel: 'stable'
       - run: dart --version
