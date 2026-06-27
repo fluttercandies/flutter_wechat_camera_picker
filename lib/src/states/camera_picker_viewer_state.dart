@@ -127,7 +127,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   /// the file to be deleted in this case too.
   void deletePreviewFileIfConfigured() {
     if (pickerConfig.shouldDeletePreviewFile &&
-        pickerConfig.onEntitySaving != null &&
+        pickerConfig.onEntitySaving == null &&
         previewFile.existsSync()) {
       previewFile.delete().catchError((e, s) {
         handleErrorWithHandler(e, s, onError);
