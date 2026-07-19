@@ -35,7 +35,10 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
 
   /// Controller for the video player.
   /// 视频播放的控制器
-  late final videoController = VideoPlayerController.file(previewFile);
+  late final videoController = VideoPlayerController.file(
+    previewFile,
+    viewType: pickerConfig.previewVideoViewType,
+  );
 
   /// Whether the controller is playing.
   /// 播放控制器是否在播放

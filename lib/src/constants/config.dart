@@ -6,6 +6,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:video_player/video_player.dart' show VideoViewType;
 
 import '../delegates/camera_picker_text_delegate.dart';
 import 'type_defs.dart';
@@ -39,6 +40,7 @@ final class CameraPickerConfig {
     this.lockCaptureOrientation,
     this.foregroundBuilder,
     this.previewTransformBuilder,
+    this.previewVideoViewType = VideoViewType.textureView,
     this.onEntitySaving,
     this.onError,
     this.onXFileCaptured,
@@ -145,6 +147,10 @@ final class CameraPickerConfig {
 
   /// {@macro wechat_camera_picker.PreviewTransformBuilder}
   final PreviewTransformBuilder? previewTransformBuilder;
+
+  /// The type of preview video view to be used.
+  /// 视频预览的类型
+  final VideoViewType previewVideoViewType;
 
   /// Whether the camera should be locked to the specific orientation
   /// during captures.
