@@ -77,6 +77,8 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   Future<void> initializeVideoPlayerController() async {
     try {
       await videoController.initialize();
+      if (!mounted) return;
+
       videoController.addListener(videoControllerListener);
       hasLoaded = true;
       if (pickerConfig.shouldAutoPreviewVideo) {
@@ -109,14 +111,15 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   Future<void> playButtonCallback() async {
     try {
       if (isPlaying.value) {
-        videoController.pause();
+        await videoController.pause();
       } else {
-        if (videoController.value.duration == videoController.value.position) {
-          videoController.seekTo(Duration.zero);
-        }
-        videoController
-          ..play()
-          ..setLooping(true);
+        await Future.wait([
+          if (videoController.value.duration == videoController.value.position)
+            videoController.seekTo(Duration.zero),
+          videoController.setLooping(true),
+        ]);
+        if (!mounted) return;
+        await videoController.play();
       }
     } catch (e, s) {
       handleErrorWithHandler(e, s, onError);
@@ -170,22 +173,23 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
 
     AssetEntity? entity;
     try {
+      final defaultPermissionRequestOption = PermissionRequestOption(
+        iosAccessLevel: IosAccessLevel.addOnly,
+        androidPermission: AndroidPermission(
+          type: switch ((
+            pickerConfig.enableRecording,
+            pickerConfig.enableTapRecording
+          )) {
+            (true, false) => RequestType.common,
+            (true, true) => RequestType.video,
+            (false, _) => RequestType.image,
+          },
+          mediaLocation: false,
+        ),
+      );
       final ps = await PhotoManager.requestPermissionExtend(
         requestOption: pickerConfig.permissionRequestOption ??
-            PermissionRequestOption(
-              iosAccessLevel: IosAccessLevel.addOnly,
-              androidPermission: AndroidPermission(
-                type: switch ((
-                  pickerConfig.enableRecording,
-                  pickerConfig.enableTapRecording
-                )) {
-                  (true, false) => RequestType.common,
-                  (true, true) => RequestType.video,
-                  (false, _) => RequestType.image,
-                },
-                mediaLocation: false,
-              ),
-            ),
+            defaultPermissionRequestOption,
       );
       if (ps == PermissionState.authorized || ps == PermissionState.limited) {
         final filePath = previewFile.path;
