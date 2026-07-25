@@ -8,12 +8,23 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## Unreleased
 
+*None.*
+
+## 4.6.0
+
 **New features**
 
+- Expose `CameraPickerConfig.previewVideoViewType` to control the video preview view type.
 - Expose `CameraPickerConfig.systemOverlayStyle` and `CameraPickerConfig.defaultSystemOverlayStyle`.
+
+**Improvements**
+
+- Improve the viewer state working flow.
 
 **Fixes**
 
+- Fix recording state handling.
+- Fix black screen issue when taking photos on Huawei phones.
 - Fix a crash in `switchCameras` when `innerController` is null during initialization.
 - Fix the Android system navigation bar rendering with a light scrim on the picker.
 
