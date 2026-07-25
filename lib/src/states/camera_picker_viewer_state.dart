@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
 import 'package:video_player/video_player.dart';
 import 'package:wechat_picker_library/wechat_picker_library.dart';
@@ -409,18 +410,22 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
           deletePreviewFileIfConfigured();
         }
       },
-      child: Theme(
-        data: theme,
-        child: Builder(
-          builder: (context) => Material(
-            color: Colors.black,
-            child: Stack(
-              fit: StackFit.expand,
-              children: <Widget>[
-                buildPreview(context),
-                buildForeground(context),
-                if (isSavingEntity) buildLoading(context),
-              ],
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: pickerConfig.systemOverlayStyle ??
+            CameraPickerConfig.defaultSystemOverlayStyle,
+        child: Theme(
+          data: theme,
+          child: Builder(
+            builder: (context) => Material(
+              color: Colors.black,
+              child: Stack(
+                fit: StackFit.expand,
+                children: <Widget>[
+                  buildPreview(context),
+                  buildForeground(context),
+                  if (isSavingEntity) buildLoading(context),
+                ],
+              ),
             ),
           ),
         ),
