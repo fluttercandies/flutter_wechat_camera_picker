@@ -2227,11 +2227,8 @@ class CameraPickerState extends State<CameraPicker>
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        systemNavigationBarIconBrightness: Brightness.light,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-      ),
+      value: pickerConfig.systemOverlayStyle ??
+          CameraPickerConfig.defaultSystemOverlayStyle,
       child: Theme(
         data: theme,
         child: Builder(

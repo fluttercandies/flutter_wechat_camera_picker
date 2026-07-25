@@ -8,9 +8,14 @@ See the [Migration Guide](guides/migration_guide.md) for breaking changes betwee
 
 ## Unreleased
 
+**New features**
+
+- Expose `CameraPickerConfig.systemOverlayStyle` and `CameraPickerConfig.defaultSystemOverlayStyle`.
+
 **Fixes**
 
 - Fix a crash in `switchCameras` when `innerController` is null during initialization.
+- Fix the Android system navigation bar rendering with a light scrim on the picker.
 
 ## 4.5.0
 
