@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
       - uses: k-paxian/dart-package-publisher@8fdba1dbf624c712706281a6f91cb50b6bfc2eaf
         with:
           credentialJson: 'MockCredentialJson'
