@@ -209,6 +209,7 @@ final AssetEntity? entity = await CameraPicker.pickFromCamera(
 | lockCaptureOrientation        | `DeviceOrientation?`          | 摄像机在拍摄时锁定的旋转角度                                     | null                                       |
 | foregroundBuilder             | `ForegroundBuilder?`          | 覆盖在相机预览上方的前景构建                                     | null                                       |
 | previewTransformBuilder       | `PreviewTransformBuilder?`    | 对相机预览做变换的构建                                        | null                                       |
+| previewVideoViewType          | `VideoViewType`               | 视频预览的类型                                                 | `VideoViewType.texture`                                   |
 | onEntitySaving                | `EntitySaveCallback?`         | 在查看器中保存图片时的回调                                      | null                                       |
 | onError                       | `CameraErrorHandler?`         | 拍摄照片过程中的自定义错误处理                                    | null                                       |
 | onXFileCaptured               | `XFileCapturedCallback?`      | 拍摄文件生成后的回调                                         | null                                       |

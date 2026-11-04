@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
 import 'package:video_player/video_player.dart';
 import 'package:wechat_picker_library/wechat_picker_library.dart';
@@ -35,7 +36,10 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
 
   /// Controller for the video player.
   /// 视频播放的控制器
-  late final videoController = VideoPlayerController.file(previewFile,viewType: Platform.isAndroid ? VideoViewType.platformView: VideoViewType.textureView);
+  late final videoController = VideoPlayerController.file(
+    previewFile,
+    viewType: pickerConfig.previewVideoViewType,
+  );
 
   /// Whether the controller is playing.
   /// 播放控制器是否在播放
@@ -74,6 +78,8 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   Future<void> initializeVideoPlayerController() async {
     try {
       await videoController.initialize();
+      if (!mounted) return;
+
       videoController.addListener(videoControllerListener);
       hasLoaded = true;
       if (pickerConfig.shouldAutoPreviewVideo) {
@@ -106,14 +112,15 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   Future<void> playButtonCallback() async {
     try {
       if (isPlaying.value) {
-        videoController.pause();
+        await videoController.pause();
       } else {
-        if (videoController.value.duration == videoController.value.position) {
-          videoController.seekTo(Duration.zero);
-        }
-        videoController
-          ..play()
-          ..setLooping(true);
+        await Future.wait([
+          if (videoController.value.duration == videoController.value.position)
+            videoController.seekTo(Duration.zero),
+          videoController.setLooping(true),
+        ]);
+        if (!mounted) return;
+        await videoController.play();
       }
     } catch (e, s) {
       handleErrorWithHandler(e, s, onError);
@@ -127,7 +134,7 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
   /// the file to be deleted in this case too.
   void deletePreviewFileIfConfigured() {
     if (pickerConfig.shouldDeletePreviewFile &&
-        pickerConfig.onEntitySaving != null &&
+        pickerConfig.onEntitySaving == null &&
         previewFile.existsSync()) {
       previewFile.delete().catchError((e, s) {
         handleErrorWithHandler(e, s, onError);
@@ -167,22 +174,23 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
 
     AssetEntity? entity;
     try {
+      final defaultPermissionRequestOption = PermissionRequestOption(
+        iosAccessLevel: IosAccessLevel.addOnly,
+        androidPermission: AndroidPermission(
+          type: switch ((
+            pickerConfig.enableRecording,
+            pickerConfig.enableTapRecording
+          )) {
+            (true, false) => RequestType.common,
+            (true, true) => RequestType.video,
+            (false, _) => RequestType.image,
+          },
+          mediaLocation: false,
+        ),
+      );
       final ps = await PhotoManager.requestPermissionExtend(
         requestOption: pickerConfig.permissionRequestOption ??
-            PermissionRequestOption(
-              iosAccessLevel: IosAccessLevel.addOnly,
-              androidPermission: AndroidPermission(
-                type: switch ((
-                  pickerConfig.enableRecording,
-                  pickerConfig.enableTapRecording
-                )) {
-                  (true, false) => RequestType.common,
-                  (true, true) => RequestType.video,
-                  (false, _) => RequestType.image,
-                },
-                mediaLocation: false,
-              ),
-            ),
+            defaultPermissionRequestOption,
       );
       if (ps == PermissionState.authorized || ps == PermissionState.limited) {
         final filePath = previewFile.path;
@@ -402,18 +410,22 @@ class CameraPickerViewerState extends State<CameraPickerViewer> {
           deletePreviewFileIfConfigured();
         }
       },
-      child: Theme(
-        data: theme,
-        child: Builder(
-          builder: (context) => Material(
-            color: Colors.black,
-            child: Stack(
-              fit: StackFit.expand,
-              children: <Widget>[
-                buildPreview(context),
-                buildForeground(context),
-                if (isSavingEntity) buildLoading(context),
-              ],
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: pickerConfig.systemOverlayStyle ??
+            CameraPickerConfig.defaultSystemOverlayStyle,
+        child: Theme(
+          data: theme,
+          child: Builder(
+            builder: (context) => Material(
+              color: Colors.black,
+              child: Stack(
+                fit: StackFit.expand,
+                children: <Widget>[
+                  buildPreview(context),
+                  buildForeground(context),
+                  if (isSavingEntity) buildLoading(context),
+                ],
+              ),
             ),
           ),
         ),

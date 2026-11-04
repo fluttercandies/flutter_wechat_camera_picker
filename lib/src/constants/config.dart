@@ -6,6 +6,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:video_player/video_player.dart' show VideoViewType;
 
 import '../delegates/camera_picker_text_delegate.dart';
 import 'type_defs.dart';
@@ -39,12 +40,14 @@ final class CameraPickerConfig {
     this.lockCaptureOrientation,
     this.foregroundBuilder,
     this.previewTransformBuilder,
+    this.previewVideoViewType = VideoViewType.textureView,
     this.onEntitySaving,
     this.onError,
     this.onXFileCaptured,
     this.onMinimumRecordDurationNotMet,
     this.onPickConfirmed,
     this.permissionRequestOption,
+    this.systemOverlayStyle,
   }) : assert(
           enableRecording == true || onlyEnableRecording != true,
           'Recording mode error.',
@@ -146,6 +149,10 @@ final class CameraPickerConfig {
   /// {@macro wechat_camera_picker.PreviewTransformBuilder}
   final PreviewTransformBuilder? previewTransformBuilder;
 
+  /// The type of preview video view to be used.
+  /// 视频预览的类型
+  final VideoViewType previewVideoViewType;
+
   /// Whether the camera should be locked to the specific orientation
   /// during captures.
   /// 摄像机在拍摄时锁定的旋转角度
@@ -177,4 +184,32 @@ final class CameraPickerConfig {
   /// the `photo_manager` package.
   /// 使用 `photo_manager` 保存拍摄的文件的权限请求配置。
   final PermissionRequestOption? permissionRequestOption;
+
+  /// Overrides the [SystemUiOverlayStyle] applied while the picker (and the
+  /// viewer it pushes) is on screen.
+  /// 选择器（及其推入的预览页）在屏幕上时应用的 [SystemUiOverlayStyle] 覆盖值。
+  ///
+  /// Since the picker itself is dark, the default value adopts light icons
+  /// on both the status bar and the system navigation bar, keeps both bars
+  /// transparent, and disables Android's automatic contrast scrim so that the
+  /// picker's black background shows through the navigation bar. Provide a
+  /// value to fully replace this default (e.g. use [Colors.black] for the
+  /// navigation bar on devices where transparency is not honored).
+  /// 由于选择器本身为深色主题，默认值使用浅色的状态栏与系统导航栏图标，
+  /// 保持两者透明，并关闭 Android 的自动对比度遮罩，让选择器的黑色背景
+  /// 能透过导航栏显示。传入非空值可完全替换该默认（例如在不支持透明导航栏
+  /// 的设备上，把导航栏颜色改为 [Colors.black]）。
+  final SystemUiOverlayStyle? systemOverlayStyle;
+
+  /// The default overlay style used when [systemOverlayStyle] is not provided.
+  /// [systemOverlayStyle] 为空时使用的默认覆盖样式。
+  static const defaultSystemOverlayStyle = SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarDividerColor: Colors.transparent,
+    systemNavigationBarContrastEnforced: false,
+    systemNavigationBarIconBrightness: Brightness.light,
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+  );
 }

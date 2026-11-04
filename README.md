@@ -215,6 +215,7 @@ Fields in `CameraPickerConfig`:
 | lockCaptureOrientation        | `DeviceOrientation?`          | Whether the camera should be locked to the specific orientation during captures.                      | null                                       |
 | foregroundBuilder             | `ForegroundBuilder?`          | The foreground widget builder which will cover the whole camera preview.                              | null                                       |
 | previewTransformBuilder       | `PreviewTransformBuilder?`    | The widget builder which will transform the camera preview.                                           | null                                       |
+| previewVideoViewType          | `VideoViewType`               | The type of preview video view to be used.                                                            | `VideoViewType.texture`                    |
 | onEntitySaving                | `EntitySaveCallback?`         | The callback type define for saving entity in the viewer.                                             | null                                       |
 | onError                       | `CameraErrorHandler?`         | The error handler when any error occurred during the picking process.                                 | null                                       |
 | onXFileCaptured               | `XFileCapturedCallback?`      | The callback type definition when the XFile is captured by the camera.                                | null                                       |
